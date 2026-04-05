@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Korea Muslim Community (starter)
 
-## Getting Started
+Next.js App Router starter with public marketing layout, authenticated dashboard, Prisma, credentials auth (NextAuth v5), email (SMTP), and role-based routes.
 
-First, run the development server:
+## Quick start
 
 ```bash
+cp .env.example .env
+# Edit .env — set AUTH_SECRET, DATABASE_URL, and optionally SMTP.
+
+npm install
+npx prisma migrate deploy
+# Or for local iteration: npm run db:push
+
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest (unit smoke tests) |
+| `npm run db:generate` | Regenerate Prisma Client |
+| `npm run db:push` | Push schema (prototyping; prefer migrate for production) |
+| `npm run db:migrate` | Create/apply migrations (dev) |
+| `npm run db:migrate:deploy` | Apply migrations (CI/production) |
+| `npm run db:seed` | Seed admin user from `.env` |
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Copy [`.env.example`](./.env.example) to `.env`. Important variables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **`AUTH_SECRET`** — required; use a long random string.
+- **`DATABASE_URL`** — SQLite default `file:./dev.db` (path is relative to the `prisma/` folder in this template).
+- **`AUTH_URL` / `NEXT_PUBLIC_APP_URL`** — public origin; used in emails and for `sitemap.xml` / `robots.txt`.
+- **SMTP** (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`) — required in production for password reset, email verification, and the contact form.
+- **`CONTACT_TO_EMAIL`** — inbox for contact submissions; if unset, **`EMAIL_FROM`** is used as the recipient (handy for small setups).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## API routes (reference)
 
-## Deploy on Vercel
+- `GET /api/health` — readiness check (503 if the database is down).
+- `POST /api/contact` — contact form JSON `{ name, email, message }` (rate limited, sends email).
+- Auth: register, NextAuth, forgot/reset password, email verification, change password, profile — see `src/app/api/`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## CI
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on push/PR to `main` or `master`.
+
+## Learn more
+
+- [Next.js documentation](https://nextjs.org/docs)
+- [Prisma Migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate)
+# NextJsFullStack-Prisma-GenericStarter
