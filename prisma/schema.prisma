@@ -8,10 +8,36 @@ datasource db {
 }
 
 model User {
+  id                        String                    @id @default(cuid())
+  email                     String                    @unique
+  password                  String
+  name                      String?
+  role                      String                    @default("USER")
+  emailVerified             DateTime?
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
+  passwordResetTokens       PasswordResetToken[]
+  emailVerificationTokens   EmailVerificationToken[]
+}
+
+model PasswordResetToken {
   id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

@@ -1,0 +1,35 @@
+---
+description: Modern UI with shadcn/ui — components, layout, and styling conventions
+globs: "**/*.tsx,src/components/**/*"
+alwaysApply: false
+---
+
+# Modern UI (shadcn)
+
+## Stack
+
+- Use **shadcn/ui** primitives from `@/components/ui/*` (Base UI + Nova preset). Add new primitives with `npx shadcn@latest add <name>`.
+- Use **`cn()`** from `@/lib/utils` to merge Tailwind classes.
+- Theme tokens live in `src/app/globals.css` (CSS variables). Prefer semantic classes: `bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`, `text-primary`, etc.
+
+## Layout and composition
+
+- **Route-specific UI** stays next to the route under `src/app/.../<route>/components/`.
+- **Shared / cross-route UI** goes in `src/components/` (`layout/`, `providers/`, etc.).
+- Prefer **Card** (`CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`) for grouped content, forms on marketing pages, and dashboard panels.
+
+## Interaction and density
+
+- Use **Button** variants: `default`, `outline`, `secondary`, `ghost`, `destructive`, `link`; sizes include `sm`, `default`, `lg`, `icon-*`.
+- Pair **Label** + **Input** / **Textarea** for forms; show errors with `text-destructive`.
+- **Do not** call `buttonVariants()` or import from `"use client"` UI modules inside **Server Components** — either mark the parent as `"use client"` or use static `className` strings / compose a small client child.
+
+## Theming
+
+- **next-themes** is wired in `AppProviders` (`attribute="class"`). User-facing chrome may include **ModeToggle** where appropriate.
+- Avoid hard-coded grays; use `muted`, `border`, `accent`, and sidebar tokens for dashboard chrome.
+
+## Polish
+
+- Prefer **consistent spacing** (`gap-*`, `space-y-*`), **rounded-xl** cards, subtle **ring-1 ring-border/60** or **shadow-sm** / **shadow-lg** on elevated surfaces.
+- Keep **accessible** labels, focus rings (built into shadcn controls), and semantic headings.

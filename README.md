@@ -58,3 +58,4 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on push/
 - [Next.js documentation](https://nextjs.org/docs)
 - [Prisma Migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate)
 # NextJsFullStack-Prisma-GenericStarter
+# Korea-Muslim-Community-Full-Stack

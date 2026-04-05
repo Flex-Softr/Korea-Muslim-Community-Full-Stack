@@ -1,15 +1,28 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { RegisterForm } from "./components/register-form";
 
 export default function RegisterPage() {
   return (
-    <div className="w-full max-w-md">
-      <h1 className="mb-2 text-center text-2xl font-semibold tracking-tight">
-        Create account
-      </h1>
-      <p className="mb-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Stored in SQLite via Prisma — swap for your production database.
-      </p>
-      <RegisterForm />
+    <div className="mx-auto w-full max-w-md">
+      <Card className="shadow-lg ring-1 ring-border/60">
+        <CardHeader className="space-y-1 text-center sm:text-left">
+          <CardTitle className="text-2xl font-semibold tracking-tight">
+            Create account
+          </CardTitle>
+          <CardDescription>
+            Stored in SQLite via Prisma — swap for your production database.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RegisterForm />
+        </CardContent>
+      </Card>
     </div>
   );
 }

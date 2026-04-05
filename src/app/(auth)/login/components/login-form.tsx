@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 
 function safeCallbackUrl(raw: string | null): string {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/";
@@ -17,6 +18,10 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
+  const resetOk = searchParams.get("reset") === "success";
+  const verifiedOk = searchParams.get("verified") === "1";
+  const verifyInvalid = searchParams.get("verify") === "invalid";
+  const verifyMessage = searchParams.get("message");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -44,10 +49,7 @@ export function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-zinc-200 p-6 dark:border-zinc-800"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="login-email">Email</Label>
         <Input
@@ -56,31 +58,56 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           required
+          className="h-10"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="login-password">Password</Label>
-        <Input
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="login-password">Password</Label>
+          <Link
+            href="/forgot-password"
+            className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <PasswordInput
           id="login-password"
           name="password"
-          type="password"
           autoComplete="current-password"
           required
         />
       </div>
+      {verifiedOk ? (
+        <p className="text-sm text-green-600 dark:text-green-500" role="status">
+          Email verified. Sign in to continue.
+        </p>
+      ) : null}
+      {verifyInvalid ? (
+        <p className="text-sm text-destructive" role="alert">
+          {verifyMessage
+            ? decodeURIComponent(verifyMessage)
+            : "That verification link is invalid or expired."}
+        </p>
+      ) : null}
+      {resetOk ? (
+        <p className="text-sm text-muted-foreground" role="status">
+          Password updated. You can sign in with your new password.
+        </p>
+      ) : null}
       {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" className="w-full" size="lg" disabled={pending}>
         {pending ? "Signing in…" : "Sign in"}
       </Button>
-      <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-center text-sm text-muted-foreground">
         No account?{" "}
         <Link
           href="/register"
-          className="font-medium underline-offset-4 hover:underline"
+          className="font-medium text-primary underline-offset-4 hover:underline"
         >
           Register
         </Link>

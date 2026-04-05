@@ -1,23 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function HomeActions() {
   return (
-    <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-      <Link
-        href="/register"
-        className="inline-flex items-center justify-center rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background hover:opacity-90"
-      >
+    <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+      <Link href="/register" className={cn(buttonVariants({ size: "lg" }))}>
         Create account
       </Link>
       <Link
         href="/login"
-        className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-600 dark:hover:bg-zinc-800"
+        className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
       >
         Log in
       </Link>
       <Link
         href="/contact"
-        className="text-sm font-medium text-zinc-600 underline-offset-4 hover:underline dark:text-zinc-400"
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "lg" }),
+          "text-muted-foreground",
+        )}
       >
         Contact
       </Link>

@@ -1,7 +1,28 @@
+import Link from "next/link";
+
 export function ClientFooter() {
   return (
-    <footer className="mt-auto border-t border-zinc-200 py-8 text-center text-sm text-zinc-500 dark:border-zinc-800">
-      <p>Generic starter — swap this footer for your product.</p>
+    <footer className="mt-auto border-t border-border/60 py-10">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 sm:px-6">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+          <Link
+            href="/privacy"
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Terms
+          </Link>
+        </nav>
+        <p className="text-center text-sm text-muted-foreground">
+          Generic starter — replace this footer with your product links and
+          legal copy.
+        </p>
+      </div>
     </footer>
   );
 }
