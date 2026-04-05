@@ -25,10 +25,10 @@ export function DashboardWelcome({
           <CardTitle className="text-2xl font-semibold">
             Welcome{name ? `, ${name}` : ""}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="break-words">
             {email ? `Signed in as ${email}.` : "You are signed in."} Route
             components live in{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs font-medium text-foreground">
+            <code className="break-all rounded bg-muted px-1 py-0.5 text-xs font-medium text-foreground sm:break-normal">
               dashboard/components
             </code>
             .
@@ -39,9 +39,9 @@ export function DashboardWelcome({
         </Badge>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
+        <p className="break-words text-sm text-muted-foreground">
           Add widgets and data views here. Shell UI (sidebar, header) stays in{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs font-medium text-foreground">
+          <code className="break-all rounded bg-muted px-1 py-0.5 text-xs font-medium text-foreground sm:break-normal">
             (dashboard)/layout.tsx
           </code>
           .

@@ -131,4 +131,18 @@
   html {
     @apply font-sans;
   }
+
+  /* Clickable affordance: hyperlinks, buttons, and link-like roles */
+  a[href],
+  button:not(:disabled),
+  [role="link"],
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  button[disabled],
+  button[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }

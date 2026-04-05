@@ -28,27 +28,41 @@ function initials(name: string | null | undefined, email: string) {
 export function ClientUserMenu({
   email,
   name,
+  onBrand = false,
 }: {
   email: string;
   name?: string | null;
+  onBrand?: boolean;
 }) {
   const router = useRouter();
   const label = initials(name, email);
 
+  const menuLabel =
+    name?.trim() || email || "Account menu";
+
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
+        aria-label={menuLabel}
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm" }),
-          "gap-2 px-2",
+          "gap-2 px-1.5 sm:px-2",
+          onBrand &&
+            "text-white hover:bg-white/15 hover:text-white focus-visible:ring-white/40",
         )}
       >
-        <Avatar size="sm">
-          <AvatarFallback>{label}</AvatarFallback>
+        <Avatar size="sm" className={onBrand ? "ring-2 ring-white/40" : undefined}>
+          <AvatarFallback
+            className={onBrand ? "bg-white/20 text-white" : undefined}
+          >
+            {label}
+          </AvatarFallback>
         </Avatar>
-        <span className="hidden max-w-[8rem] truncate text-xs text-muted-foreground sm:inline">
-          {email}
-        </span>
+        {!onBrand ? (
+          <span className="hidden max-w-[8rem] truncate text-xs text-muted-foreground sm:inline">
+            {email}
+          </span>
+        ) : null}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">

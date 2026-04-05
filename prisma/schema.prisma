@@ -7,6 +7,85 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model CommunityMember {
+  id         String  @id @default(cuid())
+  /// Optional display / internal membership code (e.g. BA-2024-001).
+  memberCode String? @unique
+
+  name    String
+  nameBn  String?
+  /// Association role on the directory (President, Volunteer coordinator, …).
+  title   String?
+  /// Short intro (e.g. one sentence for cards and profile lead).
+  aboutSummary String?
+  /// Longer bio / story; separate paragraphs with blank lines.
+  bio     String?
+  imageUrl String?
+
+  /// Achievements & credentials (multiline text each).
+  awards              String?
+  publications        String?
+  researchPapers      String?
+  scholarshipsHonors  String?
+
+  /// Engagement stats — set when community feed / events are integrated; null = hide.
+  activityPostsCount    Int?
+  activityCommentsCount Int?
+  activityEventsCount   Int?
+  /// Free-form highlights (roles, committees) until automated stats exist.
+  activityNotes         String?
+
+  /// MALE | FEMALE | OTHER | PREFER_NOT_TO_SAY
+  gender               String?
+  dateOfBirth          DateTime?
+  /// When true, only the birth year is shown to viewers allowed to see DOB.
+  dateOfBirthYearOnly  Boolean @default(false)
+
+  universityKr   String?
+  degree         String?
+  major          String?
+  /// CURRENT_STUDENT | GRADUATED
+  studyStatus    String?
+  yearAdmission  Int?
+  graduationYear Int?
+
+  locationCity     String?
+  /// Bangladesh division of origin (home), for directory filters — matches `BD_DIVISIONS` labels.
+  homeDivisionBd String?
+  /// Bangladesh district of origin under `homeDivisionBd` — matches district lists per division.
+  homeDistrictBd String?
+  /// STUDENT | JOB_HOLDER | BUSINESS_OWNER | OTHER
+  occupationType   String?
+  companyName      String?
+  jobTitle         String?
+
+  /// PUBLIC | MEMBERS_ONLY — contact, journey & DOB follow this rule.
+  profileVisibility String @default("PUBLIC")
+  contactEmail      String?
+  phone             String?
+  whatsApp          String?
+  kakaoId           String?
+  linkedInUrl       String?
+  facebookUrl       String?
+
+  yearArrivalKorea    Int?
+  visaType            String?
+  scholarshipInfo     String?
+  educationBangladesh String?
+
+  skillsTechnical   String?
+  koreanLevelTopik  String?
+  certifications    String?
+
+  sortOrder Int @default(0)
+  /// EXECUTIVE | ADVISOR_BODY | GENERAL
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
 model User {
   id                        String                    @id @default(cuid())
   email                     String                    @unique

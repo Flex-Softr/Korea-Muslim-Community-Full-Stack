@@ -158,7 +158,7 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="flex max-w-xl flex-col gap-6">
+    <div className="flex w-full max-w-xl flex-col gap-6">
       <ProfileSettingsCard
         key={profileKey}
         email={session.user.email}

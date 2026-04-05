@@ -20,6 +20,34 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/member/executive",
+        destination: "/member?type=executive",
+        permanent: true,
+      },
+      {
+        source: "/member/advisor-body",
+        destination: "/member?type=advisor-body",
+        permanent: true,
+      },
+      {
+        source: "/member/general",
+        destination: "/member?type=general",
+        permanent: true,
+      },
+    ];
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {

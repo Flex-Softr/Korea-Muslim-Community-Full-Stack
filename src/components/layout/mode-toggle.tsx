@@ -1,28 +1,27 @@
 "use client";
 
-import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/providers/theme-provider";
 import * as React from "react";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-export function ModeToggle() {
-  const { setTheme, theme } = useTheme();
+export function ModeToggle({ onBrand = false }: { onBrand?: boolean }) {
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
+
+  const isDark = resolvedTheme === "dark";
+
+  const toggle = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
 
   if (!mounted) {
     return (
       <span
         className={cn(
-          buttonVariants({ variant: "ghost", size: "icon-sm" }),
-          "size-8",
+          "inline-block size-9 shrink-0 animate-pulse rounded-lg",
+          onBrand ? "bg-white/15" : "bg-muted",
         )}
         aria-hidden
       />
@@ -30,34 +29,28 @@ export function ModeToggle() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          buttonVariants({ variant: "ghost", size: "icon-sm" }),
-          "relative size-8",
-        )}
-        aria-label="Toggle theme"
-      >
-        <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-        <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[9rem]">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 size-4" />
-          Light
-          {theme === "light" ? <span className="ml-auto text-xs">✓</span> : null}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 size-4" />
-          Dark
-          {theme === "dark" ? <span className="ml-auto text-xs">✓</span> : null}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 size-4" />
-          System
-          {theme === "system" ? <span className="ml-auto text-xs">✓</span> : null}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <button
+      type="button"
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={
+        isDark
+          ? "Dark mode — click for light"
+          : "Light mode — click for dark"
+      }
+      onClick={toggle}
+      className={cn(
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        onBrand
+          ? "text-white hover:bg-white/15 focus-visible:ring-white/60 focus-visible:ring-offset-[#2c7bb6]"
+          : "text-zinc-700 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
+      )}
+    >
+      {isDark ? (
+        <Sun className="size-5" strokeWidth={2} aria-hidden />
+      ) : (
+        <Moon className="size-5" strokeWidth={2} aria-hidden />
+      )}
+    </button>
   );
 }
