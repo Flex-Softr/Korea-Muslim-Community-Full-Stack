@@ -4,20 +4,16 @@ import { Suspense } from "react";
 import { MemberDirectoryList } from "@/components/members/member-directory-list";
 import { MemberTypeTabs } from "@/components/members/member-type-tabs";
 import { PageBanner } from "@/components/layout/page-banner";
-import { MemberBdLocationFilters } from "@/components/members/member-bd-location-filters";
 import {
   MEMBER_SECTION_COPY,
   SLUG_TO_CATEGORY,
   slugFromSearchParam,
 } from "@/lib/members/config";
-import { parseMemberBdFilters } from "@/lib/members/bd-location-filters";
 import { getMembersByCategory } from "@/lib/members/queries";
 
 type PageProps = {
   searchParams: Promise<{
     type?: string;
-    division?: string;
-    district?: string;
   }>;
 };
 
@@ -49,25 +45,12 @@ function TabsFallback() {
   );
 }
 
-function LocationFiltersFallback() {
-  return (
-    <div
-      className="mb-8 h-[7.5rem] animate-pulse rounded-xl bg-muted/80 sm:h-[5.5rem]"
-      aria-hidden
-    />
-  );
-}
-
 export default async function MemberDirectoryPage({ searchParams }: PageProps) {
-  const { type, division, district } = await searchParams;
+  const { type } = await searchParams;
   const slug = slugFromSearchParam(type);
   const category = SLUG_TO_CATEGORY[slug];
   const copy = MEMBER_SECTION_COPY[slug];
-  const bd = parseMemberBdFilters(division, district);
-  const members = await getMembersByCategory(category, {
-    homeDivisionBd: bd.division ?? undefined,
-    homeDistrictBd: bd.district ?? undefined,
-  });
+  const members = await getMembersByCategory(category);
 
   return (
     <>
@@ -85,21 +68,12 @@ export default async function MemberDirectoryPage({ searchParams }: PageProps) {
           <MemberTypeTabs className="mb-8" />
         </Suspense>
 
-        <Suspense fallback={<LocationFiltersFallback />}>
-          <MemberBdLocationFilters className="mb-10" />
-        </Suspense>
-
         {members.length === 0 ? (
           <p className="max-w-2xl text-muted-foreground">
-            {bd.division || bd.district
-              ? "No members match this division or district. Try clearing the filters above."
-              : copy.emptyMessage}
+            {copy.emptyMessage}
           </p>
         ) : (
-          <MemberDirectoryList
-            key={`${slug}-${bd.division ?? ""}-${bd.district ?? ""}`}
-            members={members}
-          />
+          <MemberDirectoryList key={slug} members={members} />
         )}
 
         <p className="mt-12 text-sm text-muted-foreground">

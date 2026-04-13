@@ -45,7 +45,7 @@ export function DashboardHeader({
           type="button"
           variant="outline"
           size="icon"
-          className="shrink-0 md:hidden"
+          className="shrink-0 lg:hidden"
           onClick={onMenuClick}
           aria-label="Open navigation menu"
         >

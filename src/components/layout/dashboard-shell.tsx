@@ -26,7 +26,7 @@ export function DashboardShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="flex h-[100dvh] min-h-0 w-full flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] md:flex-row">
+    <div className="dashboard-theme flex h-[100dvh] min-h-0 w-full flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] lg:flex-row">
       <DashboardSidebar role={role} />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -35,7 +35,7 @@ export function DashboardShell({
           name={name}
           onMenuClick={() => setMobileNavOpen(true)}
         />
-        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6">
+        <main className="animate-in fade-in min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] duration-200 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
           {children}
         </main>
       </div>
@@ -44,13 +44,13 @@ export function DashboardShell({
         <DialogContent
           showCloseButton
           className={cn(
-            "fixed start-0 top-0 z-50 flex h-[100dvh] max-h-none w-[min(19rem,calc(100vw-0.75rem))] max-w-none flex-col gap-0 rounded-none border-0 border-e border-border bg-sidebar p-0 text-sidebar-foreground shadow-xl",
+            "fixed start-0 top-0 z-50 flex h-[100dvh] max-h-none w-[min(19rem,calc(100vw-0.75rem))] max-w-none flex-col gap-0 rounded-none border-0 border-e border-emerald-800/60 bg-gradient-to-b from-emerald-900 via-emerald-900 to-emerald-800 p-0 text-white shadow-xl backdrop-blur-sm",
             "translate-x-0 translate-y-0",
           )}
         >
           <DialogTitle className="sr-only">Dashboard navigation</DialogTitle>
-          <div className="flex h-14 shrink-0 items-center border-b border-sidebar-border px-4">
-            <span className="text-sm font-semibold tracking-tight">
+          <div className="flex h-16 shrink-0 items-center border-b border-white/15 px-5">
+            <span className="text-base font-semibold tracking-tight text-white">
               Dashboard
             </span>
           </div>

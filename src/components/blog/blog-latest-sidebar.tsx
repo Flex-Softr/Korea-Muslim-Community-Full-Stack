@@ -1,16 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { blogPostPath, getLatestBlogPosts } from "@/data/student-news";
+import { blogPostPath } from "@/data/student-news";
+import { listBlogPosts } from "@/lib/content/repository";
 
-export function BlogLatestSidebar({
+export async function BlogLatestSidebar({
   excludeSlug,
   limit = 5,
 }: {
   excludeSlug: string;
   limit?: number;
 }) {
-  const items = getLatestBlogPosts({ excludeSlug, limit });
+  const { items: all } = await listBlogPosts({ page: 1, pageSize: 200 });
+  const items = all.filter((p) => p.slug !== excludeSlug).slice(0, limit);
   if (items.length === 0) {
     return null;
   }

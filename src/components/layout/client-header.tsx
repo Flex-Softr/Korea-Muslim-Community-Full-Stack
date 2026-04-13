@@ -8,13 +8,13 @@ export async function ClientHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#2c7bb6] text-white shadow-sm">
-      <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-start gap-3 px-4 py-2 sm:gap-4 sm:px-6">
+      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-start gap-3 px-4 py-2 sm:min-h-24 sm:gap-4 sm:px-6">
         <Link
           href="/"
           aria-label="Korea Muslim Community, home"
-          className="flex min-w-0 max-w-[65%] shrink-0 items-center sm:max-w-none"
+          className="relative z-10 -my-1 flex min-w-0 max-w-[65%] shrink-0 items-center sm:-my-2 sm:max-w-none"
         >
-          <SiteLogoMark priority />
+          <SiteLogoMark priority className="h-16 w-16 sm:h-20 sm:w-20" />
         </Link>
         <ClientHeaderNav user={session?.user ?? null} />
       </div>

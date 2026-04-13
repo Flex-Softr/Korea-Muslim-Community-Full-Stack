@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
+import { listVideoItems } from "@/lib/content/repository";
 import { VideoGallery } from "../components/video-gallery";
 
 export const metadata: Metadata = {
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
     "Talks, programmes, and recordings from Korea Muslim Community.",
 };
 
-export default function VideosPage() {
+export default async function VideosPage() {
+  const data = await listVideoItems({ page: 1, pageSize: 200 });
   return (
     <>
       <PageBanner
@@ -16,7 +18,7 @@ export default function VideosPage() {
         subtitle="Tap a thumbnail to play in a modal. Use on-screen arrows or keyboard left/right to move between videos."
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Videos" }]}
       />
-      <VideoGallery embedded paginated />
+      <VideoGallery embedded paginated sourceItems={data.items} />
     </>
   );
 }

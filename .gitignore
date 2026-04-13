@@ -30,9 +30,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (local secrets — edit `.env` directly; not committed)
+# env files (local secrets — use `.env` in the project root; not committed)
 .env*
-!.env.example
 
 # prisma sqlite (local)
 /prisma/*.db

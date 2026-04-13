@@ -6,21 +6,17 @@ import { ArrowLeft } from "lucide-react";
 import { ActivityLatestSidebar } from "@/components/activity/activity-latest-sidebar";
 import { PageBanner } from "@/components/layout/page-banner";
 import { Badge } from "@/components/ui/badge";
-import { getActivityBySlug, getAllActivitySlugs } from "@/data/activity-news";
+import { getActivityItem } from "@/lib/content/repository";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return getAllActivitySlugs().map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const item = getActivityBySlug(slug);
+  const item = await getActivityItem(slug);
   if (!item) {
     return { title: "Activity" };
   }
@@ -32,7 +28,7 @@ export async function generateMetadata({
 
 export default async function ActivityDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const item = getActivityBySlug(slug);
+  const item = await getActivityItem(slug);
   if (!item) {
     notFound();
   }

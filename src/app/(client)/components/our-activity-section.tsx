@@ -3,14 +3,11 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ActivityNewsCard } from "@/components/activity/activity-news-card";
-import {
-  ACTIVITY_FEATURED,
-  ACTIVITY_NEWS,
-  activityDetailPath,
-} from "@/data/activity-news";
+import { activityDetailPath } from "@/data/activity-news";
+import { listActivityItems } from "@/lib/content/repository";
 import { cn } from "@/lib/utils";
 
-export function OurActivitySection({
+export async function OurActivitySection({
   embedded = false,
   secondaryItemLimit,
 }: {
@@ -18,12 +15,32 @@ export function OurActivitySection({
   /** When set (e.g. on the home page), cap how many secondary cards appear below the featured story. */
   secondaryItemLimit?: number;
 }) {
+  const { items: allItems } = await listActivityItems({ page: 1, pageSize: 200 });
+  const featuredItem = allItems[0] ?? null;
+
+  if (!featuredItem) {
+    return (
+      <section
+        className={cn(
+          "w-full bg-muted/25 py-12 sm:py-14 dark:bg-muted/10",
+          embedded ? "pt-6 sm:pt-8" : "border-t border-border/40",
+        )}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="rounded-xl border border-border/70 bg-card p-6 text-sm text-muted-foreground">
+            No activity items available yet.
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   const secondaryItems =
     !embedded && secondaryItemLimit != null
-      ? ACTIVITY_NEWS.slice(0, secondaryItemLimit)
-      : ACTIVITY_NEWS;
+      ? allItems.slice(1, secondaryItemLimit + 1)
+      : allItems.slice(1);
 
-  const featuredHref = activityDetailPath(ACTIVITY_FEATURED.slug);
+  const featuredHref = activityDetailPath(featuredItem.slug);
 
   return (
     <section
@@ -76,7 +93,7 @@ export function OurActivitySection({
               className="relative aspect-[16/10] min-h-[200px] bg-muted lg:aspect-auto lg:min-h-[280px]"
             >
               <Image
-                src={ACTIVITY_FEATURED.imageSrc}
+                  src={featuredItem.imageSrc}
                 alt=""
                 fill
                 className="object-cover transition duration-500 hover:scale-[1.02]"
@@ -86,12 +103,12 @@ export function OurActivitySection({
             </Link>
             <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground sm:text-sm">
-                <time dateTime={ACTIVITY_FEATURED.dateIso ?? undefined}>
-                  {ACTIVITY_FEATURED.date}
+                <time dateTime={featuredItem.dateIso ?? undefined}>
+                  {featuredItem.date}
                 </time>
                 <span className="text-border">·</span>
                 <Badge variant="secondary" className="font-normal">
-                  {ACTIVITY_FEATURED.category}
+                  {featuredItem.category}
                 </Badge>
               </div>
               <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -99,11 +116,11 @@ export function OurActivitySection({
                   href={featuredHref}
                   className="transition-colors hover:text-[#2c7bb6] dark:hover:text-sky-400"
                 >
-                  {ACTIVITY_FEATURED.title}
+                  {featuredItem.title}
                 </Link>
               </h3>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                {ACTIVITY_FEATURED.excerpt}
+                {featuredItem.excerpt}
               </p>
               <Link
                 href={featuredHref}

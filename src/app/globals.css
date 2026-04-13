@@ -53,38 +53,38 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --background: #f9fafb;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #22c55e;
+  --secondary-foreground: #052e16;
+  --muted: #eef2ff;
+  --muted-foreground: #6b7280;
+  --accent: #f59e0b;
+  --accent-foreground: #451a03;
+  --destructive: #ef4444;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: #4f46e5;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.95rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1f2937;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2ff;
+  --sidebar-accent-foreground: #1f2937;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #4f46e5;
 }
 
 .dark {
@@ -121,6 +121,41 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@layer components {
+  .dashboard-theme {
+    @apply bg-background;
+  }
+
+  .dashboard-theme .rounded-lg,
+  .dashboard-theme .rounded-xl,
+  .dashboard-theme .rounded-2xl,
+  .dashboard-theme .rounded-3xl {
+    @apply shadow-md transition-all duration-200;
+  }
+
+  .dashboard-theme .rounded-2xl,
+  .dashboard-theme .rounded-3xl {
+    @apply shadow-lg;
+  }
+
+  .dashboard-theme .bg-card {
+    @apply bg-white;
+  }
+
+  .dashboard-theme .bg-card.rounded-lg,
+  .dashboard-theme .bg-card.rounded-xl,
+  .dashboard-theme .bg-card.rounded-2xl,
+  .dashboard-theme .bg-card.rounded-3xl {
+    @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg;
+  }
+
+  .dashboard-theme a,
+  .dashboard-theme button,
+  .dashboard-theme [role="button"] {
+    @apply transition-all duration-200;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -144,5 +179,27 @@
   button[disabled],
   button[aria-disabled="true"] {
     cursor: not-allowed;
+  }
+
+  select {
+    @apply h-10 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60;
+  }
+}
+
+@layer components {
+  .form-field {
+    @apply space-y-2;
+  }
+
+  .form-stack {
+    @apply space-y-4;
+  }
+
+  .form-message-error {
+    @apply text-xs font-medium text-red-600;
+  }
+
+  .form-message-success {
+    @apply text-xs font-medium text-green-600;
   }
 }

@@ -5,7 +5,7 @@ import { env } from "@/config/env";
 import { parseUserRole, type UserRole } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
 
-/** Re-sync verification (and display name) from the DB periodically for JWT sessions. */
+/** Re-sync role/verification/name from DB periodically for JWT sessions. */
 const SESSION_SYNC_MS = 2 * 60 * 1000;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -28,6 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: { email: email.trim().toLowerCase() },
         });
         if (!user) return null;
+        if (!user.emailVerified) return null;
 
         const valid = await compare(password, user.password);
         if (!valid) return null;
@@ -63,9 +64,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (Date.now() - last > SESSION_SYNC_MS) {
           const row = await prisma.user.findUnique({
             where: { id: sub },
-            select: { emailVerified: true, name: true },
+            select: { emailVerified: true, name: true, role: true },
           });
           token.emailVerified = row?.emailVerified != null;
+          if (row?.role) {
+            token.role = parseUserRole(row.role);
+          }
           if (row?.name !== undefined && row.name !== null) {
             token.name = row.name;
           } else if (row?.name === null) {

@@ -1,0 +1,143 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { listDashboardContentByCreator } from "@/lib/dashboard/store";
+import { hasMinimumRole } from "@/lib/roles";
+import { isSuspendedUser, setSuspendedUser } from "@/lib/dashboard/user-status-store";
+
+function statusFrom(user: { id: string; emailVerified: Date | null }) {
+  if (isSuspendedUser(user.id)) return "suspended";
+  return user.emailVerified ? "active" : "pending";
+}
+
+async function ensureAdmin() {
+  const session = await auth();
+  if (!session?.user?.id || !hasMinimumRole(session.user.role, "ADMIN")) {
+    return false;
+  }
+  return true;
+}
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!(await ensureAdmin())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const { id } = await params;
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const profile = await prisma.communityMember.findFirst({
+    where: { contactEmail: user.email },
+    select: {
+      aboutSummary: true,
+      bio: true,
+      imageUrl: true,
+    },
+  });
+  const submittedBlogs = (await listDashboardContentByCreator("blog", user.id)).map((item) => ({
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    dateIso: item.dateIso,
+  }));
+
+  return NextResponse.json({
+    ...user,
+    status: statusFrom(user),
+    profile,
+    submittedBlogs,
+  });
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!(await ensureAdmin())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const { id } = await params;
+  const body = (await request.json()) as {
+    role?: "USER" | "ADMIN";
+    suspend?: boolean;
+    approve?: boolean;
+  };
+
+  if (body.role) {
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { role: body.role },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+    return NextResponse.json({ ...updated, status: statusFrom(updated) });
+  }
+
+  if (typeof body.suspend === "boolean") {
+    setSuspendedUser(id, body.suspend);
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+    if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ ...user, status: statusFrom(user) });
+  }
+
+  if (body.approve === true) {
+    setSuspendedUser(id, false);
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { emailVerified: new Date() },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+    return NextResponse.json({ ...updated, status: statusFrom(updated) });
+  }
+
+  return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!(await ensureAdmin())) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const { id } = await params;
+  await prisma.user.delete({ where: { id } });
+  setSuspendedUser(id, false);
+  return NextResponse.json({ ok: true });
+}

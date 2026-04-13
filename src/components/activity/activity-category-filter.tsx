@@ -7,6 +7,10 @@ type ActivityCategoryFilterProps = {
   selectedCategory: string | null;
   onSelectCategory: (category: string | null) => void;
   className?: string;
+  title?: string;
+  allLabel?: string;
+  clearLabel?: string;
+  ariaLabel?: string;
 };
 
 export function ActivityCategoryFilter({
@@ -14,18 +18,22 @@ export function ActivityCategoryFilter({
   selectedCategory,
   onSelectCategory,
   className,
+  title = "Filter by category",
+  allLabel = "All",
+  clearLabel = "Clear filter",
+  ariaLabel = "Activity categories",
 }: ActivityCategoryFilterProps) {
   return (
     <div className={cn("space-y-2", className)}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Filter by category
+            {title}
           </p>
           <ul
             className="mt-2 flex max-w-full flex-wrap gap-2"
             role="list"
-            aria-label="Activity categories"
+            aria-label={ariaLabel}
           >
             <li>
               <button
@@ -38,7 +46,7 @@ export function ActivityCategoryFilter({
                     : "border-border/80 bg-background text-muted-foreground hover:border-[#2c7bb6]/40 hover:text-foreground dark:hover:border-sky-500/40",
                 )}
               >
-                All
+                {allLabel}
               </button>
             </li>
             {categories.map((cat) => (
@@ -67,7 +75,7 @@ export function ActivityCategoryFilter({
             onClick={() => onSelectCategory(null)}
             className="shrink-0 text-xs font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
           >
-            Clear filter
+            {clearLabel}
           </button>
         ) : null}
       </div>

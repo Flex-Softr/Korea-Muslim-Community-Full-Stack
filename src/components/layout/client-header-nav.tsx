@@ -13,12 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { brandNavPillClass } from "@/components/layout/brand-nav-pill";
+import { BrowserTranslateToggle } from "@/components/layout/browser-translate-toggle";
 import { ClientUserMenu } from "@/components/layout/client-user-menu";
 import { ModeToggle } from "@/components/layout/mode-toggle";
 import {
+  SITE_NAV,
   type SiteNavSubLink,
   type SiteNavSubmenu,
-  SITE_NAV,
   isSubLinkActive,
   isSubmenuActive,
   isTopLinkActive,
@@ -174,7 +175,7 @@ function MobileNav({
     <div
       id="mobile-site-nav"
       className={cn(
-        "fixed inset-x-0 top-14 z-30 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-white/10 bg-[#2a74a8] px-4 py-4 shadow-lg lg:hidden",
+        "fixed inset-x-0 top-20 z-30 max-h-[calc(100dvh-5rem)] overflow-y-auto border-b border-white/10 bg-[#2a74a8] px-4 py-4 shadow-lg lg:hidden",
         mobileOpen ? "block" : "hidden",
       )}
     >
@@ -269,10 +270,11 @@ function ClientHeaderNavContent({
 
   return (
     <>
-      <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 lg:justify-between lg:gap-3">
+      <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 lg:gap-3">
         <DesktopNav pathname={pathname} searchParams={searchParams} />
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
+          <BrowserTranslateToggle onBrand />
           <ModeToggle onBrand />
 
           {user ? (

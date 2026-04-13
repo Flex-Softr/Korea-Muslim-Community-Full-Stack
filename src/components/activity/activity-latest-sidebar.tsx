@@ -1,19 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import {
-  activityDetailPath,
-  getLatestActivityItems,
-} from "@/data/activity-news";
+import { activityDetailPath } from "@/data/activity-news";
+import { listActivityItems } from "@/lib/content/repository";
 
-export function ActivityLatestSidebar({
+export async function ActivityLatestSidebar({
   excludeSlug,
   limit = 5,
 }: {
   excludeSlug: string;
   limit?: number;
 }) {
-  const items = getLatestActivityItems({ excludeSlug, limit });
+  const { items: all } = await listActivityItems({ page: 1, pageSize: 200 });
+  const items = all.filter((entry) => entry.slug !== excludeSlug).slice(0, limit);
   if (items.length === 0) {
     return null;
   }

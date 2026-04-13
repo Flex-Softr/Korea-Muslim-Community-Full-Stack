@@ -6,21 +6,17 @@ import { ArrowLeft } from "lucide-react";
 import { BlogLatestSidebar } from "@/components/blog/blog-latest-sidebar";
 import { PageBanner } from "@/components/layout/page-banner";
 import { Badge } from "@/components/ui/badge";
-import { getAllBlogSlugs, getBlogPostBySlug } from "@/data/student-news";
+import { getBlogPost } from "@/lib/content/repository";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return getAllBlogSlugs().map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPost(slug);
   if (!post) {
     return { title: "Blog" };
   }
@@ -32,7 +28,7 @@ export async function generateMetadata({
 
 export default async function BlogArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPost(slug);
   if (!post) {
     notFound();
   }

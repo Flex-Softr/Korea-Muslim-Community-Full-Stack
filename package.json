@@ -14,7 +14,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -29,6 +30,7 @@
     "next": "16.2.2",
     "next-auth": "^5.0.0-beta.30",
     "nodemailer": "^7.0.13",
+    "quill": "^2.0.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "server-only": "^0.0.1",

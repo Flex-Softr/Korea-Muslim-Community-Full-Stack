@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ImageUploader } from "@/components/ui/image-uploader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -32,6 +33,7 @@ function ProfileSettingsCard({
   const [profileMsg, setProfileMsg] = useState<string | null>(null);
   const [profileErr, setProfileErr] = useState<string | null>(null);
   const [profilePending, setProfilePending] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   async function saveProfile(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -82,6 +84,15 @@ function ProfileSettingsCard({
               maxLength={120}
               autoComplete="name"
               className="h-10"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Profile image</Label>
+            <ImageUploader
+              value={avatarPreview}
+              onChange={setAvatarPreview}
+              maxSizeMb={5}
+              helperText="Upload preview only for now. Image profile persistence will be enabled in a later update."
             />
           </div>
           {isEmailVerified ? (

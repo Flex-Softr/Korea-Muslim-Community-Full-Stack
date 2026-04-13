@@ -5,8 +5,8 @@ Next.js App Router starter with public marketing layout, authenticated dashboard
 ## Quick start
 
 ```bash
-cp .env.example .env
-# Edit .env — set AUTH_SECRET, DATABASE_URL, and optionally SMTP.
+# Create `.env` in the project root (Next.js and Prisma load it automatically).
+# Set AUTH_SECRET, DATABASE_URL, and optionally SMTP — see Environment below.
 
 npm install
 npx prisma migrate deploy
@@ -35,13 +35,74 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment
 
-Copy [`.env.example`](./.env.example) to `.env`. Important variables:
+Create **`.env`** in the project root (gitignored). Next.js and Prisma load it automatically. Values are validated in `src/config/load-server-env.ts` and `src/config/public-env.ts`.
 
-- **`AUTH_SECRET`** — required; use a long random string.
-- **`DATABASE_URL`** — SQLite default `file:./dev.db` (path is relative to the `prisma/` folder in this template).
-- **`AUTH_URL` / `NEXT_PUBLIC_APP_URL`** — public origin; used in emails and for `sitemap.xml` / `robots.txt`.
-- **SMTP** (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`) — required in production for password reset, email verification, and the contact form.
-- **`CONTACT_TO_EMAIL`** — inbox for contact submissions; if unset, **`EMAIL_FROM`** is used as the recipient (handy for small setups).
+### Required
+
+| Variable | Purpose |
+|----------|---------|
+| **`DATABASE_URL`** | SQLite connection string. Default: `file:./dev.db` (file lives under `prisma/`, path is relative to `schema.prisma`). |
+| **`AUTH_SECRET`** | NextAuth signing secret (long random string; e.g. `openssl rand -base64 32`). |
+
+### URLs & public site
+
+| Variable | Purpose |
+|----------|---------|
+| **`AUTH_URL`** | Optional. Public site URL (no trailing slash); emails, Auth.js. |
+| **`NEXT_PUBLIC_APP_URL`** | Optional. Exposed to the browser; sitemap, translate link, `site-url` helpers. Should match how users open the app. |
+
+### App branding
+
+| Variable | Purpose |
+|----------|---------|
+| **`APP_NAME`** | Optional. Shown in emails/UI where configured. |
+
+### Seed (`npm run db:seed`)
+
+Set **both** or **neither**:
+
+| Variable | Purpose |
+|----------|---------|
+| **`SEED_USER_EMAIL`** | Account to upsert when seeding. |
+| **`SEED_USER_PASSWORD`** | Min 8 characters. |
+| **`SEED_USER_NAME`** | Optional display name. |
+| **`SEED_USER_ROLE`** | Optional: `USER`, `ADMIN`, or `SUPER_ADMIN` (default `ADMIN`). |
+
+### SMTP & contact mail
+
+Optional locally; set for password reset, verification, and contact form in production:
+
+| Variable | Purpose |
+|----------|---------|
+| **`EMAIL_FROM`** | From address for outgoing mail. |
+| **`SMTP_HOST`**, **`SMTP_PORT`**, **`SMTP_USER`**, **`SMTP_PASSWORD`** | SMTP connection. |
+| **`CONTACT_TO_EMAIL`** | Inbox for contact form; if unset, **`EMAIL_FROM`** is used when possible. |
+
+### Example skeleton (copy into `.env` and replace placeholders)
+
+```env
+NODE_ENV=development
+
+DATABASE_URL="file:./dev.db"
+AUTH_SECRET="replace-with-openssl-rand-base64-32"
+
+AUTH_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+APP_NAME="Korea Muslim Community"
+
+# SEED_USER_EMAIL=
+# SEED_USER_PASSWORD=
+# SEED_USER_NAME=
+# SEED_USER_ROLE=ADMIN
+
+# EMAIL_FROM=
+# SMTP_HOST=
+# SMTP_PORT=
+# SMTP_USER=
+# SMTP_PASSWORD=
+# CONTACT_TO_EMAIL=
+```
 
 ## API routes (reference)
 

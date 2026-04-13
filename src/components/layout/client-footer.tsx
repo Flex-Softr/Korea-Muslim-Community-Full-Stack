@@ -165,22 +165,6 @@ export function ClientFooter() {
               </li>
               <li>
                 <Link
-                  href="/library"
-                  className="text-white/75 transition-colors hover:text-white"
-                >
-                  Online library
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/consultation"
-                  className="text-white/75 transition-colors hover:text-white"
-                >
-                  Consultation
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/donation"
                   className="text-white/75 transition-colors hover:text-white"
                 >

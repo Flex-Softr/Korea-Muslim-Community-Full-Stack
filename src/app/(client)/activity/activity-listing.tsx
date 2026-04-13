@@ -1,13 +1,11 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityCategoryFilter } from "@/components/activity/activity-category-filter";
 import { ActivityNewsCard } from "@/components/activity/activity-news-card";
 import { DataPagination } from "@/components/ui/pagination";
-import {
-  ACTIVITY_NEWS,
-  getActivityListingCategories,
-} from "@/data/activity-news";
+import type { ActivityNewsItem } from "@/data/activity-news";
 import { usePagination } from "@/hooks/use-pagination";
 
 const PAGE_SIZE = 8;
@@ -15,25 +13,72 @@ const PAGE_SIZE = 8;
 const GRID_IMAGE_SIZES =
   "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw";
 
-export function ActivityListing() {
-  const categories = useMemo(() => getActivityListingCategories(), []);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+type ActivityListingProps = {
+  items: ActivityNewsItem[];
+  categories: string[];
+  years: number[];
+  initialCategory: string | null;
+  initialYear: number | null;
+  initialPage: number;
+};
+
+export function ActivityListing({
+  items,
+  categories,
+  years,
+  initialCategory,
+  initialYear,
+  initialPage,
+}: ActivityListingProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialCategory,
+  );
+  const [selectedYear, setSelectedYear] = useState<number | null>(initialYear);
 
   const filtered = useMemo(() => {
-    if (selectedCategory == null) {
-      return ACTIVITY_NEWS;
-    }
-    return ACTIVITY_NEWS.filter((item) => item.category === selectedCategory);
-  }, [selectedCategory]);
+    return items.filter((item) => {
+      if (selectedCategory != null && item.category !== selectedCategory) {
+        return false;
+      }
+      if (selectedYear != null) {
+        const year = Number(item.dateIso?.slice(0, 4));
+        if (year !== selectedYear) return false;
+      }
+      return true;
+    });
+  }, [items, selectedCategory, selectedYear]);
 
   const { page, setPage, totalPages, offset } = usePagination({
     totalItems: filtered.length,
     pageSize: PAGE_SIZE,
+    initialPage,
   });
 
   useEffect(() => {
     setPage(1);
-  }, [selectedCategory, setPage]);
+  }, [selectedCategory, selectedYear, setPage]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParamsString);
+    if (selectedCategory) params.set("category", selectedCategory);
+    else params.delete("category");
+    if (selectedYear != null) params.set("year", String(selectedYear));
+    else params.delete("year");
+    params.set("page", String(page));
+    const next = params.toString();
+    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+  }, [
+    page,
+    pathname,
+    router,
+    searchParamsString,
+    selectedCategory,
+    selectedYear,
+  ]);
 
   const pageItems = filtered.slice(offset, offset + PAGE_SIZE);
 
@@ -44,22 +89,33 @@ export function ActivityListing() {
           categories={categories}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
+          className="mb-4"
+        />
+        <ActivityCategoryFilter
+          categories={years.map(String)}
+          selectedCategory={selectedYear != null ? String(selectedYear) : null}
+          onSelectCategory={(year) =>
+            setSelectedYear(year != null ? Number.parseInt(year, 10) : null)
+          }
+          title="Filter by year"
+          allLabel="All years"
+          clearLabel="Clear year"
+          ariaLabel="Activity years"
           className="mb-8 sm:mb-10"
         />
 
         <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
-          {ACTIVITY_NEWS.length === 0 ? (
+          {items.length === 0 ? (
             <>No stories yet.</>
           ) : filtered.length === 0 ? (
             <>
-              No stories in category{" "}
-              <span className="font-medium text-foreground">
-                {selectedCategory}
-              </span>
-              . Try another category or{" "}
+              No stories match your filters. Try another filter or{" "}
               <button
                 type="button"
-                onClick={() => setSelectedCategory(null)}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSelectedYear(null);
+                }}
                 className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
               >
                 show all
@@ -77,13 +133,28 @@ export function ActivityListing() {
                 {filtered.length}
               </span>{" "}
               {filtered.length === 1 ? "story" : "stories"}
-              {selectedCategory != null ? (
+              {selectedCategory != null || selectedYear != null ? (
                 <>
                   {" "}
-                  in{" "}
-                  <span className="font-medium text-foreground">
-                    {selectedCategory}
-                  </span>
+                  with active filters
+                  {selectedCategory != null ? (
+                    <>
+                      {" "}
+                      in{" "}
+                      <span className="font-medium text-foreground">
+                        {selectedCategory}
+                      </span>
+                    </>
+                  ) : null}
+                  {selectedYear != null ? (
+                    <>
+                      {" "}
+                      for{" "}
+                      <span className="font-medium text-foreground">
+                        {selectedYear}
+                      </span>
+                    </>
+                  ) : null}
                 </>
               ) : null}
             </>

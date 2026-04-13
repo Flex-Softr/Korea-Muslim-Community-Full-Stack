@@ -6,7 +6,6 @@ import {
   rateLimitHeaders,
 } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
-import { createAndSendEmailVerification } from "@/lib/email-verification/service";
 
 const WINDOW_MS = 15 * 60 * 1000;
 const REGISTER_LIMIT = 5;
@@ -32,15 +31,54 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
 
-  const { email, password, name } = body as {
+  const {
+    fullNameEn,
+    fullNameBn,
+    email,
+    phone,
+    password,
+    academicStatus,
+    universityName,
+    department,
+    degree,
+    sessionIntake,
+    cityKorea,
+    profilePhoto,
+    studentIdImage,
+    reasonToJoin,
+  } = body as {
+    fullNameEn?: string;
+    fullNameBn?: string;
     email?: string;
+    phone?: string;
     password?: string;
-    name?: string;
+    academicStatus?: "student" | "graduate" | "professional";
+    universityName?: string;
+    department?: string;
+    degree?: "Bachelor" | "Masters" | "PhD";
+    sessionIntake?: string;
+    cityKorea?: string;
+    profilePhoto?: string | null;
+    studentIdImage?: string | null;
+    reasonToJoin?: string;
   };
 
-  if (!email?.trim() || !password || password.length < 8) {
+  if (
+    !fullNameEn?.trim() ||
+    !email?.trim() ||
+    !phone?.trim() ||
+    !password ||
+    password.length < 8 ||
+    !academicStatus ||
+    !universityName?.trim() ||
+    !department?.trim() ||
+    !degree ||
+    !sessionIntake?.trim() ||
+    !cityKorea?.trim() ||
+    !profilePhoto
+  ) {
     return NextResponse.json(
-      { error: "Valid email and password (min 8 chars) required" },
+      { error: "Please fill all required fields." },
       { status: 400 },
     );
   }
@@ -54,20 +92,49 @@ export async function POST(request: Request) {
   }
 
   const hashed = await hash(password, 12);
+  const mappedStudyStatus =
+    academicStatus === "student"
+      ? "CURRENT_STUDENT"
+      : academicStatus === "graduate"
+        ? "GRADUATED"
+        : null;
+
+  const mappedOccupationType = academicStatus === "professional" ? "JOB_HOLDER" : null;
+
   const user = await prisma.user.create({
     data: {
       email: normalized,
       password: hashed,
-      name: name?.trim() || null,
+      name: fullNameEn.trim(),
       role: "USER",
+      // Remains null by default; admin approval sets this to mark active.
+      emailVerified: null,
     },
   });
 
-  try {
-    await createAndSendEmailVerification(user.id);
-  } catch (err) {
-    console.error("[register] verification email failed:", err);
-  }
+  await prisma.communityMember.create({
+    data: {
+      name: fullNameEn.trim(),
+      nameBn: fullNameBn?.trim() || null,
+      category: "GENERAL",
+      contactEmail: normalized,
+      phone: phone.trim(),
+      imageUrl: profilePhoto,
+      universityKr: universityName.trim(),
+      major: department.trim(),
+      degree,
+      studyStatus: mappedStudyStatus,
+      occupationType: mappedOccupationType,
+      locationCity: cityKorea.trim(),
+      aboutSummary: `Status: ${academicStatus.toUpperCase()} | Session: ${sessionIntake.trim()}`,
+      certifications: studentIdImage || null,
+      bio: reasonToJoin?.trim() || null,
+      activityNotes: "Registration submitted. Waiting for admin approval.",
+    },
+  });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    message: "Registration submitted. Your account is pending admin approval.",
+  });
 }

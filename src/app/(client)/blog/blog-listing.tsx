@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { BlogArchiveCard } from "@/components/blog/blog-archive-card";
 import {
@@ -9,7 +10,7 @@ import {
 } from "@/components/blog/blog-archive-sidebar";
 import { BlogFeaturedCard } from "@/components/blog/blog-featured-card";
 import { DataPagination } from "@/components/ui/pagination";
-import { postsSortedByDate } from "@/data/student-news";
+import type { StudentNewsPost } from "@/data/student-news";
 import { usePagination } from "@/hooks/use-pagination";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,7 @@ const GRID_IMAGE_SIZES =
   "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
 function buildYearArchive(
-  posts: ReturnType<typeof postsSortedByDate>,
+  posts: StudentNewsPost[],
 ): YearArchiveEntry[] {
   const byYear = new Map<number, number>();
   for (const p of posts) {
@@ -34,15 +35,30 @@ function buildYearArchive(
     .map(([year, count]) => ({ year, count }));
 }
 
-export function BlogListing() {
-  const allSorted = useMemo(() => postsSortedByDate(), []);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+type BlogListingProps = {
+  posts: StudentNewsPost[];
+  categories: string[];
+  initialCategory: string | null;
+  initialYear: number | null;
+  initialPage: number;
+};
 
-  const categories = useMemo(() => {
-    const set = new Set(allSorted.map((p) => p.category));
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }, [allSorted]);
+export function BlogListing({
+  posts,
+  categories,
+  initialCategory,
+  initialYear,
+  initialPage,
+}: BlogListingProps) {
+  const allSorted = useMemo(() => posts, [posts]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialCategory,
+  );
+  const [selectedYear, setSelectedYear] = useState<number | null>(initialYear);
 
   const yearArchive = useMemo(() => buildYearArchive(allSorted), [allSorted]);
 
@@ -72,11 +88,29 @@ export function BlogListing() {
       return filtered.length;
     })(),
     pageSize: PAGE_SIZE,
+    initialPage,
   });
 
   useEffect(() => {
     setPage(1);
   }, [selectedCategory, selectedYear, setPage]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParamsString);
+    if (selectedCategory) {
+      params.set("category", selectedCategory);
+    } else {
+      params.delete("category");
+    }
+    if (selectedYear != null) {
+      params.set("year", String(selectedYear));
+    } else {
+      params.delete("year");
+    }
+    params.set("page", String(page));
+    const next = params.toString();
+    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+  }, [page, pathname, router, searchParamsString, selectedCategory, selectedYear]);
 
   const showFeatured =
     !hasActiveFilter && page === 1 && filtered.length > 0;

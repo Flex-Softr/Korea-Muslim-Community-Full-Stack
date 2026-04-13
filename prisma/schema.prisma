@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model CommunityMember {
-  id         String  @id @default(cuid())
+  id         String  @id @default(cuid()) @map("_id")
   /// Optional display / internal membership code (e.g. BA-2024-001).
   memberCode String? @unique
 
@@ -87,7 +87,7 @@ model CommunityMember {
 }
 
 model User {
-  id                        String                    @id @default(cuid())
+  id                        String                    @id @default(cuid()) @map("_id")
   email                     String                    @unique
   password                  String
   name                      String?
@@ -100,7 +100,7 @@ model User {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   tokenHash String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -111,7 +111,7 @@ model PasswordResetToken {
 }
 
 model EmailVerificationToken {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   tokenHash String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -119,4 +119,50 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model DashboardContent {
+  id          String   @id @default(cuid()) @map("_id")
+  type        String
+  title       String
+  category    String
+  description String?
+  coverImage  String?
+  videoUrl    String?
+  createdById String?
+  status      String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type, createdAt])
+  @@index([type, createdById])
+  @@index([type, status])
+}
+
+model DashboardCategory {
+  id        String   @id @default(cuid()) @map("_id")
+  type      String
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, slug])
+  @@index([type, name])
+}
+
+model DashboardCarousel {
+  id        String   @id @default(cuid()) @map("_id")
+  title     String
+  subtitle  String
+  imageUrl  String
+  ctaLabel  String?
+  ctaHref   String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
 }

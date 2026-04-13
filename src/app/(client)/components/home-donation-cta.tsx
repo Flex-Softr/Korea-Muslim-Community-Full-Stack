@@ -21,9 +21,8 @@ export function HomeDonationCta() {
               <h2
                 id="home-donation-cta-heading"
                 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-[2rem] md:leading-tight lg:text-4xl"
-                lang="bn"
               >
-                দান ও সহযোগিতা
+                Donate and Support
               </h2>
               <p
                 className="mt-3 max-w-sm text-sm font-medium text-white/85 sm:text-base"
@@ -56,11 +55,6 @@ export function HomeDonationCta() {
             {/* Right: copy + CTA */}
             <div className="flex flex-col justify-center px-6 pb-10 pt-2 md:px-10 md:py-10 md:pt-10">
               <p className="text-pretty text-left text-sm leading-relaxed text-white/95 sm:text-base">
-                আপনার অবদান কর্মসূচি, ত্রাণ কার্যক্রম এবং কোরিয়া জুড়ে মুসলিম
-                সম্প্রদায়ের জন্য স্বাগত স্থান পরিচালনায় সাহায্য করে। ব্যাংক
-                ট্রান্সফারসহ দানের বিস্তারিত জানুন।
-              </p>
-              <p className="mt-3 text-pretty text-left text-sm leading-relaxed text-white/90 sm:text-base">
                 Your gift funds programmes, relief, and welcoming spaces for
                 Muslims across Korea — including how to give by bank transfer.
               </p>
@@ -73,13 +67,7 @@ export function HomeDonationCta() {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#2c7bb6]",
                 )}
               >
-                <span>
-                  <span lang="bn">দান করুন</span>
-                  <span className="mx-1.5 text-[#2c7bb6]/50" aria-hidden>
-                    /
-                  </span>
-                  <span lang="en">Donate</span>
-                </span>
+                <span>Donate</span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-90" aria-hidden />
               </Link>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import { ActivityCategoryFilter } from "@/components/activity/activity-category-filter";
@@ -13,92 +14,71 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { VIDEO_GALLERY_ITEMS, type VideoGalleryItem } from "@/data/gallery-media";
 import { cn } from "@/lib/utils";
 
-type VideoEntry = {
-  id: string;
-  category: string;
-  title: string;
-  thumbClass: string;
-  /** YouTube / Vimeo embed URL (replace with your real video IDs). */
-  embedUrl: string;
-  caption?: string;
-};
+type VideoEntry = VideoGalleryItem;
 
-const VIDEOS: VideoEntry[] = [
-  {
-    id: "1",
-    category: "Community",
-    title: "Barakah Iftar Gift Program",
-    thumbClass: "from-slate-600 via-slate-700 to-slate-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/jNQXAC9IVRw",
-    caption: "Replace embed URLs in the video list with your own uploads.",
-  },
-  {
-    id: "2",
-    category: "Education",
-    title: "Discussion on Historic Badr Day",
-    thumbClass: "from-indigo-600 via-blue-800 to-slate-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ",
-  },
-  {
-    id: "3",
-    category: "Education",
-    title: "Face to Face with Talented Students — 03",
-    thumbClass: "from-emerald-700 via-teal-800 to-slate-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/ysz5S6PUM-U",
-  },
-  {
-    id: "4",
-    category: "Education",
-    title: "Face to Face with Talented Students — Part 02",
-    thumbClass: "from-amber-700 via-orange-800 to-stone-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/L_jWHffIx5E",
-  },
-  {
-    id: "5",
-    category: "Education",
-    title: "Face to Face with Talented Students — Part 01",
-    thumbClass: "from-violet-600 via-purple-800 to-slate-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/9bZkp7q19f0",
-  },
-  {
-    id: "6",
-    category: "Culture",
-    title: "Photo Exhibition: community highlights",
-    thumbClass: "from-rose-700 via-red-900 to-stone-950",
-    embedUrl: "https://www.youtube-nocookie.com/embed/kJQP7kiw5Fk",
-  },
-  {
-    id: "7",
-    category: "Education",
-    title: "Face to Face with Students: leadership talk",
-    thumbClass: "from-cyan-700 via-sky-900 to-slate-900",
-    embedUrl: "https://www.youtube-nocookie.com/embed/OPf0YbXqDm0",
-  },
-  {
-    id: "8",
-    category: "Community",
-    title: "Community forum recording",
-    thumbClass: "from-neutral-600 via-neutral-800 to-zinc-950",
-    embedUrl: "https://www.youtube-nocookie.com/embed/ScMzIvxBSi4",
-  },
-];
+const VIDEO_PAGE_SIZE = 12;
 
-function getVideoGalleryCategories(): string[] {
-  const set = new Set(VIDEOS.map((v) => v.category));
-  return [...set].sort((a, b) => a.localeCompare(b));
+function getYoutubeThumbnailUrl(videoUrl: string): string | null {
+  if (!videoUrl) return null;
+
+  const normalizedUrl = videoUrl.trim();
+  if (!normalizedUrl) return null;
+
+  const resolveVideoId = (urlValue: URL): string | null => {
+    const host = urlValue.hostname.replace(/^www\./, "").toLowerCase();
+    const path = urlValue.pathname;
+    const segments = path.split("/").filter(Boolean);
+
+    if (host === "youtu.be") {
+      return segments[0] ?? null;
+    }
+
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (path === "/watch") {
+        return urlValue.searchParams.get("v");
+      }
+      if (segments[0] === "embed" || segments[0] === "shorts") {
+        return segments[1] ?? null;
+      }
+    }
+
+    return null;
+  };
+
+  try {
+    const parsed = new URL(normalizedUrl);
+    const videoId = resolveVideoId(parsed);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+  } catch {
+    // Handles values like "youtube.com/watch?v=..." without protocol.
+    try {
+      const parsed = new URL(`https://${normalizedUrl}`);
+      const videoId = resolveVideoId(parsed);
+      if (videoId) {
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
-
-const VIDEO_PAGE_SIZE = 4;
 
 function VideoCard({
   title,
   thumbClass,
+  thumbnailUrl,
   onOpen,
 }: {
   title: string;
   thumbClass: string;
+  thumbnailUrl: string | null;
   onOpen: () => void;
 }) {
   return (
@@ -107,12 +87,17 @@ function VideoCard({
       onClick={onOpen}
       className="group flex w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-black/[0.06] bg-white text-left shadow-sm outline-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-card"
     >
-      <span
-        className={cn(
-          "relative aspect-video overflow-hidden bg-muted bg-gradient-to-br",
-          thumbClass,
-        )}
-      >
+      <span className={cn("relative aspect-video overflow-hidden bg-muted", !thumbnailUrl && "bg-gradient-to-br", !thumbnailUrl && thumbClass)}>
+        {thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+            loading="lazy"
+            aria-hidden
+          />
+        ) : null}
+        <span className="absolute inset-0 bg-black/20" aria-hidden />
         <span className="absolute inset-0 flex items-center justify-center">
           <span
             className="flex size-14 items-center justify-center rounded-full bg-white/85 text-[#2c7bb6] shadow-md transition-opacity duration-200 group-hover:bg-white dark:bg-white/90"
@@ -135,25 +120,69 @@ export function VideoGallery({
   embedded = false,
   maxItems,
   paginated = false,
+  sourceItems,
 }: {
   embedded?: boolean;
   /** When set (e.g. on the home page), only the first N videos are shown. */
   maxItems?: number;
   /** Full listing page: paginate with `DataPagination`. */
   paginated?: boolean;
+  sourceItems?: VideoEntry[];
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [localCategory, setLocalCategory] = useState<string | null>(null);
+  const [localYear, setLocalYear] = useState<number | null>(null);
+  const baseItems = useMemo(
+    () => sourceItems ?? VIDEO_GALLERY_ITEMS,
+    [sourceItems],
+  );
 
-  const videoCategories = useMemo(() => getVideoGalleryCategories(), []);
+  const parsedCategory = useMemo(() => {
+    const category = searchParams.get("category");
+    return category?.trim() ? category : null;
+  }, [searchParams]);
+  const parsedYear = useMemo(() => {
+    const raw = searchParams.get("year");
+    const year = raw ? Number.parseInt(raw, 10) : null;
+    return year != null && Number.isFinite(year) ? year : null;
+  }, [searchParams]);
+  const selectedCategory = paginated ? parsedCategory : localCategory;
+  const selectedYear = paginated ? parsedYear : localYear;
+
+  const videoCategories = useMemo(
+    () =>
+      [...new Set(baseItems.map((v) => v.category))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [baseItems],
+  );
+  const videoYears = useMemo(
+    () =>
+      [...new Set(baseItems.map((v) => Number.parseInt(v.dateIso.slice(0, 4), 10)))]
+        .filter(Number.isFinite)
+        .sort((a, b) => b - a),
+    [baseItems],
+  );
 
   const fullList = useMemo(() => {
-    const base = maxItems != null ? VIDEOS.slice(0, maxItems) : VIDEOS;
-    if (!paginated || selectedCategory == null) {
-      return base;
-    }
-    return base.filter((v) => v.category === selectedCategory);
-  }, [maxItems, paginated, selectedCategory]);
+    const base =
+      maxItems != null ? baseItems.slice(0, maxItems) : baseItems;
+    if (!paginated) return base;
+    return base.filter((v) => {
+      if (selectedCategory != null && v.category !== selectedCategory) {
+        return false;
+      }
+      if (selectedYear != null) {
+        const year = Number.parseInt(v.dateIso.slice(0, 4), 10);
+        return year === selectedYear;
+      }
+      return true;
+    });
+  }, [baseItems, maxItems, paginated, selectedCategory, selectedYear]);
 
   const pagination = usePagination({
     totalItems: fullList.length,
@@ -161,6 +190,16 @@ export function VideoGallery({
   });
 
   const { offset, pageSize, page, setPage, totalPages } = pagination;
+
+  useEffect(() => {
+    if (!paginated) return;
+    const params = new URLSearchParams(searchParamsString);
+    const pageRaw = params.get("page");
+    const nextPage = pageRaw ? Number.parseInt(pageRaw, 10) : 1;
+    if (Number.isFinite(nextPage)) {
+      setPage(nextPage);
+    }
+  }, [paginated, searchParamsString, setPage]);
 
   const videos = useMemo(() => {
     if (!paginated) {
@@ -171,13 +210,39 @@ export function VideoGallery({
 
   const handleSelectCategory = useCallback(
     (category: string | null) => {
-      setSelectedCategory(category);
-      if (paginated) {
-        setPage(1);
-        setOpenIndex(null);
+      if (!paginated) {
+        setLocalCategory(category);
+        return;
       }
+      const params = new URLSearchParams(searchParamsString);
+      if (category) params.set("category", category);
+      else params.delete("category");
+      params.delete("page");
+      router.replace(params.toString() ? `${pathname}?${params.toString()}` : pathname, {
+        scroll: false,
+      });
+      setOpenIndex(null);
     },
-    [paginated, setPage],
+    [paginated, pathname, router, searchParamsString],
+  );
+
+  const handleSelectYear = useCallback(
+    (year: string | null) => {
+      const parsed = year != null ? Number.parseInt(year, 10) : null;
+      if (!paginated) {
+        setLocalYear(parsed);
+        return;
+      }
+      const params = new URLSearchParams(searchParamsString);
+      if (parsed != null) params.set("year", String(parsed));
+      else params.delete("year");
+      params.delete("page");
+      router.replace(params.toString() ? `${pathname}?${params.toString()}` : pathname, {
+        scroll: false,
+      });
+      setOpenIndex(null);
+    },
+    [paginated, pathname, router, searchParamsString],
   );
 
   const handlePageChange = useCallback(
@@ -189,6 +254,26 @@ export function VideoGallery({
   );
 
   const count = videos.length;
+
+  useEffect(() => {
+    if (!paginated) return;
+    const params = new URLSearchParams(searchParamsString);
+    if (selectedCategory) params.set("category", selectedCategory);
+    else params.delete("category");
+    if (selectedYear != null) params.set("year", String(selectedYear));
+    else params.delete("year");
+    params.set("page", String(page));
+    const next = params.toString();
+    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+  }, [
+    page,
+    paginated,
+    pathname,
+    router,
+    searchParamsString,
+    selectedCategory,
+    selectedYear,
+  ]);
 
   const goPrev = useCallback(() => {
     setOpenIndex((i) =>
@@ -260,26 +345,39 @@ export function VideoGallery({
         ) : null}
 
         {paginated ? (
-          <ActivityCategoryFilter
-            categories={videoCategories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleSelectCategory}
-            className="mb-8 sm:mb-10"
-          />
+          <>
+            <ActivityCategoryFilter
+              categories={videoCategories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+              className="mb-4"
+            />
+            <ActivityCategoryFilter
+              categories={videoYears.map(String)}
+              selectedCategory={
+                selectedYear != null ? String(selectedYear) : null
+              }
+              onSelectCategory={handleSelectYear}
+              title="Filter by year"
+              allLabel="All years"
+              clearLabel="Clear year"
+              ariaLabel="Video years"
+              className="mb-8 sm:mb-10"
+            />
+          </>
         ) : null}
 
-        {paginated && VIDEOS.length > 0 ? (
+        {paginated && baseItems.length > 0 ? (
           <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
             {fullList.length === 0 ? (
               <>
-                No videos in category{" "}
-                <span className="font-medium text-foreground">
-                  {selectedCategory}
-                </span>
-                . Try another category or{" "}
+                No videos match your filters. Try another filter or{" "}
                 <button
                   type="button"
-                  onClick={() => handleSelectCategory(null)}
+                  onClick={() => {
+                    handleSelectCategory(null);
+                    handleSelectYear(null);
+                  }}
                   className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                 >
                   show all
@@ -297,13 +395,10 @@ export function VideoGallery({
                   {fullList.length}
                 </span>{" "}
                 {fullList.length === 1 ? "video" : "videos"}
-                {selectedCategory != null ? (
+                {selectedCategory != null || selectedYear != null ? (
                   <>
                     {" "}
-                    in{" "}
-                    <span className="font-medium text-foreground">
-                      {selectedCategory}
-                    </span>
+                    with filters
                   </>
                 ) : null}
               </>
@@ -317,6 +412,7 @@ export function VideoGallery({
               key={v.id}
               title={v.title}
               thumbClass={v.thumbClass}
+              thumbnailUrl={getYoutubeThumbnailUrl(v.embedUrl)}
               onOpen={() => setOpenIndex(index)}
             />
           ))}
