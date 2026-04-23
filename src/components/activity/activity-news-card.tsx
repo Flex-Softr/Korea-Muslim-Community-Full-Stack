@@ -1,11 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 import { Badge } from "@/components/ui/badge";
 import {
   activityDetailPath,
   type ActivityNewsItem,
 } from "@/data/activity-news";
+import { useTranslatedFields } from "@/hooks/use-translated-fields";
 
 type ActivityNewsCardProps = {
   item: ActivityNewsItem;
@@ -17,6 +21,13 @@ export function ActivityNewsCard({
   item,
   imageSizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
 }: ActivityNewsCardProps) {
+  const { t } = useLanguage();
+  const translated = useTranslatedFields({
+    locale: item.locale,
+    title: item.title,
+    excerpt: item.excerpt,
+  });
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] transition-shadow hover:shadow-md dark:ring-white/5">
       <Link
@@ -43,13 +54,13 @@ export function ActivityNewsCard({
             </Badge>
           </div>
           <h3 className="mt-2 text-base font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-lg">
-            {item.title}
+            {translated.title}
           </h3>
           <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-            {item.excerpt}
+            {translated.excerpt}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#2c7bb6] dark:text-sky-400">
-            Read more
+            {t("common.readMore")}
             <ArrowUpRight className="size-4" aria-hidden />
           </span>
         </div>

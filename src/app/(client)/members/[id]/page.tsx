@@ -40,7 +40,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!member) return { title: "Member" };
   return {
     title: `${member.name} · Member profile`,
-    description: member.aboutSummary ?? member.bio ?? member.title ?? member.name,
+    description:
+      member.aboutSummary ??
+      member.bio ??
+      member.designation ??
+      member.title ??
+      member.name,
   };
 }
 
@@ -72,7 +77,7 @@ export default async function MembersProfilePage({ params }: PageProps) {
     <>
       <PageBanner
         title={member.name}
-        subtitle={`${roleLabel(member.category)} member`}
+        subtitle={member.designation ?? `${roleLabel(member.category)} member`}
         breadcrumbs={[
           { label: "Home", href: "/" },
           { label: "Members", href: "/member" },

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { useLanguage, type Lang } from "@/components/providers/language-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { brandNavPillClass } from "@/components/layout/brand-nav-pill";
-import { BrowserTranslateToggle } from "@/components/layout/browser-translate-toggle";
 import { ClientUserMenu } from "@/components/layout/client-user-menu";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { useToastSystem } from "@/components/ui/toast-system";
 import {
   SITE_NAV,
   type SiteNavSubLink,
@@ -24,7 +25,39 @@ import {
   isSubmenuActive,
   isTopLinkActive,
 } from "@/config/site-nav";
+import type { TranslationKey } from "@/lib/i18n/dictionary";
+import { MEMBER_NAV_LABELS, type MemberSlug } from "@/lib/members/config";
+import { getLangTriggerShortLabel } from "@/lib/i18n/lang-trigger-label";
 import { cn } from "@/lib/utils";
+
+const LANG_OPTIONS: Array<{ value: Lang; labelKey: "common.bengali" | "common.english" | "common.korean" }> = [
+  { value: "bn", labelKey: "common.bengali" },
+  { value: "en", labelKey: "common.english" },
+  { value: "kr", labelKey: "common.korean" },
+];
+
+function translateMemberLabel(slug: MemberSlug): string {
+  return MEMBER_NAV_LABELS[slug];
+}
+
+function translateNavLabel(
+  entry: SiteNavSubLink | { href?: string; id?: string; label: string },
+  t: (key: TranslationKey) => string,
+): string {
+  if ("memberSlug" in entry && entry.memberSlug) {
+    return translateMemberLabel(entry.memberSlug);
+  }
+  if (entry.href === "/") return t("common.home");
+  if (entry.href === "/about") return t("common.about");
+  if (entry.href === "/activity") return t("common.activity");
+  if (entry.href === "/blog") return t("common.blog");
+  if (entry.href === "/photo-gallery") return t("common.photoGallery");
+  if (entry.href === "/video-gallery") return t("common.videoGallery");
+  if (entry.href === "/donation") return t("common.donation");
+  if ("id" in entry && entry.id === "media") return t("common.media");
+  if ("id" in entry && entry.id === "members") return t("common.members");
+  return entry.label;
+}
 
 function NavLink({
   href,
@@ -52,10 +85,12 @@ function DesktopSubmenu({
   entry,
   pathname,
   searchParams,
+  t,
 }: {
   entry: SiteNavSubmenu;
   pathname: string;
   searchParams: URLSearchParams | null;
+  t: (key: TranslationKey) => string;
 }) {
   const router = useRouter();
   const open = isSubmenuActive(pathname, searchParams, entry);
@@ -71,7 +106,7 @@ function DesktopSubmenu({
           "cursor-default outline-none focus-visible:ring-2 focus-visible:ring-white/50",
         )}
       >
-        {entry.label}
+        {translateNavLabel(entry, t)}
         <ChevronDown className="size-4 shrink-0 opacity-90" aria-hidden />
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -85,7 +120,7 @@ function DesktopSubmenu({
             className="cursor-pointer rounded-lg px-3 py-2.5 text-sm"
             onClick={() => router.push(item.href)}
           >
-            {item.label}
+            {translateNavLabel(item, t)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -96,9 +131,11 @@ function DesktopSubmenu({
 function DesktopNav({
   pathname,
   searchParams,
+  t,
 }: {
   pathname: string;
   searchParams: URLSearchParams | null;
+  t: (key: TranslationKey) => string;
 }) {
   return (
     <nav
@@ -111,7 +148,7 @@ function DesktopNav({
             <NavLink
               key={entry.href}
               href={entry.href}
-              label={entry.label}
+              label={translateNavLabel(entry, t)}
               active={isTopLinkActive(pathname, entry.href)}
             />
           );
@@ -122,6 +159,7 @@ function DesktopNav({
             entry={entry}
             pathname={pathname}
             searchParams={searchParams}
+            t={t}
           />
         );
       })}
@@ -134,11 +172,13 @@ function MobileSubLink({
   pathname,
   searchParams,
   onNavigate,
+  t,
 }: {
   item: SiteNavSubLink;
   pathname: string;
   searchParams: URLSearchParams | null;
   onNavigate: () => void;
+  t: (key: TranslationKey) => string;
 }) {
   const active = isSubLinkActive(pathname, searchParams, item);
   return (
@@ -147,7 +187,7 @@ function MobileSubLink({
       onClick={onNavigate}
       className={brandNavPillClass(active)}
     >
-      {item.label}
+      {translateNavLabel(item, t)}
     </Link>
   );
 }
@@ -158,12 +198,14 @@ function MobileNav({
   mobileOpen,
   closeMobile,
   user,
+  t,
 }: {
   pathname: string;
   searchParams: URLSearchParams | null;
   mobileOpen: boolean;
   closeMobile: () => void;
   user: Session["user"] | null;
+  t: (key: TranslationKey) => string;
 }) {
   const [openSubmenuId, setOpenSubmenuId] = useState<string | null>(null);
 
@@ -186,7 +228,7 @@ function MobileNav({
               <NavLink
                 key={entry.href}
                 href={entry.href}
-                label={entry.label}
+                label={translateNavLabel(entry, t)}
                 active={isTopLinkActive(pathname, entry.href)}
                 onNavigate={closeMobile}
               />
@@ -209,7 +251,7 @@ function MobileNav({
                 aria-controls={`mobile-submenu-panel-${entry.id}`}
                 onClick={() => toggleSubmenu(entry.id)}
               >
-                <span>{entry.label}</span>
+                <span>{translateNavLabel(entry, t)}</span>
                 <ChevronDown
                   className={cn(
                     "size-4 shrink-0 opacity-90 transition-transform",
@@ -234,6 +276,7 @@ function MobileNav({
                     pathname={pathname}
                     searchParams={searchParams}
                     onNavigate={closeMobile}
+                    t={t}
                   />
                 ))}
               </div>
@@ -246,7 +289,7 @@ function MobileNav({
             className="mt-2 rounded-md px-2.5 py-2 text-sm font-medium text-white hover:bg-white/10"
             onClick={closeMobile}
           >
-            Login
+            {t("common.login")}
           </Link>
         ) : null}
       </div>
@@ -263,6 +306,9 @@ function ClientHeaderNavContent({
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const { lang, setLang, t } = useLanguage();
+  const { notify } = useToastSystem();
 
   const closeMobile = () => {
     setMobileOpen(false);
@@ -271,16 +317,44 @@ function ClientHeaderNavContent({
   return (
     <>
       <div className="flex min-w-0 flex-1 items-center justify-end gap-1 sm:gap-2 lg:gap-3">
-        <DesktopNav pathname={pathname} searchParams={searchParams} />
+        <DesktopNav pathname={pathname} searchParams={searchParams} t={t} />
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
-          <BrowserTranslateToggle onBrand />
+          <div data-no-auto-translate="true">
+            <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
+            <DropdownMenuTrigger
+              className={cn(
+                brandNavPillClass(false),
+                "cursor-pointer border border-white/30 bg-white/10 text-xs",
+              )}
+            >
+              <span>Lan: <span className="font-bold pl-1">{getLangTriggerShortLabel(lang)}</span></span>
+              <ChevronDown className="size-4 shrink-0 opacity-80" aria-hidden />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8}>
+              {LANG_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setLang(option.value);
+                    setLangOpen(false);
+                    notify(t("common.languageChanged"), "success");
+                  }}
+                >
+                  {t(option.labelKey)}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <ModeToggle onBrand />
 
           {user ? (
             <ClientUserMenu
               email={user.email ?? ""}
               name={user.name}
+              image={user.image}
               onBrand
             />
           ) : (
@@ -291,7 +365,7 @@ function ClientHeaderNavContent({
                 "text-white hover:bg-white/15 hover:text-white",
               )}
             >
-              Login
+              {t("common.login")}
             </Link>
           )}
 
@@ -314,6 +388,7 @@ function ClientHeaderNavContent({
         mobileOpen={mobileOpen}
         closeMobile={closeMobile}
         user={user}
+        t={t}
       />
     </>
   );

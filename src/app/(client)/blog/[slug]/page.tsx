@@ -12,6 +12,14 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function richTextToPlainText(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -33,7 +41,11 @@ export default async function BlogArticlePage({ params }: PageProps) {
     notFound();
   }
 
-  const paragraphs = post.content.split("\n\n").filter(Boolean);
+  const plainContent = richTextToPlainText(post.content);
+  const paragraphs = plainContent
+    .split(/(?:\r?\n){2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return (
     <>
@@ -84,9 +96,11 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </p>
 
               <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
-                {paragraphs.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
+                {paragraphs.length > 0 ? (
+                  paragraphs.map((p, i) => <p key={i}>{p}</p>)
+                ) : (
+                  <p>{plainContent}</p>
+                )}
               </div>
 
               <p className="mt-10 text-sm text-muted-foreground">

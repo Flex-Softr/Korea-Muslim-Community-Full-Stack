@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -28,10 +28,12 @@ function initials(name: string | null | undefined, email: string) {
 export function ClientUserMenu({
   email,
   name,
+  image,
   onBrand = false,
 }: {
   email: string;
   name?: string | null;
+  image?: string | null;
   onBrand?: boolean;
 }) {
   const router = useRouter();
@@ -52,6 +54,7 @@ export function ClientUserMenu({
         )}
       >
         <Avatar size="sm" className={onBrand ? "ring-2 ring-white/40" : undefined}>
+          {image ? <AvatarImage src={image} alt={menuLabel} /> : null}
           <AvatarFallback
             className={onBrand ? "bg-white/20 text-white" : undefined}
           >

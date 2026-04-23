@@ -1,6 +1,7 @@
 /** Student / community blog feed for `/blog` — separate from activity routes and data. */
 export type StudentNewsPost = {
   id: string;
+  locale?: "en" | "bn" | "kr";
   /** URL segment for `/blog/[slug]`. */
   slug: string;
   /** ISO date for `<time datetime>`, archive, and sorting. */

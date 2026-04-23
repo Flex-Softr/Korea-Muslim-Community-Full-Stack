@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { hash } from "bcryptjs";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasMinimumRole } from "@/lib/roles";
@@ -50,10 +51,27 @@ export async function GET(request: Request) {
     },
   });
 
+  const memberRows = await prisma.communityMember.findMany({
+    where: {
+      contactEmail: {
+        in: users.map((user) => user.email),
+      },
+    },
+    select: {
+      contactEmail: true,
+    },
+  });
+  const memberEmails = new Set(
+    memberRows
+      .map((row) => row.contactEmail?.toLowerCase())
+      .filter((email): email is string => Boolean(email)),
+  );
+
   const withStatus = users
     .map((user) => ({
       ...user,
       status: getStatus(user),
+      isMember: memberEmails.has(user.email.toLowerCase()),
     }))
     .filter((user) => (status ? user.status === status : true));
 
@@ -75,4 +93,81 @@ export async function GET(request: Request) {
       totalPages,
     },
   });
+}
+
+export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id || !hasMinimumRole(session.user.role, "ADMIN")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = (await request.json().catch(() => null)) as
+    | {
+        name?: string;
+        email?: string;
+        password?: string;
+      }
+    | null;
+
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  const name = (body.name ?? "").trim();
+  const email = (body.email ?? "").trim().toLowerCase();
+  const password = body.password ?? "";
+
+  if (!name) {
+    return NextResponse.json({ error: "Name is required." }, { status: 400 });
+  }
+  if (!email) {
+    return NextResponse.json({ error: "Email is required." }, { status: 400 });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
+  }
+  if (password.length < 8) {
+    return NextResponse.json(
+      { error: "Password must be at least 8 characters." },
+      { status: 400 },
+    );
+  }
+
+  const existing = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+  if (existing) {
+    return NextResponse.json({ error: "A user with this email already exists." }, { status: 409 });
+  }
+
+  const passwordHash = await hash(password, 12);
+  const created = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: passwordHash,
+      role: "ADMIN",
+      emailVerified: new Date(),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+      createdAt: true,
+    },
+  });
+
+  return NextResponse.json(
+    {
+      ok: true,
+      user: {
+        ...created,
+        status: getStatus(created),
+      },
+    },
+    { status: 201 },
+  );
 }

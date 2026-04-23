@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityCategoryFilter } from "@/components/activity/activity-category-filter";
 import { ActivityNewsCard } from "@/components/activity/activity-news-card";
+import { useLanguage } from "@/components/providers/language-provider";
 import { DataPagination } from "@/components/ui/pagination";
 import type { ActivityNewsItem } from "@/data/activity-news";
 import { usePagination } from "@/hooks/use-pagination";
@@ -30,6 +31,7 @@ export function ActivityListing({
   initialYear,
   initialPage,
 }: ActivityListingProps) {
+  const { t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -97,19 +99,19 @@ export function ActivityListing({
           onSelectCategory={(year) =>
             setSelectedYear(year != null ? Number.parseInt(year, 10) : null)
           }
-          title="Filter by year"
-          allLabel="All years"
-          clearLabel="Clear year"
+          title={t("blog.filterByYear")}
+          allLabel={t("blog.allYears")}
+          clearLabel={t("blog.clearYear")}
           ariaLabel="Activity years"
           className="mb-8 sm:mb-10"
         />
 
         <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
           {items.length === 0 ? (
-            <>No stories yet.</>
+            <>{t("activity.noStoriesYet")}</>
           ) : filtered.length === 0 ? (
             <>
-              No stories match your filters. Try another filter or{" "}
+              {t("activity.noStoriesMatch")}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -118,29 +120,29 @@ export function ActivityListing({
                 }}
                 className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
               >
-                show all
+                {t("blog.showAll")}
               </button>
               .
             </>
           ) : (
             <>
-              Showing{" "}
+              {t("blog.showing")}{" "}
               <span className="font-medium text-foreground">
                 {offset + 1}–{offset + pageItems.length}
               </span>{" "}
-              of{" "}
+              {t("blog.of")}{" "}
               <span className="font-medium text-foreground">
                 {filtered.length}
               </span>{" "}
-              {filtered.length === 1 ? "story" : "stories"}
+              {filtered.length === 1 ? t("activity.story") : t("activity.stories")}
               {selectedCategory != null || selectedYear != null ? (
                 <>
                   {" "}
-                  with active filters
+                  {t("blog.withActiveFilters")}
                   {selectedCategory != null ? (
                     <>
                       {" "}
-                      in{" "}
+                      {t("blog.in")}{" "}
                       <span className="font-medium text-foreground">
                         {selectedCategory}
                       </span>
@@ -149,7 +151,7 @@ export function ActivityListing({
                   {selectedYear != null ? (
                     <>
                       {" "}
-                      for{" "}
+                      {t("blog.for")}{" "}
                       <span className="font-medium text-foreground">
                         {selectedYear}
                       </span>

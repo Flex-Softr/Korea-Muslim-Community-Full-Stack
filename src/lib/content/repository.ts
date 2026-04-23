@@ -7,8 +7,10 @@ import type {
   PaginatedResponse,
   YearOption,
 } from "@/lib/content/types";
+import { getRequestLang } from "@/lib/i18n/server-language";
 import { prisma } from "@/lib/prisma";
 import { clampPage, totalPagesFromCount } from "@/lib/pagination/get-pagination-items";
+import { translateText } from "@/lib/translate";
 
 function categoryOptionsFrom<T extends { category: string }>(
   items: T[],
@@ -105,6 +107,7 @@ function mapDbBlogPost(row: {
   const plain = stripHtml(row.description ?? "");
   return {
     id: row.id,
+    locale: "en",
     slug: slugify(row.title),
     dateIso,
     date: formatHumanDate(dateIso),
@@ -128,6 +131,7 @@ function mapDbActivityItem(row: {
   const plain = stripHtml(row.description ?? "");
   return {
     id: row.id,
+    locale: "en",
     slug: slugify(row.title),
     dateIso,
     date: formatHumanDate(dateIso),
@@ -204,18 +208,58 @@ function paginate<T>(items: T[], query: ContentListQuery): { items: T[]; page: n
   };
 }
 
+async function translateBlogPost(
+  post: StudentNewsPost,
+  lang: "en" | "bn" | "kr",
+): Promise<StudentNewsPost> {
+  const source = post.locale ?? "en";
+  if (source === lang) return post;
+  const [title, excerpt, content, category] = await Promise.all([
+    translateText(post.title, lang, source),
+    translateText(post.excerpt, lang, source),
+    translateText(post.content, lang, source),
+    translateText(post.category, lang, source),
+  ]);
+  return { ...post, title, excerpt, content, category };
+}
+
+async function translateActivityItem(
+  item: ActivityNewsItem,
+  lang: "en" | "bn" | "kr",
+): Promise<ActivityNewsItem> {
+  const source = item.locale ?? "en";
+  if (source === lang) return item;
+  const [title, excerpt, content, category] = await Promise.all([
+    translateText(item.title, lang, source),
+    translateText(item.excerpt, lang, source),
+    translateText(item.content, lang, source),
+    translateText(item.category, lang, source),
+  ]);
+  return { ...item, title, excerpt, content, category };
+}
+
 export async function listBlogPosts(
   query: ContentListQuery,
 ): Promise<PaginatedResponse<StudentNewsPost>> {
+  const requestLang = await getRequestLang();
   const dbRows = await listPublishedContentByType("blog");
   const base = dbRows
     ? dbRows.map(mapDbBlogPost)
     : [...STUDENT_NEWS_POSTS].sort((a, b) => b.dateIso.localeCompare(a.dateIso));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
+  const translatedItems = await Promise.all(
+    paged.items.map((item) => translateBlogPost(item, requestLang)),
+  );
+  const translatedCategories = await Promise.all(
+    categoryOptionsFrom(base).map(async (category) => ({
+      ...category,
+      label: await translateText(category.label, requestLang, "en"),
+    })),
+  );
   return {
-    items: paged.items,
-    categories: categoryOptionsFrom(base),
+    items: translatedItems,
+    categories: translatedCategories,
     years: yearOptionsFrom(base),
     pagination: {
       page: paged.page,
@@ -227,28 +271,41 @@ export async function listBlogPosts(
 }
 
 export async function getBlogPost(slug: string): Promise<StudentNewsPost | null> {
+  const requestLang = await getRequestLang();
   const dbRows = await listPublishedContentByType("blog");
   if (dbRows) {
     const dbMatch = dbRows
       .map(mapDbBlogPost)
       .find((post) => post.slug === slug);
-    if (dbMatch) return dbMatch;
+    if (dbMatch) return translateBlogPost(dbMatch, requestLang);
   }
-  return getBlogPostBySlug(slug) ?? null;
+  const staticMatch = getBlogPostBySlug(slug) ?? null;
+  if (!staticMatch) return null;
+  return translateBlogPost(staticMatch, requestLang);
 }
 
 export async function listActivityItems(
   query: ContentListQuery,
 ): Promise<PaginatedResponse<ActivityNewsItem>> {
+  const requestLang = await getRequestLang();
   const dbRows = await listPublishedContentByType("activity");
   const base = dbRows
     ? dbRows.map(mapDbActivityItem)
     : [...ACTIVITY_NEWS].sort((a, b) => (b.dateIso ?? "").localeCompare(a.dateIso ?? ""));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
+  const translatedItems = await Promise.all(
+    paged.items.map((item) => translateActivityItem(item, requestLang)),
+  );
+  const translatedCategories = await Promise.all(
+    categoryOptionsFrom(base).map(async (category) => ({
+      ...category,
+      label: await translateText(category.label, requestLang, "en"),
+    })),
+  );
   return {
-    items: paged.items,
-    categories: categoryOptionsFrom(base),
+    items: translatedItems,
+    categories: translatedCategories,
     years: yearOptionsFrom(base),
     pagination: {
       page: paged.page,
@@ -262,14 +319,17 @@ export async function listActivityItems(
 export async function getActivityItem(
   slug: string,
 ): Promise<ActivityNewsItem | null> {
+  const requestLang = await getRequestLang();
   const dbRows = await listPublishedContentByType("activity");
   if (dbRows) {
     const dbMatch = dbRows
       .map(mapDbActivityItem)
       .find((item) => item.slug === slug);
-    if (dbMatch) return dbMatch;
+    if (dbMatch) return translateActivityItem(dbMatch, requestLang);
   }
-  return getActivityBySlug(slug) ?? null;
+  const staticMatch = getActivityBySlug(slug) ?? null;
+  if (!staticMatch) return null;
+  return translateActivityItem(staticMatch, requestLang);
 }
 
 export async function listPhotoItems(

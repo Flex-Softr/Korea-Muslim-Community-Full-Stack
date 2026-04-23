@@ -188,7 +188,7 @@ export function CarosalModule() {
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[42rem] text-sm">
               <thead>
-                <tr className="border-b border-border bg-gray-100 text-left text-xs font-bold uppercase tracking-wide text-foreground">
+                <tr className="border-b border-border/80 bg-muted/70 text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   <th className="px-2 py-2">Preview</th>
                   <th className="px-2 py-2">Title</th>
                   <th className="px-2 py-2">Status</th>
@@ -207,7 +207,14 @@ export function CarosalModule() {
                   </tr>
                 ) : (
                   rows.map((row, idx) => (
-                    <tr key={row.id} className={idx % 2 === 0 ? "border-b border-border/60 bg-white hover:bg-indigo-50" : "border-b border-border/60 bg-slate-50/70 hover:bg-indigo-50"}>
+                    <tr
+                      key={row.id}
+                      className={
+                        idx % 2 === 0
+                          ? "border-b border-border/60 bg-background text-foreground transition-colors duration-200 hover:bg-muted/60"
+                          : "border-b border-border/60 bg-muted/30 text-foreground transition-colors duration-200 hover:bg-muted/60"
+                      }
+                    >
                       <td className="px-2 py-2">
                         <div className="relative h-12 w-20 overflow-hidden rounded border border-border/70 bg-muted">
                           <Image src={row.imageUrl} alt="" fill className="object-cover" sizes="80px" />

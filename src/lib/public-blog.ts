@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getPublishedDashboardBlogBySlug } from "@/lib/dashboard/store";
 import { getBlogPostBySlug } from "@/data/student-news";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { translateText } from "@/lib/translate";
 
 export type PublicBlogPost = {
   slug: string;
@@ -40,6 +42,7 @@ function sanitizeHtml(input: string): string {
 }
 
 export async function getPublicBlogBySlug(slug: string): Promise<PublicBlogPost | null> {
+  const requestLang = await getRequestLang();
   const dashboardPost = await getPublishedDashboardBlogBySlug(slug);
   if (dashboardPost) {
     let authorName = "KMC Member";
@@ -52,12 +55,17 @@ export async function getPublicBlogBySlug(slug: string): Promise<PublicBlogPost 
       authorName = author?.name?.trim() || author?.email || authorName;
       authorEmail = author?.email || null;
     }
+    const [title, category, contentHtml] = await Promise.all([
+      translateText(dashboardPost.title, requestLang, "en"),
+      translateText(dashboardPost.category, requestLang, "en"),
+      translateText(dashboardPost.description || "<p></p>", requestLang, "en"),
+    ]);
     return {
       slug,
-      title: dashboardPost.title,
+      title,
       dateIso: dashboardPost.dateIso,
-      category: dashboardPost.category,
-      contentHtml: sanitizeHtml(dashboardPost.description || "<p></p>"),
+      category,
+      contentHtml: sanitizeHtml(contentHtml),
       thumbnail: dashboardPost.coverImage || null,
       author: {
         id: dashboardPost.createdById ?? null,
@@ -69,12 +77,17 @@ export async function getPublicBlogBySlug(slug: string): Promise<PublicBlogPost 
 
   const staticPost = getBlogPostBySlug(slug);
   if (!staticPost) return null;
+  const [title, category, content] = await Promise.all([
+    translateText(staticPost.title, requestLang, staticPost.locale ?? "en"),
+    translateText(staticPost.category, requestLang, staticPost.locale ?? "en"),
+    translateText(staticPost.content, requestLang, staticPost.locale ?? "en"),
+  ]);
   return {
     slug,
-    title: staticPost.title,
+    title,
     dateIso: staticPost.dateIso,
-    category: staticPost.category,
-    contentHtml: paragraphsToHtml(staticPost.content),
+    category,
+    contentHtml: paragraphsToHtml(content),
     thumbnail: staticPost.coverImage || null,
     author: {
       id: null,

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { listDashboardContentByCreator } from "@/lib/dashboard/store";
+import { isMemberCategory } from "@/lib/members/config";
 import { hasMinimumRole } from "@/lib/roles";
 import { isSuspendedUser, setSuspendedUser } from "@/lib/dashboard/user-status-store";
 
@@ -74,6 +75,8 @@ export async function PATCH(
     role?: "USER" | "ADMIN";
     suspend?: boolean;
     approve?: boolean;
+    convertToMember?: boolean;
+    convertToMemberRole?: string;
   };
 
   if (body.role) {
@@ -124,6 +127,47 @@ export async function PATCH(
       },
     });
     return NextResponse.json({ ...updated, status: statusFrom(updated) });
+  }
+
+  if (body.convertToMember === true) {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+    if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const existing = await prisma.communityMember.findFirst({
+      where: { contactEmail: user.email },
+      select: { id: true },
+    });
+    if (existing) {
+      return NextResponse.json({ error: "User is already a member." }, { status: 400 });
+    }
+
+    const convertRole = (body.convertToMemberRole ?? "GENERAL").trim().toUpperCase();
+    if (!isMemberCategory(convertRole)) {
+      return NextResponse.json({ error: "Invalid member role." }, { status: 400 });
+    }
+
+    const created = await prisma.communityMember.create({
+      data: {
+        name: user.name?.trim() || user.email.split("@")[0] || "Member",
+        contactEmail: user.email,
+        category: convertRole,
+        profileVisibility: "MEMBERS_ONLY",
+      },
+      select: {
+        id: true,
+        name: true,
+        contactEmail: true,
+        category: true,
+      },
+    });
+    return NextResponse.json({ ok: true, member: created });
   }
 
   return NextResponse.json({ error: "Invalid payload" }, { status: 400 });

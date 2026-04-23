@@ -8,6 +8,20 @@ import { prisma } from "@/lib/prisma";
 /** Re-sync role/verification/name from DB periodically for JWT sessions. */
 const SESSION_SYNC_MS = 2 * 60 * 1000;
 
+async function resolveProfileImage(email: string | null | undefined) {
+  const normalizedEmail = email?.trim().toLowerCase();
+  if (!normalizedEmail) {
+    return undefined;
+  }
+
+  const member = await prisma.communityMember.findFirst({
+    where: { contactEmail: normalizedEmail },
+    select: { imageUrl: true },
+  });
+  const imageUrl = member?.imageUrl?.trim();
+  return imageUrl || undefined;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
   secret: env.AUTH_SECRET,
@@ -46,7 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.sub = user.id;
         if (user.email) token.email = user.email;
@@ -54,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role as UserRole;
         token.emailVerified =
           (user as { emailVerified?: boolean }).emailVerified === true;
+        token.picture = await resolveProfileImage(user.email);
         token.sessionSyncedAt = Date.now();
         return token;
       }
@@ -61,10 +76,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const sub = token.sub;
       if (sub) {
         const last = (token.sessionSyncedAt as number) || 0;
-        if (Date.now() - last > SESSION_SYNC_MS) {
+        const shouldSync = trigger === "update" || Date.now() - last > SESSION_SYNC_MS;
+        if (shouldSync) {
           const row = await prisma.user.findUnique({
             where: { id: sub },
-            select: { emailVerified: true, name: true, role: true },
+            select: { emailVerified: true, name: true, role: true, email: true },
           });
           token.emailVerified = row?.emailVerified != null;
           if (row?.role) {
@@ -75,6 +91,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           } else if (row?.name === null) {
             token.name = undefined;
           }
+          token.picture = await resolveProfileImage(row?.email ?? (token.email as string | undefined));
           token.sessionSyncedAt = Date.now();
         }
       }
@@ -85,6 +102,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.sub;
         if (token.email) session.user.email = token.email as string;
         if (token.name) session.user.name = token.name as string;
+        session.user.image = token.picture ? (token.picture as string) : undefined;
         session.user.role = parseUserRole(token.role as string | undefined);
         session.user.isEmailVerified = token.emailVerified === true;
       }

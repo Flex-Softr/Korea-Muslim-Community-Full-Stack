@@ -1,5 +1,6 @@
 export type ActivityNewsItem = {
   id: string;
+  locale?: "en" | "bn" | "kr";
   /** URL segment for `/activity/[slug]` — not shared with blog routes. */
   slug: string;
   /** ISO date for `<time datetime>` when available. */

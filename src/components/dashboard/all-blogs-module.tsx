@@ -21,6 +21,7 @@ type EditableRow = {
   dateIso: string;
   description: string;
   coverImage: string;
+  createdById?: string;
 };
 
 function formatDate(dateIso: string): string {
@@ -60,6 +61,8 @@ function ContentRowsModule({
   const [editTitle, setEditTitle] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [canManageAll, setCanManageAll] = useState(false);
   const { notify } = useToastSystem();
 
   useEffect(() => {
@@ -70,11 +73,15 @@ function ContentRowsModule({
         const res = await fetch(`/api/dashboard/content/${contentType}`, { cache: "no-store" });
         const data = (await res.json()) as {
           items?: EditableRow[];
+          currentUserId?: string | null;
+          canManageAll?: boolean;
         };
         if (!res.ok) throw new Error("Failed");
         if (cancelled) return;
         const rows = data.items ?? [];
         setItems(rows);
+        setCurrentUserId(data.currentUserId ?? null);
+        setCanManageAll(data.canManageAll ?? false);
         setCategories(
           [...new Set(rows.map((row) => row.category))].sort((a, b) => a.localeCompare(b)),
         );
@@ -102,6 +109,8 @@ function ContentRowsModule({
     setEditTitle(row.title);
     setEditCategory(row.category);
   };
+
+  const canManageRow = (row: EditableRow) => canManageAll || (currentUserId != null && row.createdById === currentUserId);
 
   const saveEdit = () => {
     if (!editTarget) return;
@@ -177,7 +186,7 @@ function ContentRowsModule({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[42rem] text-sm">
             <thead>
-              <tr className="border-b border-border bg-gray-100 text-left text-xs font-bold uppercase tracking-wide text-foreground">
+              <tr className="border-b border-border/80 bg-muted/70 text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
                 <th className="px-2 py-2">Title</th>
                 <th className="px-2 py-2">Category</th>
                 <th className="px-2 py-2">Created At</th>
@@ -203,8 +212,8 @@ function ContentRowsModule({
                     key={row.id}
                     className={
                       idx % 2 === 0
-                        ? "border-b border-border/60 bg-white transition-colors duration-200 hover:bg-indigo-50"
-                        : "border-b border-border/60 bg-slate-50/70 transition-colors duration-200 hover:bg-indigo-50"
+                        ? "border-b border-border/60 bg-background text-foreground transition-colors duration-200 hover:bg-muted/60"
+                        : "border-b border-border/60 bg-muted/30 text-foreground transition-colors duration-200 hover:bg-muted/60"
                     }
                   >
                     <td className="px-2 py-2 font-medium">{row.title}</td>
@@ -213,21 +222,34 @@ function ContentRowsModule({
                     <td className="px-2 py-2">
                       <div className="flex justify-end gap-2">
                         {editHrefBase ? (
-                          <Link
-                            href={`${editHrefBase}/${row.id}/edit`}
-                            className={buttonVariants({ variant: "outline", size: "icon-sm" })}
-                            title={`Edit ${nounSingular.toLowerCase()}`}
-                          >
-                            <Pencil className="size-4" />
-                          </Link>
+                          canManageRow(row) ? (
+                            <Link
+                              href={`${editHrefBase}/${row.id}/edit`}
+                              className={buttonVariants({ variant: "outline", size: "icon-sm" })}
+                              title={`Edit ${nounSingular.toLowerCase()}`}
+                            >
+                              <Pencil className="size-4" />
+                            </Link>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon-sm"
+                              disabled
+                              title={`Only the creator can edit this ${nounSingular.toLowerCase()}`}
+                            >
+                              <Pencil className="size-4" />
+                            </Button>
+                          )
                         ) : (
                           <Button
                             type="button"
                             variant="outline"
                             size="icon-sm"
                             onClick={() => openEdit(row)}
+                            disabled={!canManageRow(row)}
                             title={`Edit ${nounSingular.toLowerCase()}`}
-                            className="hover:bg-indigo-50 hover:text-indigo-700"
+                            className="hover:bg-muted hover:text-foreground"
                           >
                             <Pencil className="size-4" />
                           </Button>
@@ -237,6 +259,7 @@ function ContentRowsModule({
                           variant="destructive"
                           size="icon-sm"
                           onClick={() => setDeleteTarget(row)}
+                          disabled={!canManageRow(row)}
                           title={`Delete ${nounSingular.toLowerCase()}`}
                           className="hover:bg-red-600"
                         >

@@ -11,6 +11,7 @@ export type CommunityMemberListDTO = {
   name: string;
   nameBn: string | null;
   title: string | null;
+  designation: string | null;
   aboutSummary: string | null;
   bio: string | null;
   imageUrl: string | null;
@@ -64,6 +65,7 @@ function mapListRow(m: {
   name: string;
   nameBn: string | null;
   title: string | null;
+  designation: string | null;
   aboutSummary: string | null;
   bio: string | null;
   imageUrl: string | null;
@@ -87,6 +89,7 @@ function mapListRow(m: {
     name: m.name,
     nameBn: m.nameBn,
     title: m.title,
+    designation: m.designation,
     aboutSummary: m.aboutSummary,
     bio: m.bio,
     imageUrl: m.imageUrl,

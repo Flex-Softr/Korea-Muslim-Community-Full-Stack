@@ -2,22 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ImageUploader } from "@/components/ui/image-uploader";
+import { getAccountProfile } from "@/lib/api/account-profile";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToastSystem } from "@/components/ui/toast-system";
-
-type ProfilePayload = {
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-    role: string;
-    bio: string | null;
-    imageUrl: string | null;
-  };
-};
 
 type BlogItem = {
   id: string;
@@ -38,8 +27,8 @@ export function UserDashboardHome() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [bio, setBio] = useState("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [memberCode, setMemberCode] = useState<string | null>(null);
+  const [city, setCity] = useState<string | null>(null);
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
 
   useEffect(() => {
@@ -47,18 +36,17 @@ export function UserDashboardHome() {
     const load = async () => {
       setLoading(true);
       try {
-        const [profileRes, blogRes] = await Promise.all([
-          fetch("/api/account/profile", { cache: "no-store" }),
+        const [profile, blogRes] = await Promise.all([
+          getAccountProfile(),
           fetch("/api/dashboard/content/blog?mine=true", { cache: "no-store" }),
         ]);
-        if (!profileRes.ok || !blogRes.ok) throw new Error("Failed");
-        const profile = (await profileRes.json()) as ProfilePayload;
+        if (!blogRes.ok) throw new Error("Failed blogs");
         const blogData = (await blogRes.json()) as { items?: BlogItem[] };
         if (cancelled) return;
         setName(profile.user.name ?? "");
         setEmail(profile.user.email);
-        setBio(profile.user.bio ?? "");
-        setImageUrl(profile.user.imageUrl ?? null);
+        setMemberCode(profile.member?.memberCode ?? null);
+        setCity(profile.member?.cityKorea ?? null);
         setBlogs(blogData.items ?? []);
       } catch {
         if (!cancelled) notify("Could not load dashboard data.", "error");
@@ -72,32 +60,19 @@ export function UserDashboardHome() {
     };
   }, [notify]);
 
-  const saveProfile = () => {
-    void (async () => {
-      const res = await fetch("/api/account/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          bio: bio.trim(),
-          imageUrl,
-        }),
-      });
-      if (!res.ok) {
-        notify("Could not update profile.", "error");
-        return;
-      }
-      notify("Profile updated.", "success");
-    })();
-  };
-
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">My Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Manage your profile and your blogs.</p>
+            <p className="text-sm text-muted-foreground">
+              View a quick profile summary. Edit your full registration details in{" "}
+              <Link href="/dashboard/settings#account-profile" className="font-medium text-primary underline-offset-4 hover:underline">
+                Settings
+              </Link>
+              .
+            </p>
           </div>
           <Link
             href="/dashboard/blogs/create"
@@ -108,45 +83,36 @@ export function UserDashboardHome() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
+          <p className="text-sm text-muted-foreground">Loading profile…</p>
         ) : (
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Email</Label>
-              <Input value={email} readOnly />
+              <Input value={email} readOnly className="bg-muted" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile-name">Name</Label>
-              <Input
-                id="profile-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={120}
-              />
+              <Label>Name</Label>
+              <Input value={name} readOnly className="bg-muted" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="profile-bio">Bio</Label>
-              <textarea
-                id="profile-bio"
-                className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                maxLength={3000}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Profile image</Label>
-              <ImageUploader
-                value={imageUrl}
-                onChange={setImageUrl}
-                maxSizeMb={5}
-                helperText="Upload your profile image."
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button type="button" onClick={saveProfile}>
-                Save Profile
-              </Button>
+            {memberCode ? (
+              <div className="space-y-2">
+                <Label>Member code</Label>
+                <Input value={memberCode} readOnly className="bg-muted" />
+              </div>
+            ) : null}
+            {city ? (
+              <div className="space-y-2">
+                <Label>City (Korea)</Label>
+                <Input value={city} readOnly className="bg-muted" />
+              </div>
+            ) : null}
+            <div className="pt-1">
+              <Link
+                href="/dashboard/settings#account-profile"
+                className={buttonVariants({ variant: "secondary" })}
+              >
+                Edit full profile in Settings
+              </Link>
             </div>
           </div>
         )}
@@ -160,7 +126,7 @@ export function UserDashboardHome() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[34rem] text-sm sm:min-w-[40rem]">
               <thead>
-                <tr className="border-b border-border bg-gray-100 text-left text-xs font-bold uppercase tracking-wide text-foreground">
+                <tr className="border-b border-border/80 bg-muted/70 text-left text-xs font-bold uppercase tracking-wide text-muted-foreground">
                   <th className="px-2 py-2">Title</th>
                   <th className="px-2 py-2">Category</th>
                   <th className="px-2 py-2">Status</th>
@@ -173,8 +139,8 @@ export function UserDashboardHome() {
                     key={blog.id}
                     className={
                       idx % 2 === 0
-                        ? "border-b border-border/60 bg-white transition-colors duration-200 hover:bg-indigo-50"
-                        : "border-b border-border/60 bg-slate-50/70 transition-colors duration-200 hover:bg-indigo-50"
+                        ? "border-b border-border/60 bg-background text-foreground transition-colors duration-200 hover:bg-muted/60"
+                        : "border-b border-border/60 bg-muted/30 text-foreground transition-colors duration-200 hover:bg-muted/60"
                     }
                   >
                     <td className="px-2 py-2 font-medium">{blog.title}</td>

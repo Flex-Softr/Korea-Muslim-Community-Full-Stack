@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ArrowLeft, LogOut, Menu } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ChevronDown, LogOut, Menu } from "lucide-react";
+import { useLanguage, type Lang } from "@/components/providers/language-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -13,7 +15,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getLangTriggerShortLabel } from "@/lib/i18n/lang-trigger-label";
+
+const LANG_OPTIONS: Array<{
+  value: Lang;
+  labelKey: "common.bengali" | "common.english" | "common.korean";
+}> = [
+  { value: "bn", labelKey: "common.bengali" },
+  { value: "en", labelKey: "common.english" },
+  { value: "kr", labelKey: "common.korean" },
+];
 
 function initials(name: string | null | undefined, email: string) {
   if (name?.trim()) {
@@ -28,14 +40,18 @@ function initials(name: string | null | undefined, email: string) {
 export function DashboardHeader({
   email,
   name,
+  image,
   onMenuClick,
 }: {
   email: string;
   name?: string | null;
+  image?: string | null;
   /** Opens the mobile navigation drawer (dashboard shell only). */
   onMenuClick?: () => void;
 }) {
   const router = useRouter();
+  const [langOpen, setLangOpen] = useState(false);
+  const { lang, setLang, t } = useLanguage();
   const label = initials(name, email);
 
   return (
@@ -61,14 +77,44 @@ export function DashboardHeader({
         )}
       >
         <ArrowLeft className="size-4 shrink-0" />
-        <span className="hidden min-[380px]:inline sm:inline">Back to site</span>
+        <span className="hidden min-[380px]:inline sm:inline">{t("common.backToSite")}</span>
       </Link>
 
       <span className="min-w-0 flex-1" aria-hidden />
 
+      <div data-no-auto-translate="true">
+        <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
+          <DropdownMenuTrigger
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "h-9 px-2.5 text-sm font-semibold",
+            )}
+          >
+            <span>Lan:</span>
+            <span className="pl-1 font-bold">{getLangTriggerShortLabel(lang)}</span>
+            <ChevronDown className="ml-1 size-4 opacity-80" aria-hidden />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8}>
+            {LANG_OPTIONS.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                className="cursor-pointer"
+                onClick={() => {
+                  setLang(option.value);
+                  setLangOpen(false);
+                }}
+              >
+                {t(option.labelKey)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger className="flex max-w-[min(100%,12rem)] min-w-0 items-center gap-2 rounded-lg p-1.5 outline-none ring-offset-background hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring sm:max-w-none">
           <Avatar size="sm" className="shrink-0">
+            {image ? <AvatarImage src={image} alt={name || email || "Account"} /> : null}
             <AvatarFallback>{label}</AvatarFallback>
           </Avatar>
           <div className="hidden min-w-0 text-left text-sm sm:block">
@@ -89,7 +135,7 @@ export function DashboardHeader({
           </div>
           <div className="p-1">
             <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
-              Settings
+              {t("common.settings")}
             </DropdownMenuItem>
           </div>
           <DropdownMenuSeparator className="my-0" />
@@ -101,7 +147,7 @@ export function DashboardHeader({
               onClick={() => signOut({ callbackUrl: "/" })}
             >
               <LogOut className="size-4" />
-              Log out
+              {t("common.logout")}
             </Button>
           </div>
         </DropdownMenuContent>

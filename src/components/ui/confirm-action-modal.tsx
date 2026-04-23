@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,7 @@ type ConfirmActionModalProps = {
   cancelLabel?: string;
   onConfirm: () => void;
   confirmVariant?: "default" | "destructive";
+  children?: ReactNode;
 };
 
 export function ConfirmActionModal({
@@ -23,6 +25,7 @@ export function ConfirmActionModal({
   cancelLabel = "Cancel",
   onConfirm,
   confirmVariant = "destructive",
+  children,
 }: ConfirmActionModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -30,6 +33,7 @@ export function ConfirmActionModal({
         <div className="space-y-4 p-5">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
+          {children}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {cancelLabel}

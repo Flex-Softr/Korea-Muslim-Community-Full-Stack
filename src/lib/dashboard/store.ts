@@ -92,8 +92,11 @@ export async function createDashboardContent(
     coverImage?: string;
     videoUrl?: string;
     createdById?: string;
+    status?: "pending" | "published";
   },
 ): Promise<DashboardContentRow> {
+  const resolvedStatus =
+    input.status ?? (type === "blog" ? "pending" : "published");
   const created = await prisma.dashboardContent.create({
     data: {
       type,
@@ -103,8 +106,8 @@ export async function createDashboardContent(
       coverImage: input.coverImage?.trim() ?? "",
       videoUrl: input.videoUrl?.trim() || null,
       createdById: input.createdById,
-      status: type === "blog" ? "pending" : "published",
-      publishedAt: type === "blog" ? null : new Date(),
+      status: resolvedStatus,
+      publishedAt: resolvedStatus === "published" ? new Date() : null,
     },
   });
   return mapContentRow(created);

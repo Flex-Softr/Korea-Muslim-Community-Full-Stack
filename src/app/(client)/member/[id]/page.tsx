@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const desc =
     member.aboutSummary ??
     member.bio ??
+    member.designation ??
     member.jobTitle ??
     member.title ??
     member.name;
@@ -61,6 +62,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
     .filter(Boolean)
     .join(" · ");
   const bannerSubtitle =
+    member.designation ??
     member.jobTitle ??
     member.title ??
     member.aboutSummary ??
@@ -101,7 +103,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
               className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
             >
               <ArrowLeft className="size-4 shrink-0" aria-hidden />
-              Back to {section.title.toLowerCase()}
+              Back to <span className="capitalize">{section.title.toLowerCase()}</span> 
             </Link>
 
             <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">

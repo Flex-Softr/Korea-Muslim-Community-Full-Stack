@@ -16,11 +16,13 @@ export function DashboardShell({
   role,
   email,
   name,
+  image,
   children,
 }: {
   role: UserRole;
   email: string;
   name?: string | null;
+  image?: string | null;
   children: React.ReactNode;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -33,6 +35,7 @@ export function DashboardShell({
         <DashboardHeader
           email={email}
           name={name}
+          image={image}
           onMenuClick={() => setMobileNavOpen(true)}
         />
         <main className="animate-in fade-in min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] duration-200 sm:px-4 sm:py-4 lg:px-6 lg:py-6">

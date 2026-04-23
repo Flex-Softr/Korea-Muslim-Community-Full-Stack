@@ -65,6 +65,11 @@ export function MemberCard({ member }: { member: CommunityMemberListDTO }) {
           <h3 className="text-lg font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] dark:group-hover:text-sky-400">
             {member.name}
           </h3>
+          {member.designation ? (
+            <p className="mt-1 text-sm font-medium text-[#2c7bb6] dark:text-sky-400">
+              {member.designation}
+            </p>
+          ) : null}
           {member.nameBn ? (
             <p className="mt-1 text-sm text-muted-foreground" lang="bn">
               {member.nameBn}
