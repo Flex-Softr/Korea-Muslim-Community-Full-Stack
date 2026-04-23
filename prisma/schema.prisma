@@ -16,6 +16,8 @@ model CommunityMember {
   nameBn  String?
   /// Association role on the directory (President, Volunteer coordinator, …).
   title   String?
+  /// Public-facing designation shown under member name.
+  designation String?
   /// Short intro (e.g. one sentence for cards and profile lead).
   aboutSummary String?
   /// Longer bio / story; separate paragraphs with blank lines.
@@ -165,4 +167,12 @@ model DashboardCarousel {
   updatedAt DateTime @updatedAt
 
   @@index([isActive, sortOrder])
+}
+
+model AppSetting {
+  id        String   @id @default(cuid()) @map("_id")
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

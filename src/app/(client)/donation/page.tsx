@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     "Support Korea Muslim Community — why we need your help and how to give by bank transfer.",
 };
 
-export default function DonationPage() {
-  const bank = getDonationBankDetails();
+export default async function DonationPage() {
+  const bank = await getDonationBankDetails();
 
   return (
     <>
@@ -118,13 +118,13 @@ export default function DonationPage() {
                 <div>
                   <dt className="font-medium text-foreground">Bank</dt>
                   <dd className="mt-0.5 text-muted-foreground">
-                    {bank.bankName}
+                    <span data-no-auto-translate="true">{bank.bankName}</span>
                   </dd>
                 </div>
                 <div>
                   <dt className="font-medium text-foreground">Account name</dt>
                   <dd className="mt-0.5 text-muted-foreground">
-                    {bank.accountName}
+                    <span data-no-auto-translate="true">{bank.accountName}</span>
                   </dd>
                 </div>
                 <div>
@@ -132,14 +132,14 @@ export default function DonationPage() {
                     Account number
                   </dt>
                   <dd className="mt-0.5 font-mono text-base text-foreground">
-                    {bank.accountNumber}
+                    <span data-no-auto-translate="true">{bank.accountNumber}</span>
                   </dd>
                 </div>
                 {bank.branch ? (
                   <div>
                     <dt className="font-medium text-foreground">Branch</dt>
                     <dd className="mt-0.5 text-muted-foreground">
-                      {bank.branch}
+                      <span data-no-auto-translate="true">{bank.branch}</span>
                     </dd>
                   </div>
                 ) : null}
@@ -149,7 +149,7 @@ export default function DonationPage() {
                       SWIFT / BIC
                     </dt>
                     <dd className="mt-0.5 font-mono text-muted-foreground">
-                      {bank.swift}
+                      <span data-no-auto-translate="true">{bank.swift}</span>
                     </dd>
                   </div>
                 ) : null}
@@ -159,7 +159,7 @@ export default function DonationPage() {
                       Transfer reference / memo
                     </dt>
                     <dd className="mt-1 font-mono text-sm text-muted-foreground">
-                      {bank.referenceNote}
+                      <span data-no-auto-translate="true">{bank.referenceNote}</span>
                     </dd>
                   </div>
                 ) : null}

@@ -6,6 +6,7 @@ import {
   listDashboardContent,
   type DashboardContentType,
 } from "@/lib/dashboard/store";
+import { hasMinimumRole } from "@/lib/roles";
 
 function parseType(value: string): DashboardContentType | null {
   if (value === "blog" || value === "activity" || value === "photo" || value === "video") return value;
@@ -16,6 +17,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ type: string }> },
 ) {
+  const session = await auth();
   const { type } = await params;
   const parsed = parseType(type);
   if (!parsed) {
@@ -24,13 +26,16 @@ export async function GET(
   const searchParams = new URL(request.url).searchParams;
   const mine = searchParams.get("mine") === "true";
   if (mine) {
-    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.json({ items: await listDashboardContentByCreator(parsed, session.user.id) });
   }
-  return NextResponse.json({ items: await listDashboardContent(parsed) });
+  return NextResponse.json({
+    items: await listDashboardContent(parsed),
+    currentUserId: session?.user?.id ?? null,
+    canManageAll: hasMinimumRole(session?.user?.role, "ADMIN"),
+  });
 }
 
 export async function POST(
@@ -74,6 +79,10 @@ export async function POST(
     coverImage: body.coverImage?.trim(),
     videoUrl: body.videoUrl,
     createdById: session?.user?.id ?? undefined,
+    status:
+      parsed === "blog" && hasMinimumRole(session?.user?.role, "ADMIN")
+        ? "published"
+        : undefined,
   });
   return NextResponse.json(created, { status: 201 });
 }

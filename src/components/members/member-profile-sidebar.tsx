@@ -60,7 +60,9 @@ export function MemberProfileSidebar({
   const visibility = parseProfileVisibility(member.profileVisibility);
   const studyLabel = formatStudyStatus(member.studyStatus);
   const occLabel = formatOccupationType(member.occupationType);
-  const roleLine = [member.title, member.jobTitle].filter(Boolean).join(" · ");
+  const roleLine = [member.designation, member.title, member.jobTitle]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="space-y-6">

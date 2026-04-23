@@ -155,6 +155,7 @@ export function MemberProfileContent({
           ) : null}
           {(() => {
             const parts = [
+              member.designation,
               member.title,
               member.jobTitle,
               formatOccupationType(member.occupationType),
@@ -197,6 +198,7 @@ export function MemberProfileContent({
 
       <ProfileSection title="Basic identity">
         <div className="grid gap-6 sm:grid-cols-2">
+          <Field label="Designation" value={member.designation} />
           <Field label="Gender" value={genderLabel} />
           <Field label="Date of birth" value={dobDisplay} />
           <Field
@@ -517,7 +519,7 @@ export function MemberProfileContent({
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-8">
         <Link href={listingHref} className={cn(linkClass, "inline-flex items-center gap-2 text-sm")}>
           <span aria-hidden>←</span>
-          All {sectionListTitle.toLowerCase()}
+          All<span className="capitalize">{sectionListTitle.toLowerCase()}</span>
         </Link>
       </div>
     </div>

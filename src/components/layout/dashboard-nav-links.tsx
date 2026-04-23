@@ -17,6 +17,7 @@ import {
   Video,
   Users,
   UserCheck,
+  UsersRound,
 } from "lucide-react";
 import { hasMinimumRole, type UserRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -36,6 +37,7 @@ const navItems: Array<
       type: "group";
       label: string;
       icon: typeof LayoutDashboard;
+      adminOnly?: boolean;
       children: Array<{
         href: string;
         label: string;
@@ -51,6 +53,12 @@ const navItems: Array<
     icon: FileText,
     children: [
       { href: "/dashboard/content/blog/blogs", label: "All Blogs", icon: FileText },
+      {
+        href: "/dashboard/content/blog/categories",
+        label: "Categories",
+        icon: FolderKanban,
+        adminOnly: true,
+      },
       { href: "/dashboard/blogs/pending", label: "Pending Blogs", icon: Clock3, adminOnly: true },
     ],
   },
@@ -58,6 +66,7 @@ const navItems: Array<
     type: "group",
     label: "Activity",
     icon: Activity,
+    adminOnly: true,
     children: [
       { href: "/dashboard/content/activity/activities", label: "All Activities", icon: Activity },
       { href: "/dashboard/content/activity/categories", label: "Categories", icon: FolderKanban }
@@ -67,6 +76,7 @@ const navItems: Array<
     type: "group",
     label: "Photo Gallery",
     icon: ImageIcon,
+    adminOnly: true,
     children: [
       { href: "/dashboard/content/photo-gallery/photos", label: "All Photos", icon: ImageIcon },
       { href: "/dashboard/content/photo-gallery/categories", label: "Categories", icon: FolderKanban },
@@ -76,6 +86,7 @@ const navItems: Array<
     type: "group",
     label: "Video Gallery",
     icon: Video,
+    adminOnly: true,
     children: [
       { href: "/dashboard/content/video-gallery/videos", label: "All Videos", icon: Video },
       { href: "/dashboard/content/video-gallery/categories", label: "Categories", icon: FolderKanban },
@@ -85,9 +96,11 @@ const navItems: Array<
     type: "group",
     label: "Users",
     icon: Users,
+    adminOnly: true,
     children: [
       { href: "/dashboard/users", label: "All Users", icon: Users, adminOnly: true },
       { href: "/dashboard/users/pending", label: "Pending Users", icon: UserCheck, adminOnly: true },
+      { href: "/dashboard/members", label: "Members", icon: UsersRound, adminOnly: true },
     ],
   },
   { type: "link", href: "/dashboard", label: "Profile", icon: User },
@@ -117,6 +130,7 @@ export function DashboardNavLinks({
         if (item.adminOnly && !isAdmin) return null;
         return item;
       }
+      if (item.adminOnly && !isAdmin) return null;
       const children = item.children.filter((child) => !(child.adminOnly && !isAdmin));
       if (children.length === 0) return null;
       return { ...item, children };

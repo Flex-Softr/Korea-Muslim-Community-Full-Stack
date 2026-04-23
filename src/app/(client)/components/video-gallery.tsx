@@ -22,12 +22,18 @@ type VideoEntry = VideoGalleryItem;
 const VIDEO_PAGE_SIZE = 12;
 
 function getYoutubeThumbnailUrl(videoUrl: string): string | null {
+  const videoId = resolveYoutubeVideoId(videoUrl);
+  if (!videoId) return null;
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function resolveYoutubeVideoId(videoUrl: string): string | null {
   if (!videoUrl) return null;
 
   const normalizedUrl = videoUrl.trim();
   if (!normalizedUrl) return null;
 
-  const resolveVideoId = (urlValue: URL): string | null => {
+  const resolveFromUrl = (urlValue: URL): string | null => {
     const host = urlValue.hostname.replace(/^www\./, "").toLowerCase();
     const path = urlValue.pathname;
     const segments = path.split("/").filter(Boolean);
@@ -49,25 +55,26 @@ function getYoutubeThumbnailUrl(videoUrl: string): string | null {
   };
 
   try {
-    const parsed = new URL(normalizedUrl);
-    const videoId = resolveVideoId(parsed);
-    if (videoId) {
-      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    }
+    return resolveFromUrl(new URL(normalizedUrl));
   } catch {
-    // Handles values like "youtube.com/watch?v=..." without protocol.
     try {
-      const parsed = new URL(`https://${normalizedUrl}`);
-      const videoId = resolveVideoId(parsed);
-      if (videoId) {
-        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      }
+      return resolveFromUrl(new URL(`https://${normalizedUrl}`));
     } catch {
       return null;
     }
   }
+}
 
-  return null;
+function getVideoEmbedUrl(videoUrl: string): string {
+  const youtubeId = resolveYoutubeVideoId(videoUrl);
+  if (youtubeId) {
+    return `https://www.youtube.com/embed/${youtubeId}?rel=0`;
+  }
+
+  if (videoUrl.includes("?")) {
+    return `${videoUrl}&rel=0`;
+  }
+  return `${videoUrl}?rel=0`;
 }
 
 function VideoCard({
@@ -447,11 +454,7 @@ export function VideoGallery({
             <div className="relative aspect-video w-full bg-black">
               <iframe
                 key={active.id}
-                src={
-                  active.embedUrl.includes("?")
-                    ? `${active.embedUrl}&rel=0`
-                    : `${active.embedUrl}?rel=0`
-                }
+                src={getVideoEmbedUrl(active.embedUrl)}
                 title={active.title}
                 className="absolute inset-0 size-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

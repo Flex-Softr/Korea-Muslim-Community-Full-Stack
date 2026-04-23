@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Ban, Eye, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
+import { Ban, Eye, ShieldCheck, ShieldOff, Trash2, UserPlus } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ConfirmActionModal } from "@/components/ui/confirm-action-modal";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
@@ -12,6 +13,13 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ReusablePagination } from "@/components/ui/reusable-pagination";
 import { useToastSystem } from "@/components/ui/toast-system";
 import { emitPendingUsersChanged } from "@/lib/dashboard-events";
+import {
+  deleteDashboardUser,
+  fetchDashboardUserById,
+  fetchDashboardUsers,
+  parseJson,
+  patchDashboardUser,
+} from "@/lib/services/dashboard-users";
 
 type UserRow = {
   id: string;
@@ -19,7 +27,29 @@ type UserRow = {
   email: string;
   role: string;
   status: "pending" | "active" | "suspended";
+  isMember: boolean;
   createdAt: string;
+};
+
+type UserDetail = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+  status: "pending" | "active" | "suspended";
+  createdAt: string;
+  updatedAt: string;
+  profile: {
+    aboutSummary: string | null;
+    bio: string | null;
+    imageUrl: string | null;
+  } | null;
+  submittedBlogs: Array<{
+    id: string;
+    title: string;
+    category: string | null;
+    dateIso: string;
+  }>;
 };
 
 type UsersResponse = {
@@ -31,6 +61,8 @@ type UsersResponse = {
     totalPages: number;
   };
 };
+
+type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY" | "GENERAL";
 
 const PAGE_SIZE = 10;
 
@@ -50,6 +82,30 @@ function StatusBadge({ status }: { status: UserRow["status"] }) {
   return <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{status}</span>;
 }
 
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-sm text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function DetailImage({ label, src }: { label: string; src: string | null | undefined }) {
+  return (
+    <div className="space-y-1 md:col-span-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      {src ? (
+        <div className="relative h-32 w-32 overflow-hidden rounded-lg border border-border">
+          <Image src={src} alt="Profile" fill className="object-cover" />
+        </div>
+      ) : (
+        <p className="text-sm text-foreground">N/A</p>
+      )}
+    </div>
+  );
+}
+
 export function UsersModule() {
   const { notify } = useToastSystem();
   const [rows, setRows] = useState<UserRow[]>([]);
@@ -61,6 +117,10 @@ export function UsersModule() {
   const [loading, setLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
   const [suspendTarget, setSuspendTarget] = useState<UserRow | null>(null);
+  const [convertTarget, setConvertTarget] = useState<UserRow | null>(null);
+  const [convertRole, setConvertRole] = useState<MemberCategory>("GENERAL");
+  const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
+  const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     setLoading(true);
@@ -72,8 +132,8 @@ export function UsersModule() {
       if (search.trim()) params.set("search", search.trim());
       if (role) params.set("role", role);
       if (status) params.set("status", status);
-      const res = await fetch(`/api/dashboard/users?${params.toString()}`, { cache: "no-store" });
-      const data = (await res.json()) as UsersResponse;
+      const res = await fetchDashboardUsers(params);
+      const data = await parseJson<UsersResponse>(res);
       if (!res.ok) throw new Error("Failed");
       setRows(data.items ?? []);
       setTotalPages(data.pagination?.totalPages ?? 1);
@@ -95,11 +155,7 @@ export function UsersModule() {
   };
 
   const updateRole = async (row: UserRow, nextRole: "USER" | "ADMIN") => {
-    const res = await fetch(`/api/dashboard/users/${row.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: nextRole }),
-    });
+    const res = await patchDashboardUser(row.id, { role: nextRole });
     if (!res.ok) return notify("Could not update user role.", "error");
     notify(nextRole === "ADMIN" ? "User promoted to admin." : "Admin role removed.", "success");
     void load();
@@ -107,14 +163,36 @@ export function UsersModule() {
 
   const suspendToggle = async (row: UserRow) => {
     const suspend = row.status !== "suspended";
-    const res = await fetch(`/api/dashboard/users/${row.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ suspend }),
-    });
+    const res = await patchDashboardUser(row.id, { suspend });
     if (!res.ok) return notify("Could not update user status.", "error");
     notify(suspend ? "User suspended." : "User activated.", "success");
     void load();
+  };
+
+  const convertToMember = async (row: UserRow, role: MemberCategory) => {
+    const res = await patchDashboardUser(row.id, {
+      convertToMember: true,
+      convertToMemberRole: role,
+    });
+    const body = await parseJson<{ error?: string }>(res);
+    if (!res.ok) return notify(body.error ?? "Could not convert user to member.", "error");
+    notify("User converted to member successfully.", "success");
+    void load();
+  };
+
+  const loadUserDetails = async (userId: string) => {
+    if (userDetails[userId] || loadingDetails[userId]) return;
+    setLoadingDetails((prev) => ({ ...prev, [userId]: true }));
+    try {
+      const res = await fetchDashboardUserById(userId);
+      const data = await parseJson<UserDetail | { error?: string }>(res);
+      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Failed");
+      setUserDetails((prev) => ({ ...prev, [userId]: data as UserDetail }));
+    } catch {
+      notify("Could not load full user details.", "error");
+    } finally {
+      setLoadingDetails((prev) => ({ ...prev, [userId]: false }));
+    }
   };
 
   const columns = useMemo<Array<DataTableColumn<UserRow>>>(() => {
@@ -138,6 +216,20 @@ export function UsersModule() {
         key: "status",
         header: "Status",
         render: (row) => <StatusBadge status={row.status} />,
+      },
+      {
+        key: "member",
+        header: "Member",
+        render: (row) =>
+          row.isMember ? (
+            <span className="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-800">
+              Yes
+            </span>
+          ) : (
+            <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+              No
+            </span>
+          ),
       },
       {
         key: "createdAt",
@@ -191,6 +283,21 @@ export function UsersModule() {
             >
               <Ban className="size-4" />
             </Button>
+            {!row.isMember ? (
+              <Button
+                type="button"
+                size="icon-sm"
+                variant="outline"
+                onClick={() => {
+                  setConvertTarget(row);
+                  setConvertRole("GENERAL");
+                }}
+                title="Convert to member"
+                className="hover:bg-muted hover:text-foreground"
+              >
+                <UserPlus className="size-4" />
+              </Button>
+            ) : null}
             <Button
               type="button"
               size="icon-sm"
@@ -263,7 +370,49 @@ export function UsersModule() {
         {loading ? (
           <LoadingSpinner label="Loading users..." />
         ) : (
-          <DataTable rows={rows} columns={columns} getRowId={(row) => row.id} emptyLabel="No users found." />
+          <DataTable
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.id}
+            emptyLabel="No users found."
+            expandButtonLabel="Toggle user details"
+            onExpandedChange={(row, expanded) => {
+              if (expanded) {
+                void loadUserDetails(row.id);
+              }
+            }}
+            renderExpandedRow={(row) => (
+              loadingDetails[row.id] ? (
+                <p className="text-sm text-muted-foreground">Loading full details...</p>
+              ) : userDetails[row.id] ? (
+                <div className="grid gap-3 md:grid-cols-3">
+                  <DetailItem label="User ID" value={userDetails[row.id].id} />
+                  <DetailItem label="Full Name" value={userDetails[row.id].name || "N/A"} />
+                  <DetailItem label="Email" value={userDetails[row.id].email} />
+                  <DetailItem
+                    label="Role"
+                    value={userDetails[row.id].role === "ADMIN" ? "admin" : "user"}
+                  />
+                  <DetailItem label="Status" value={userDetails[row.id].status} />
+                  <DetailItem label="Member Account" value={row.isMember ? "Yes" : "No"} />
+                  <DetailItem label="Created At" value={formatDate(userDetails[row.id].createdAt)} />
+                  <DetailItem label="Updated At" value={formatDate(userDetails[row.id].updatedAt)} />
+                  <DetailItem
+                    label="About Summary"
+                    value={userDetails[row.id].profile?.aboutSummary || "N/A"}
+                  />
+                  <DetailItem label="Bio" value={userDetails[row.id].profile?.bio || "N/A"} />
+                  <DetailImage label="Profile Image" src={userDetails[row.id].profile?.imageUrl} />
+                  <DetailItem
+                    label="Submitted Blogs"
+                    value={String(userDetails[row.id].submittedBlogs.length)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No detail data found.</p>
+              )
+            )}
+          />
         )}
 
         {totalPages > 1 ? (
@@ -292,6 +441,43 @@ export function UsersModule() {
       />
 
       <ConfirmActionModal
+        open={convertTarget != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setConvertTarget(null);
+            setConvertRole("GENERAL");
+          }
+        }}
+        title="Convert user to member?"
+        description={`This will create a member profile from ${convertTarget?.email ?? "this user"}.`}
+        confirmLabel="Convert"
+        cancelLabel="Cancel"
+        confirmVariant="default"
+        onConfirm={() => {
+          if (!convertTarget) return;
+          void convertToMember(convertTarget, convertRole);
+          setConvertTarget(null);
+          setConvertRole("GENERAL");
+        }}
+      >
+        <div className="space-y-2">
+          <label htmlFor="convert-member-role" className="text-sm font-medium text-foreground">
+            Assign member role
+          </label>
+          <select
+            id="convert-member-role"
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            value={convertRole}
+            onChange={(e) => setConvertRole(e.target.value as MemberCategory)}
+          >
+            <option value="EXECUTIVE">Executive Member</option>
+            <option value="ADVISOR_BODY">Advisor Body</option>
+            <option value="GENERAL">General Member</option>
+          </select>
+        </div>
+      </ConfirmActionModal>
+
+      <ConfirmActionModal
         open={deleteTarget != null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         title="Delete user?"
@@ -302,7 +488,7 @@ export function UsersModule() {
         onConfirm={() => {
           if (!deleteTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/users/${deleteTarget.id}`, { method: "DELETE" });
+            const res = await deleteDashboardUser(deleteTarget.id);
             if (!res.ok) return notify("Could not delete user.", "error");
             setDeleteTarget(null);
             notify("User deleted.", "success");

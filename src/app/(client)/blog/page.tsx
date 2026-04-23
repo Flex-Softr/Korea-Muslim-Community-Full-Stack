@@ -26,17 +26,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const page = Number.isFinite(pageParsed) ? pageParsed : 1;
 
   const all = await listBlogPosts({ page: 1, pageSize: 200 });
+  console.log(all);
 
   return (
     <>
       <PageBanner
         title="Blog"
-        subtitle="Articles, announcements, and student life updates — browse by topic or year."
+        subtitle="Articles, announcements, and student life updates in a news format."
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
       />
       <BlogListing
         posts={all.items}
         categories={all.categories.map((c) => c.label)}
+        years={all.years.map((y) => y.value)}
         initialCategory={category}
         initialYear={year}
         initialPage={page}

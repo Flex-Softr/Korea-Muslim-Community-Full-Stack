@@ -5,29 +5,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ConfirmActionModal } from "@/components/ui/confirm-action-modal";
+import { useTranslatedFields } from "@/hooks/use-translated-fields";
+import {
+  deleteDashboardUser,
+  getDashboardUserById,
+  updateDashboardUser,
+  type UserDetail,
+} from "@/lib/api/dashboard-users";
 import { useRouter } from "next/navigation";
 import { useToastSystem } from "@/components/ui/toast-system";
-
-type UserDetail = {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  status: "pending" | "active" | "suspended";
-  createdAt: string;
-  updatedAt: string;
-  profile: {
-    aboutSummary: string | null;
-    bio: string | null;
-    imageUrl: string | null;
-  } | null;
-  submittedBlogs: Array<{
-    id: string;
-    title: string;
-    category: string;
-    dateIso: string;
-  }>;
-};
 
 function formatDate(dateIso: string): string {
   const d = new Date(dateIso);
@@ -48,10 +34,8 @@ export function UserDetailsCard({ id }: { id: string }) {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch(`/api/dashboard/users/${id}`, { cache: "no-store" });
-        const data = (await res.json()) as UserDetail | { error: string };
-        if (!res.ok) throw new Error("Failed");
-        if (!cancelled) setUser(data as UserDetail);
+        const data = await getDashboardUserById(id);
+        if (!cancelled) setUser(data);
       } catch {
         if (!cancelled) setError("Could not load user details.");
       } finally {
@@ -62,6 +46,11 @@ export function UserDetailsCard({ id }: { id: string }) {
       cancelled = true;
     };
   }, [id]);
+
+  const profileCopy = useTranslatedFields({
+    locale: "en",
+    description: user?.profile?.aboutSummary || user?.profile?.bio || "No profile bio/image found.",
+  });
 
   return (
     <section className="space-y-4">
@@ -97,7 +86,7 @@ export function UserDetailsCard({ id }: { id: string }) {
                 </div>
               ) : null}
               <p className="text-sm text-muted-foreground">
-                {user.profile?.aboutSummary || user.profile?.bio || "No profile bio/image found."}
+                {profileCopy.description}
               </p>
             </div>
 
@@ -111,7 +100,7 @@ export function UserDetailsCard({ id }: { id: string }) {
                 <ul className="space-y-2">
                   {user.submittedBlogs.map((blog) => (
                     <li key={blog.id} className="rounded-md border border-border/70 px-3 py-2">
-                      <p className="font-medium">{blog.title}</p>
+                      <BlogTitle title={blog.title} />
                       <p className="text-xs text-muted-foreground">
                         {blog.category} · {formatDate(blog.dateIso)}
                       </p>
@@ -128,12 +117,11 @@ export function UserDetailsCard({ id }: { id: string }) {
                   variant="outline"
                   onClick={() => {
                     void (async () => {
-                      const res = await fetch(`/api/dashboard/users/${user.id}`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ role: "USER" }),
-                      });
-                      if (!res.ok) return notify("Could not remove admin role.", "error");
+                      try {
+                        await updateDashboardUser(user.id, { role: "USER" });
+                      } catch {
+                        return notify("Could not remove admin role.", "error");
+                      }
                       notify("Admin role removed.", "success");
                       router.refresh();
                     })();
@@ -147,12 +135,11 @@ export function UserDetailsCard({ id }: { id: string }) {
                   variant="outline"
                   onClick={() => {
                     void (async () => {
-                      const res = await fetch(`/api/dashboard/users/${user.id}`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ role: "ADMIN" }),
-                      });
-                      if (!res.ok) return notify("Could not make admin.", "error");
+                      try {
+                        await updateDashboardUser(user.id, { role: "ADMIN" });
+                      } catch {
+                        return notify("Could not make admin.", "error");
+                      }
                       notify("User promoted to admin.", "success");
                       router.refresh();
                     })();
@@ -186,12 +173,11 @@ export function UserDetailsCard({ id }: { id: string }) {
         onConfirm={() => {
           if (!user) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/users/${user.id}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ suspend: user.status !== "suspended" }),
-            });
-            if (!res.ok) return notify("Could not update user status.", "error");
+            try {
+              await updateDashboardUser(user.id, { suspend: user.status !== "suspended" });
+            } catch {
+              return notify("Could not update user status.", "error");
+            }
             notify(user.status === "suspended" ? "User activated." : "User suspended.", "success");
             setConfirmSuspend(false);
             router.refresh();
@@ -210,8 +196,11 @@ export function UserDetailsCard({ id }: { id: string }) {
         onConfirm={() => {
           if (!user) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/users/${user.id}`, { method: "DELETE" });
-            if (!res.ok) return notify("Could not delete user.", "error");
+            try {
+              await deleteDashboardUser(user.id);
+            } catch {
+              return notify("Could not delete user.", "error");
+            }
             notify("User deleted.", "success");
             router.push("/dashboard/users");
           })();
@@ -219,4 +208,9 @@ export function UserDetailsCard({ id }: { id: string }) {
       />
     </section>
   );
+}
+
+function BlogTitle({ title }: { title: string }) {
+  const translated = useTranslatedFields({ locale: "en", title });
+  return <p className="font-medium">{translated.title}</p>;
 }

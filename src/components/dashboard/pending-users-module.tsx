@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Check, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmActionModal } from "@/components/ui/confirm-action-modal";
@@ -11,6 +12,13 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ReusablePagination } from "@/components/ui/reusable-pagination";
 import { useToastSystem } from "@/components/ui/toast-system";
 import { emitPendingUsersChanged } from "@/lib/dashboard-events";
+import {
+  deleteDashboardUser,
+  fetchDashboardUserById,
+  fetchDashboardUsers,
+  parseJson,
+  patchDashboardUser,
+} from "@/lib/services/dashboard-users";
 
 type UserRow = {
   id: string;
@@ -19,6 +27,27 @@ type UserRow = {
   role: string;
   status: "pending" | "active" | "suspended";
   createdAt: string;
+};
+
+type UserDetail = {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+  status: "pending" | "active" | "suspended";
+  createdAt: string;
+  updatedAt: string;
+  profile: {
+    aboutSummary: string | null;
+    bio: string | null;
+    imageUrl: string | null;
+  } | null;
+  submittedBlogs: Array<{
+    id: string;
+    title: string;
+    category: string | null;
+    dateIso: string;
+  }>;
 };
 
 type UsersResponse = {
@@ -39,6 +68,30 @@ function formatDate(dateIso: string): string {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-sm text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function DetailImage({ label, src }: { label: string; src: string | null | undefined }) {
+  return (
+    <div className="space-y-1 md:col-span-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      {src ? (
+        <div className="relative h-32 w-32 overflow-hidden rounded-lg border border-border">
+          <Image src={src} alt="Profile" fill className="object-cover" />
+        </div>
+      ) : (
+        <p className="text-sm text-foreground">N/A</p>
+      )}
+    </div>
+  );
+}
+
 export function PendingUsersModule() {
   const { notify } = useToastSystem();
   const [rows, setRows] = useState<UserRow[]>([]);
@@ -48,6 +101,8 @@ export function PendingUsersModule() {
   const [loading, setLoading] = useState(false);
   const [approveTarget, setApproveTarget] = useState<UserRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
+  const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
+  const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     setLoading(true);
@@ -58,8 +113,8 @@ export function PendingUsersModule() {
         pageSize: String(PAGE_SIZE),
       });
       if (search.trim()) params.set("search", search.trim());
-      const res = await fetch(`/api/dashboard/users?${params.toString()}`, { cache: "no-store" });
-      const data = (await res.json()) as UsersResponse;
+      const res = await fetchDashboardUsers(params);
+      const data = await parseJson<UsersResponse>(res);
       if (!res.ok) throw new Error("Failed");
       setRows(data.items ?? []);
       setTotalPages(data.pagination?.totalPages ?? 1);
@@ -78,6 +133,21 @@ export function PendingUsersModule() {
   const applySearch = () => {
     setPage(1);
     void load();
+  };
+
+  const loadUserDetails = async (userId: string) => {
+    if (userDetails[userId] || loadingDetails[userId]) return;
+    setLoadingDetails((prev) => ({ ...prev, [userId]: true }));
+    try {
+      const res = await fetchDashboardUserById(userId);
+      const data = await parseJson<UserDetail | { error?: string }>(res);
+      if (!res.ok) throw new Error((data as { error?: string }).error ?? "Failed");
+      setUserDetails((prev) => ({ ...prev, [userId]: data as UserDetail }));
+    } catch {
+      notify("Could not load full user details.", "error");
+    } finally {
+      setLoadingDetails((prev) => ({ ...prev, [userId]: false }));
+    }
   };
 
   const columns = useMemo<Array<DataTableColumn<UserRow>>>(() => {
@@ -175,6 +245,42 @@ export function PendingUsersModule() {
             columns={columns}
             getRowId={(row) => row.id}
             emptyLabel="No pending users found."
+            expandButtonLabel="Toggle pending user details"
+            onExpandedChange={(row, expanded) => {
+              if (expanded) {
+                void loadUserDetails(row.id);
+              }
+            }}
+            renderExpandedRow={(row) => (
+              loadingDetails[row.id] ? (
+                <p className="text-sm text-muted-foreground">Loading full details...</p>
+              ) : userDetails[row.id] ? (
+                <div className="grid gap-3 md:grid-cols-3">
+                  <DetailItem label="User ID" value={userDetails[row.id].id} />
+                  <DetailItem label="Full Name" value={userDetails[row.id].name || "N/A"} />
+                  <DetailItem label="Email" value={userDetails[row.id].email} />
+                  <DetailItem
+                    label="Role"
+                    value={userDetails[row.id].role === "ADMIN" ? "admin" : "user"}
+                  />
+                  <DetailItem label="Status" value={userDetails[row.id].status} />
+                  <DetailItem label="Created At" value={formatDate(userDetails[row.id].createdAt)} />
+                  <DetailItem label="Updated At" value={formatDate(userDetails[row.id].updatedAt)} />
+                  <DetailItem
+                    label="About Summary"
+                    value={userDetails[row.id].profile?.aboutSummary || "N/A"}
+                  />
+                  <DetailItem label="Bio" value={userDetails[row.id].profile?.bio || "N/A"} />
+                  <DetailImage label="Profile Image" src={userDetails[row.id].profile?.imageUrl} />
+                  <DetailItem
+                    label="Submitted Blogs"
+                    value={String(userDetails[row.id].submittedBlogs.length)}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No detail data found.</p>
+              )
+            )}
           />
         )}
 
@@ -195,11 +301,7 @@ export function PendingUsersModule() {
         onConfirm={() => {
           if (!approveTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/users/${approveTarget.id}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ approve: true }),
-            });
+            const res = await patchDashboardUser(approveTarget.id, { approve: true });
             if (!res.ok) return notify("Could not approve user.", "error");
             setApproveTarget(null);
             notify("User approved.", "success");
@@ -220,7 +322,7 @@ export function PendingUsersModule() {
         onConfirm={() => {
           if (!deleteTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/users/${deleteTarget.id}`, { method: "DELETE" });
+            const res = await deleteDashboardUser(deleteTarget.id);
             if (!res.ok) return notify("Could not delete user.", "error");
             setDeleteTarget(null);
             notify("Pending user deleted.", "success");
