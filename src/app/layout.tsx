@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
+import { Noto_Sans_Bengali } from "next/font/google";
 import { auth } from "@/auth";
 import { AppProviders } from "@/components/providers/app-providers";
 import "./globals.css";
+
+const notoSansBengali = Noto_Sans_Bengali({
+  subsets: ["bengali"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-noto-sans-bengali",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Korea Muslim Community",
@@ -16,7 +24,12 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html lang="bn" dir="ltr" suppressHydrationWarning className="h-full antialiased">
+    <html
+      lang="bn"
+      dir="ltr"
+      suppressHydrationWarning
+      className={`${notoSansBengali.variable} h-full antialiased`}
+    >
       <body className="min-h-full bg-background text-foreground">
         <AppProviders session={session}>{children}</AppProviders>
       </body>
