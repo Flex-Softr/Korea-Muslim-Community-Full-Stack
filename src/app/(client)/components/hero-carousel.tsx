@@ -70,7 +70,7 @@ export function HeroCarousel() {
       aria-label="Featured banner"
       className="relative w-full border-b border-black/[0.06] bg-[#f0f0f0]"
     >
-      <div className="relative mx-auto h-[clamp(11rem,32vw,20rem)] w-full max-w-[1920px] sm:h-[clamp(12rem,28vw,22rem)] md:h-[clamp(13rem,24vw,24rem)]">
+      <div className="relative mx-auto h-[clamp(15rem,56vw,24rem)] w-full max-w-[1920px] sm:h-[clamp(13rem,32vw,22rem)] md:h-[clamp(13rem,24vw,24rem)]">
         <Image
           src={imageSrc}
           alt={current?.title || "Korea Muslim Community — featured banner"}
