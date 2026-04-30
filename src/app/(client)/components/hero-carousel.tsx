@@ -17,27 +17,27 @@ type HeroSlide = {
   sortOrder: number;
 };
 
-export function HeroCarousel() {
-  const [slides, setSlides] = useState<HeroSlide[]>([]);
+export function HeroCarousel({ initialSlides = [] }: { initialSlides: HeroSlide[] }) {
+  const [slides] = useState<HeroSlide[]>(initialSlides);
   const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    let active = true;
-    void (async () => {
-      try {
-        const res = await fetch("/api/public/carosal", { cache: "no-store" });
-        const data = (await res.json()) as { items?: HeroSlide[] };
-        if (!res.ok || !active) return;
-        setSlides((data.items ?? []).sort((a, b) => a.sortOrder - b.sortOrder));
-      } catch {
-        if (!active) return;
-        setSlides([]);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+  // useEffect(() => {
+  //   let active = true;
+  //   void (async () => {
+  //     try {
+  //       const res = await fetch("/api/public/carosal", { cache: "no-store" });
+  //       const data = (await res.json()) as { items?: HeroSlide[] };
+  //       if (!res.ok || !active) return;
+  //       setSlides((data.items ?? []).sort((a, b) => a.sortOrder - b.sortOrder));
+  //     } catch {
+  //       if (!active) return;
+  //       setSlides([]);
+  //     }
+  //   })();
+  //   return () => {
+  //     active = false;
+  //   };
+  // }, []);
 
   const hasSlides = slides.length > 0;
   const current = hasSlides ? slides[index] : null;
@@ -60,10 +60,14 @@ export function HeroCarousel() {
     setIndex((prev) => (prev + 1) % slides.length);
   };
 
-  const imageSrc = useMemo(
-    () => current?.imageUrl || "/hero/carousel-slide-1.png",
-    [current?.imageUrl],
-  );
+  // const imageSrc = useMemo(
+  //   () => current?.imageUrl || "/hero/carousel-slide-1.png",
+  //   [current?.imageUrl],
+  //);
+
+  if (!current) return null;
+
+const imageSrc = current.imageUrl;
 
   return (
     <section
