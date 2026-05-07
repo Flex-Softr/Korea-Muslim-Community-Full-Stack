@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -48,7 +48,7 @@ export function ClientUserMenu({
         aria-label={menuLabel}
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm" }),
-          "gap-2 px-1.5 sm:px-2",
+          "gap-2 px-1.5 py-4 sm:px-2 shadow-sm shadow-zinc-800/60 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
           onBrand &&
             "text-white hover:bg-white/15 hover:text-white focus-visible:ring-white/40",
         )}
@@ -61,6 +61,7 @@ export function ClientUserMenu({
             {label}
           </AvatarFallback>
         </Avatar>
+        <ChevronDown className="size-4 shrink-0 opacity-90" aria-hidden />
         {!onBrand ? (
           <span className="hidden max-w-[8rem] truncate text-xs text-muted-foreground sm:inline">
             {email}

@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "jamaat-e-islami.org",
+      },
     ],
   },
   async headers() {
