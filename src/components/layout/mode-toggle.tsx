@@ -43,7 +43,7 @@ export function ModeToggle({ onBrand = false }: { onBrand?: boolean }) {
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         onBrand
           ? "text-white hover:bg-white/15 focus-visible:ring-white/60 focus-visible:ring-offset-[#2c7bb6]"
-          : "text-zinc-700 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
+          : "text-zinc-700 shadow-sm shadow-zinc-800/40 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
       )}
     >
       {isDark ? (

@@ -1,19 +1,32 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Bengali } from "next/font/google";
+import localFont from "next/font/local";
 import { auth } from "@/auth";
 import { AppProviders } from "@/components/providers/app-providers";
 import "./globals.css";
 
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ["bengali"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-sans-bengali",
+const solaimanLipi = localFont({
+  src: [
+    {
+      path: "../../public/fonts/SolaimanLipi.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-solaiman-lipi",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Korea Muslim Community",
-  description: "Community site for Muslims in Korea — events, resources, and member access.",
+  description:
+    "Community site for Muslims in Korea — events, resources, and member access.",
+  icons: {
+    icon: [{ url: "/logo.png", sizes: "512x512" }],
+    shortcut: ["/logo.png"],
+    apple: [
+      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default async function RootLayout({
@@ -28,11 +41,59 @@ export default async function RootLayout({
       lang="bn"
       dir="ltr"
       suppressHydrationWarning
-      className={`${notoSansBengali.variable} h-full antialiased`}
+      className={`${solaimanLipi.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground">
-        <AppProviders session={session}>{children}</AppProviders>
+      <body className="min-h-full bg-background text-foreground font-bangla">
+        <AppProviders session={session}>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );
 }
+
+// import type { Metadata } from "next";
+// import { Noto_Sans_Bengali } from "next/font/google";
+// import { auth } from "@/auth";
+// import { AppProviders } from "@/components/providers/app-providers";
+// import "./globals.css";
+
+// const notoSansBengali = Noto_Sans_Bengali({
+//   subsets: ["bengali"],
+//   weight: ["400", "500", "600", "700"],
+//   variable: "--font-noto-sans-bengali",
+//   display: "swap",
+// });
+
+// export const metadata: Metadata = {
+//   title: "Korea Muslim Community",
+//   description: "Community site for Muslims in Korea — events, resources, and member access.",
+//   icons: {
+//     icon: [
+//       { url: '/logo.png', sizes: '512x512' },
+//     ],
+//     shortcut: ['/logo.png'],
+//     apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
+//   },
+// };
+
+// export default async function RootLayout({
+//   children,
+// }: Readonly<{
+//   children: React.ReactNode;
+// }>) {
+//   const session = await auth();
+
+//   return (
+//     <html
+//       lang="bn"
+//       dir="ltr"
+//       suppressHydrationWarning
+//       className={`${notoSansBengali.variable} h-full antialiased`}
+//     >
+//       <body className="min-h-full bg-background text-foreground">
+//         <AppProviders session={session}>{children}</AppProviders>
+//       </body>
+//     </html>
+//   );
+// }
