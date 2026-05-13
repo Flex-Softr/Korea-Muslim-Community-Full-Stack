@@ -164,6 +164,30 @@ export async function getMembersByCategory(
   const rows = await prisma.communityMember.findMany({
     where,
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: {
+      id: true,
+      name: true,
+      nameBn: true,
+      title: true,
+      designation: true,
+      aboutSummary: true,
+      bio: true,
+      imageUrl: true,
+      sortOrder: true,
+      category: true,
+      universityKr: true,
+      locationCity: true,
+      homeDivisionBd: true,
+      homeDistrictBd: true,
+      degree: true,
+      major: true,
+      studyStatus: true,
+      yearAdmission: true,
+      graduationYear: true,
+      occupationType: true,
+      companyName: true,
+      jobTitle: true,
+    },
   });
   return rows.map(mapListRow);
 }

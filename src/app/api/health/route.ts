@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const timestamp = new Date().toISOString();
   try {
-    await prisma.$connect();
+    await prisma.user.findFirst({ select: { id: true } });
     return NextResponse.json({
       ok: true,
       timestamp,
