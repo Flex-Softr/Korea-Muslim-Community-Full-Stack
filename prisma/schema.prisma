@@ -86,6 +86,7 @@ model CommunityMember {
   updatedAt DateTime @updatedAt
 
   @@index([category])
+  @@index([contactEmail])
 }
 
 model User {

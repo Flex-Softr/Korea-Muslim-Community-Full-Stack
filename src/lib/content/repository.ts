@@ -19,19 +19,20 @@ import {
 } from "@/lib/i18n/content-locale";
 import type { Lang } from "@/lib/i18n/lang";
 import { getRequestLang } from "@/lib/i18n/server-language";
-import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
 import { prisma } from "@/lib/prisma";
-import { clampPage, totalPagesFromCount } from "@/lib/pagination/get-pagination-items";
+import { clampPage, offsetForPage, totalPagesFromCount } from "@/lib/pagination/get-pagination-items";
 
-type DashboardContentModelDelegate = {
-  findMany(args: unknown): Promise<PrismaContentDoc[]>;
+type CmsModelDelegate = {
+  count(args: unknown): Promise<number>;
+  findMany(args: unknown): Promise<unknown[]>;
+  groupBy(args: unknown): Promise<{ category: string; _count: { _all: number } }[]>;
 };
 
 type DashboardPrismaClient = typeof prisma & {
-  dashboardBlog: DashboardContentModelDelegate;
-  dashboardActivity: DashboardContentModelDelegate;
-  dashboardPhoto: DashboardContentModelDelegate;
-  dashboardVideo: DashboardContentModelDelegate;
+  dashboardBlog: CmsModelDelegate;
+  dashboardActivity: CmsModelDelegate;
+  dashboardPhoto: CmsModelDelegate;
+  dashboardVideo: CmsModelDelegate;
 };
 
 const dashboardPrisma = prisma as DashboardPrismaClient;
@@ -113,56 +114,122 @@ function resolveContentSlug(row: PrismaContentDoc, map: ReturnType<typeof resolv
   return slugify(map.en.title) || slugify(map.ko.title) || slugify(map.bn.title) || row.id;
 }
 
-type ListPublishedOpts = {
-  /** When set, only the newest N rows are read from the DB (plus a small buffer for videos with empty URLs). */
-  take?: number;
-};
+const PUBLISHED_OR_LEGACY = {
+  OR: [{ status: "published" as const }, { status: null }],
+} as const;
 
-async function listPublishedContentByType(
-  type: "blog" | "activity" | "photo" | "video",
-  options?: ListPublishedOpts,
-): Promise<PrismaContentDoc[] | null> {
-  const where = { OR: [{ status: "published" as const }, { status: null }] };
-  const take = options?.take;
-  try {
-    switch (type) {
-      case "blog":
-        return await dashboardPrisma.dashboardBlog.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          ...(take != null ? { take } : {}),
-        });
-      case "activity":
-        return await dashboardPrisma.dashboardActivity.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          ...(take != null ? { take } : {}),
-        });
-      case "photo":
-        return await dashboardPrisma.dashboardPhoto.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          ...(take != null ? { take } : {}),
-        });
-      case "video": {
-        const buffer =
-          take != null ? Math.min(Math.max(take * 6, take + 8), 400) : undefined;
-        const rows = await dashboardPrisma.dashboardVideo.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          ...(buffer != null ? { take: buffer } : {}),
-        });
-        const withUrl = rows.filter((row: PrismaContentDoc) =>
-          !!row.videoUrl?.trim(),
-        );
-        if (take != null) {
-          return withUrl.slice(0, take);
-        }
-        return withUrl;
-      }
-    }
-  } catch {
-    return null;
+const LIST_DOC_SELECT = {
+  id: true,
+  title: true,
+  category: true,
+  createdAt: true,
+  description: true,
+  coverImage: true,
+  videoUrl: true,
+  slug: true,
+  localeContent: true,
+} as const;
+
+const FACET_YEAR_SAMPLE = 4000;
+
+function buildCategoryYearWhereBlog(query: ContentListQuery): object {
+  const and: object[] = [PUBLISHED_OR_LEGACY];
+  const cat = query.category?.trim();
+  if (cat) {
+    and.push({ category: cat });
+  }
+  if (query.year != null && Number.isFinite(query.year)) {
+    const y = query.year;
+    and.push({
+      createdAt: {
+        gte: new Date(Date.UTC(y, 0, 1)),
+        lt: new Date(Date.UTC(y + 1, 0, 1)),
+      },
+    });
+  }
+  return { AND: and };
+}
+
+function buildCategoryYearWhereActivity(query: ContentListQuery): object {
+  const and: object[] = [{ OR: [{ status: "published" as const }, { status: null }] }];
+  const cat = query.category?.trim();
+  if (cat) {
+    and.push({ category: cat });
+  }
+  if (query.year != null && Number.isFinite(query.year)) {
+    const y = query.year;
+    and.push({
+      createdAt: {
+        gte: new Date(Date.UTC(y, 0, 1)),
+        lt: new Date(Date.UTC(y + 1, 0, 1)),
+      },
+    });
+  }
+  return { AND: and };
+}
+
+function buildCategoryYearWherePhoto(query: ContentListQuery): object {
+  const and: object[] = [{ OR: [{ status: "published" as const }, { status: null }] }];
+  const cat = query.category?.trim();
+  if (cat) {
+    and.push({ category: cat });
+  }
+  if (query.year != null && Number.isFinite(query.year)) {
+    const y = query.year;
+    and.push({
+      createdAt: {
+        gte: new Date(Date.UTC(y, 0, 1)),
+        lt: new Date(Date.UTC(y + 1, 0, 1)),
+      },
+    });
+  }
+  return { AND: and };
+}
+
+/** Embeddable URLs only so `count` / `skip` match listable items (avoids full scans trimming empty URLs). */
+function buildVideoListWhere(query: ContentListQuery): object {
+  const and: object[] = [
+    { OR: [{ status: "published" as const }, { status: null }] },
+    {
+      OR: [
+        { videoUrl: { startsWith: "http://" } },
+        { videoUrl: { startsWith: "https://" } },
+        { videoUrl: { startsWith: "//" } },
+      ],
+    },
+  ];
+  const cat = query.category?.trim();
+  if (cat) {
+    and.push({ category: cat });
+  }
+  if (query.year != null && Number.isFinite(query.year)) {
+    const y = query.year;
+    and.push({
+      createdAt: {
+        gte: new Date(Date.UTC(y, 0, 1)),
+        lt: new Date(Date.UTC(y + 1, 0, 1)),
+      },
+    });
+  }
+  return { AND: and };
+}
+
+function listPaginationPlan(totalDb: number, query: ContentListQuery, maxCap?: number) {
+  const pageSize = Math.max(1, Math.floor(query.pageSize ?? 9));
+  const effectiveTotal = maxCap != null ? Math.min(totalDb, maxCap) : totalDb;
+  const totalPages = totalPagesFromCount(effectiveTotal, pageSize);
+  const page = clampPage(query.page ?? 1, totalPages);
+  const skip = offsetForPage(page, pageSize);
+  let take = pageSize;
+  if (maxCap != null) {
+    take = Math.max(0, Math.min(pageSize, maxCap - skip));
+  }
+  return { pageSize, effectiveTotal, totalPages, page, skip, take };
+}
+
+function logDbListError(label: string, err: unknown) {
+  if (process.env.NODE_ENV === "development") {
+    console.error(`[content/repository] ${label}:`, err);
   }
 }
 
@@ -282,10 +349,11 @@ function paginate<T>(items: T[], query: ContentListQuery): {
 }
 
 export type ListContentRepositoryOpts = {
+  /** When set, caps how many newest published rows participate in totals and pagination (previews / home). */
   maxRowsFromDb?: number;
 };
 
-/** When listing query is page 1 with no filters, cap DB reads to `pageSize` (pagination beyond page 1 needs a full scan). */
+/** Optional hint for callers that only need the first page without filters (same as passing `maxRowsFromDb: pageSize`). */
 export function repositoryOptsForListQuery(
   query: ContentListQuery,
 ): ListContentRepositoryOpts | undefined {
@@ -297,26 +365,138 @@ export function repositoryOptsForListQuery(
   return { maxRowsFromDb: ps };
 }
 
-export async function listBlogPosts(
-  query: ContentListQuery,
-  /** When set (e.g. from `?lang=` on API), avoids relying on cookie timing alone. */
-  lang?: Lang,
-  opts?: ListContentRepositoryOpts,
-): Promise<PaginatedResponse<StudentNewsPost>> {
-  const requestLang = lang ?? (await getRequestLang());
-  const dbTake = opts?.maxRowsFromDb;
-  const dbRows = await listPublishedContentByType(
-    "blog",
-    dbTake != null ? { take: dbTake } : undefined,
+async function facetCategoriesAndYearsBlog(): Promise<{
+  categories: CategoryOption[];
+  years: YearOption[];
+}> {
+  const [categoryGroups, yearSamples] = await Promise.all([
+    dashboardPrisma.dashboardBlog.groupBy({
+      by: ["category"],
+      where: PUBLISHED_OR_LEGACY,
+      _count: { _all: true },
+    }),
+    dashboardPrisma.dashboardBlog.findMany({
+      where: PUBLISHED_OR_LEGACY,
+      select: { createdAt: true },
+      orderBy: { createdAt: "desc" },
+      take: FACET_YEAR_SAMPLE,
+    }),
+  ]);
+  const categories: CategoryOption[] = [...categoryGroups]
+    .sort((a, b) => a.category.localeCompare(b.category))
+    .map((g) => ({
+      id: g.category,
+      label: g.category,
+      count: g._count._all,
+    }));
+  const years = yearOptionsFrom(
+    (yearSamples as { createdAt: Date }[]).map((r) => ({ dateIso: r.createdAt.toISOString() })),
   );
+  return { categories, years };
+}
+
+async function facetCategoriesAndYearsActivity(): Promise<{
+  categories: CategoryOption[];
+  years: YearOption[];
+}> {
+  const [categoryGroups, yearSamples] = await Promise.all([
+    dashboardPrisma.dashboardActivity.groupBy({
+      by: ["category"],
+      where: PUBLISHED_OR_LEGACY,
+      _count: { _all: true },
+    }),
+    dashboardPrisma.dashboardActivity.findMany({
+      where: PUBLISHED_OR_LEGACY,
+      select: { createdAt: true },
+      orderBy: { createdAt: "desc" },
+      take: FACET_YEAR_SAMPLE,
+    }),
+  ]);
+  const categories: CategoryOption[] = [...categoryGroups]
+    .sort((a, b) => a.category.localeCompare(b.category))
+    .map((g) => ({
+      id: g.category,
+      label: g.category,
+      count: g._count._all,
+    }));
+  const years = yearOptionsFrom(
+    (yearSamples as { createdAt: Date }[]).map((r) => ({ dateIso: r.createdAt.toISOString() })),
+  );
+  return { categories, years };
+}
+
+async function facetCategoriesAndYearsPhoto(): Promise<{
+  categories: CategoryOption[];
+  years: YearOption[];
+}> {
+  const [categoryGroups, yearSamples] = await Promise.all([
+    dashboardPrisma.dashboardPhoto.groupBy({
+      by: ["category"],
+      where: PUBLISHED_OR_LEGACY,
+      _count: { _all: true },
+    }),
+    dashboardPrisma.dashboardPhoto.findMany({
+      where: PUBLISHED_OR_LEGACY,
+      select: { createdAt: true },
+      orderBy: { createdAt: "desc" },
+      take: FACET_YEAR_SAMPLE,
+    }),
+  ]);
+  const categories: CategoryOption[] = [...categoryGroups]
+    .sort((a, b) => a.category.localeCompare(b.category))
+    .map((g) => ({
+      id: g.category,
+      label: g.category,
+      count: g._count._all,
+    }));
+  const years = yearOptionsFrom(
+    (yearSamples as { createdAt: Date }[]).map((r) => ({ dateIso: r.createdAt.toISOString() })),
+  );
+  return { categories, years };
+}
+
+async function facetCategoriesAndYearsVideo(): Promise<{
+  categories: CategoryOption[];
+  years: YearOption[];
+}> {
+  const baseWhere = buildVideoListWhere({});
+  const [categoryGroups, yearSamples] = await Promise.all([
+    dashboardPrisma.dashboardVideo.groupBy({
+      by: ["category"],
+      where: baseWhere,
+      _count: { _all: true },
+    }),
+    dashboardPrisma.dashboardVideo.findMany({
+      where: baseWhere,
+      select: { createdAt: true },
+      orderBy: { createdAt: "desc" },
+      take: FACET_YEAR_SAMPLE,
+    }),
+  ]);
+  const categories: CategoryOption[] = [...categoryGroups]
+    .sort((a, b) => a.category.localeCompare(b.category))
+    .map((g) => ({
+      id: g.category,
+      label: g.category,
+      count: g._count._all,
+    }));
+  const years = yearOptionsFrom(
+    (yearSamples as { createdAt: Date }[]).map((r) => ({ dateIso: r.createdAt.toISOString() })),
+  );
+  return { categories, years };
+}
+
+function listBlogPostsStatic(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): PaginatedResponse<StudentNewsPost> {
+  const maxCap = opts?.maxRowsFromDb;
   const staticSorted = [...STUDENT_NEWS_POSTS].sort((a, b) =>
     b.dateIso.localeCompare(a.dateIso),
   );
-  const staticSlice =
-    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
-  const base = dbRows
-    ? dbRows.map((row) => mapDbBlogPost(row, requestLang))
-    : staticSlice.map((p) => mapStaticBlog(p, requestLang));
+  const staticSlice = maxCap != null ? staticSorted.slice(0, maxCap) : staticSorted;
+  const base = staticSlice.map((p) => mapStaticBlog(p, requestLang));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {
@@ -330,6 +510,61 @@ export async function listBlogPosts(
       totalPages: paged.totalPages,
     },
   };
+}
+
+async function listBlogPostsFromDb(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<StudentNewsPost>> {
+  const where = buildCategoryYearWhereBlog(query);
+  const maxCap = opts?.maxRowsFromDb;
+  const totalDb = await dashboardPrisma.dashboardBlog.count({ where });
+  const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
+    totalDb,
+    query,
+    maxCap,
+  );
+  const [{ categories, years }, rawRows] = await Promise.all([
+    facetCategoriesAndYearsBlog(),
+    take === 0
+      ? Promise.resolve([])
+      : dashboardPrisma.dashboardBlog.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take,
+          select: LIST_DOC_SELECT,
+        }),
+  ]);
+  const rows = rawRows as PrismaContentDoc[];
+  const items = rows.map((row) => mapDbBlogPost(row, requestLang));
+  return {
+    items,
+    categories,
+    years,
+    pagination: {
+      page,
+      pageSize,
+      totalItems: effectiveTotal,
+      totalPages,
+    },
+  };
+}
+
+export async function listBlogPosts(
+  query: ContentListQuery,
+  /** When set (e.g. from `?lang=` on API), avoids relying on cookie timing alone. */
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<StudentNewsPost>> {
+  const requestLang = lang ?? (await getRequestLang());
+  try {
+    return await listBlogPostsFromDb(requestLang, query, opts);
+  } catch (err) {
+    logDbListError("listBlogPosts", err);
+    return listBlogPostsStatic(requestLang, query, opts);
+  }
 }
 
 export async function getBlogPost(slug: string, lang?: Lang): Promise<StudentNewsPost | null> {
@@ -356,25 +591,17 @@ export async function getBlogPost(slug: string, lang?: Lang): Promise<StudentNew
   return mapStaticBlog(staticMatch, requestLang);
 }
 
-export async function listActivityItems(
+function listActivityItemsStatic(
+  requestLang: Lang,
   query: ContentListQuery,
-  lang?: Lang,
   opts?: ListContentRepositoryOpts,
-): Promise<PaginatedResponse<ActivityNewsItem>> {
-  const requestLang = lang ?? (await getRequestLang());
-  const dbTake = opts?.maxRowsFromDb;
-  const dbRows = await listPublishedContentByType(
-    "activity",
-    dbTake != null ? { take: dbTake } : undefined,
-  );
+): PaginatedResponse<ActivityNewsItem> {
+  const maxCap = opts?.maxRowsFromDb;
   const staticSorted = [...ACTIVITY_NEWS].sort((a, b) =>
     (b.dateIso ?? "").localeCompare(a.dateIso ?? ""),
   );
-  const staticSlice =
-    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
-  const base = dbRows
-    ? dbRows.map((row) => mapDbActivityItem(row, requestLang))
-    : staticSlice.map((item) => mapStaticActivity(item, requestLang));
+  const staticSlice = maxCap != null ? staticSorted.slice(0, maxCap) : staticSorted;
+  const base = staticSlice.map((item) => mapStaticActivity(item, requestLang));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {
@@ -388,6 +615,60 @@ export async function listActivityItems(
       totalPages: paged.totalPages,
     },
   };
+}
+
+async function listActivityItemsFromDb(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<ActivityNewsItem>> {
+  const where = buildCategoryYearWhereActivity(query);
+  const maxCap = opts?.maxRowsFromDb;
+  const totalDb = await dashboardPrisma.dashboardActivity.count({ where });
+  const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
+    totalDb,
+    query,
+    maxCap,
+  );
+  const [{ categories, years }, rawRows] = await Promise.all([
+    facetCategoriesAndYearsActivity(),
+    take === 0
+      ? Promise.resolve([])
+      : dashboardPrisma.dashboardActivity.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take,
+          select: LIST_DOC_SELECT,
+        }),
+  ]);
+  const rows = rawRows as PrismaContentDoc[];
+  const items = rows.map((row) => mapDbActivityItem(row, requestLang));
+  return {
+    items,
+    categories,
+    years,
+    pagination: {
+      page,
+      pageSize,
+      totalItems: effectiveTotal,
+      totalPages,
+    },
+  };
+}
+
+export async function listActivityItems(
+  query: ContentListQuery,
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<ActivityNewsItem>> {
+  const requestLang = lang ?? (await getRequestLang());
+  try {
+    return await listActivityItemsFromDb(requestLang, query, opts);
+  } catch (err) {
+    logDbListError("listActivityItems", err);
+    return listActivityItemsStatic(requestLang, query, opts);
+  }
 }
 
 export async function getActivityItem(slug: string, lang?: Lang): Promise<ActivityNewsItem | null> {
@@ -414,25 +695,17 @@ export async function getActivityItem(slug: string, lang?: Lang): Promise<Activi
   return mapStaticActivity(staticMatch, requestLang);
 }
 
-export async function listPhotoItems(
+function listPhotoItemsStatic(
+  _requestLang: Lang,
   query: ContentListQuery,
-  lang?: Lang,
   opts?: ListContentRepositoryOpts,
-): Promise<PaginatedResponse<PhotoGalleryItem>> {
-  const requestLang = lang ?? (await getRequestLang());
-  const dbTake = opts?.maxRowsFromDb;
-  const dbRows = await listPublishedContentByType(
-    "photo",
-    dbTake != null ? { take: dbTake } : undefined,
-  );
+): PaginatedResponse<PhotoGalleryItem> {
+  const maxCap = opts?.maxRowsFromDb;
   const staticSorted = [...PHOTO_GALLERY_ITEMS].sort((a, b) =>
     b.dateIso.localeCompare(a.dateIso),
   );
-  const staticSlice =
-    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
-  const base = dbRows
-    ? dbRows.map((row) => mapDbPhotoItem(row, requestLang))
-    : staticSlice;
+  const staticSlice = maxCap != null ? staticSorted.slice(0, maxCap) : staticSorted;
+  const base = staticSlice;
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {
@@ -448,27 +721,71 @@ export async function listPhotoItems(
   };
 }
 
-export async function listVideoItems(
+async function listPhotoItemsFromDb(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<PhotoGalleryItem>> {
+  const where = buildCategoryYearWherePhoto(query);
+  const maxCap = opts?.maxRowsFromDb;
+  const totalDb = await dashboardPrisma.dashboardPhoto.count({ where });
+  const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
+    totalDb,
+    query,
+    maxCap,
+  );
+  const [{ categories, years }, rawRows] = await Promise.all([
+    facetCategoriesAndYearsPhoto(),
+    take === 0
+      ? Promise.resolve([])
+      : dashboardPrisma.dashboardPhoto.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take,
+          select: LIST_DOC_SELECT,
+        }),
+  ]);
+  const rows = rawRows as PrismaContentDoc[];
+  const items = rows.map((row) => mapDbPhotoItem(row, requestLang));
+  return {
+    items,
+    categories,
+    years,
+    pagination: {
+      page,
+      pageSize,
+      totalItems: effectiveTotal,
+      totalPages,
+    },
+  };
+}
+
+export async function listPhotoItems(
   query: ContentListQuery,
   lang?: Lang,
   opts?: ListContentRepositoryOpts,
-): Promise<PaginatedResponse<VideoGalleryItem>> {
+): Promise<PaginatedResponse<PhotoGalleryItem>> {
   const requestLang = lang ?? (await getRequestLang());
-  const dbTake = opts?.maxRowsFromDb;
-  const dbRows = await listPublishedContentByType(
-    "video",
-    dbTake != null ? { take: dbTake } : undefined,
-  );
+  try {
+    return await listPhotoItemsFromDb(requestLang, query, opts);
+  } catch (err) {
+    logDbListError("listPhotoItems", err);
+    return listPhotoItemsStatic(requestLang, query, opts);
+  }
+}
+
+function listVideoItemsStatic(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): PaginatedResponse<VideoGalleryItem> {
+  const maxCap = opts?.maxRowsFromDb;
   const staticSorted = [...VIDEO_GALLERY_ITEMS].sort((a, b) =>
     b.dateIso.localeCompare(a.dateIso),
   );
-  const staticSlice =
-    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
-  const base = dbRows
-    ? dbRows
-        .filter((row) => !!row.videoUrl?.trim())
-        .map((row) => mapDbVideoItem(row, requestLang))
-    : staticSlice;
+  const staticSlice = maxCap != null ? staticSorted.slice(0, maxCap) : staticSorted;
+  const base = staticSlice;
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {
@@ -482,4 +799,60 @@ export async function listVideoItems(
       totalPages: paged.totalPages,
     },
   };
+}
+
+async function listVideoItemsFromDb(
+  requestLang: Lang,
+  query: ContentListQuery,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<VideoGalleryItem>> {
+  const where = buildVideoListWhere(query);
+  const maxCap = opts?.maxRowsFromDb;
+  const totalDb = await dashboardPrisma.dashboardVideo.count({ where });
+  const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
+    totalDb,
+    query,
+    maxCap,
+  );
+  const [{ categories, years }, rawRows] = await Promise.all([
+    facetCategoriesAndYearsVideo(),
+    take === 0
+      ? Promise.resolve([])
+      : dashboardPrisma.dashboardVideo.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take,
+          select: LIST_DOC_SELECT,
+        }),
+  ]);
+  const rows = rawRows as PrismaContentDoc[];
+  const items = rows
+    .filter((row) => !!row.videoUrl?.trim())
+    .map((row) => mapDbVideoItem(row, requestLang));
+  return {
+    items,
+    categories,
+    years,
+    pagination: {
+      page,
+      pageSize,
+      totalItems: effectiveTotal,
+      totalPages,
+    },
+  };
+}
+
+export async function listVideoItems(
+  query: ContentListQuery,
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<VideoGalleryItem>> {
+  const requestLang = lang ?? (await getRequestLang());
+  try {
+    return await listVideoItemsFromDb(requestLang, query, opts);
+  } catch (err) {
+    logDbListError("listVideoItems", err);
+    return listVideoItemsStatic(requestLang, query, opts);
+  }
 }

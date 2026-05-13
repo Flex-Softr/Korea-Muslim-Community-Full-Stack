@@ -1,5 +1,10 @@
 const suspendedUserIds = new Set<string>();
 
+/** Used for DB filters (pagination, counts) so suspended accounts stay consistent with `getStatus`. */
+export function getSuspendedUserIds(): string[] {
+  return [...suspendedUserIds];
+}
+
 export function isSuspendedUser(userId: string): boolean {
   return suspendedUserIds.has(userId);
 }

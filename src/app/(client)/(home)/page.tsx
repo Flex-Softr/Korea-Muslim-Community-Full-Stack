@@ -1,10 +1,10 @@
-import { HomeDonationCta } from "./components/home-donation-cta";
-import { HomeQuickContact } from "./components/home-quick-contact";
-import { HeroCarousel } from "./components/hero-carousel";
-import { HomeWhoWeAre } from "./components/home-who-we-are";
-import { OurActivitySection } from "./components/our-activity-section";
-import { VideoGallery } from "./components/video-gallery";
-import { PhotoGallery } from "./components/photo-gallery";
+import { HomeDonationCta } from "../components/home-donation-cta";
+import { HomeQuickContact } from "../components/home-quick-contact";
+import { HeroCarousel } from "../components/hero-carousel";
+import { HomeWhoWeAre } from "../components/home-who-we-are";
+import { OurActivitySection } from "../components/our-activity-section";
+import { VideoGallery } from "../components/video-gallery";
+import { PhotoGallery } from "../components/photo-gallery";
 import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
 import {
   listActivityItems,
@@ -13,28 +13,30 @@ import {
   listVideoItems,
 } from "@/lib/content/repository";
 import { listDashboardCarousel } from "@/lib/dashboard/store";
-import { OurBlogSection } from "./components/our-blog-section";
+import { OurBlogSection } from "../components/our-blog-section";
+import { getRequestLang } from "@/lib/i18n/server-language";
 
 export default async function HomePage() {
+  const lang = await getRequestLang();
   const [blogs, activities, photos, videos, carouselRows] = await Promise.all([
     listBlogPosts(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
-      undefined,
+      lang,
       { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
     ),
     listActivityItems(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
-      undefined,
+      lang,
       { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
     ),
     listPhotoItems(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
-      undefined,
+      lang,
       { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
     ),
     listVideoItems(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
-      undefined,
+      lang,
       { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
     ),
     listDashboardCarousel(),

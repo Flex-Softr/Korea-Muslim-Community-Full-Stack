@@ -267,6 +267,7 @@ export async function listPublishedDashboardBlogs(): Promise<PublicDashboardBlog
   const rows = await dashboardPrisma.dashboardBlog.findMany({
     where: { OR: [{ status: "published" }, { status: null }] },
     orderBy: { createdAt: "desc" },
+    take: 2000,
   });
   return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
@@ -281,10 +282,18 @@ export async function getPublishedDashboardBlogBySlug(slug: string): Promise<Pub
   if (direct) {
     return mapContentRow(direct as DbContentRow);
   }
-  const rows = await dashboardPrisma.dashboardBlog.findMany({
-    where: { OR: [{ status: "published" }, { status: null }] },
+  /** Legacy rows without `slug`: scan a bounded set instead of every published post. */
+  const legacy = await dashboardPrisma.dashboardBlog.findMany({
+    where: {
+      AND: [
+        { OR: [{ status: "published" }, { status: null }] },
+        { OR: [{ slug: null }, { slug: "" }] },
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take: 600,
   });
-  for (const row of rows) {
+  for (const row of legacy) {
     const mapped = mapContentRow(row as DbContentRow);
     if (mapped.slug === slug) return mapped;
     const map = mapped.localeContent;
@@ -524,10 +533,17 @@ export async function getPublishedDashboardActivityBySlug(slug: string): Promise
   if (direct) {
     return mapContentRow(direct as DbContentRow);
   }
-  const rows = await dashboardPrisma.dashboardActivity.findMany({
-    where: { OR: [{ status: "published" }, { status: null }] },
+  const legacy = await dashboardPrisma.dashboardActivity.findMany({
+    where: {
+      AND: [
+        { OR: [{ status: "published" }, { status: null }] },
+        { OR: [{ slug: null }, { slug: "" }] },
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    take: 600,
   });
-  for (const row of rows) {
+  for (const row of legacy) {
     const mapped = mapContentRow(row as DbContentRow);
     if (mapped.slug === slug) return mapped;
     const map = mapped.localeContent;
