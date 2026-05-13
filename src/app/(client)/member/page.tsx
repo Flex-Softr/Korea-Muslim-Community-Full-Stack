@@ -5,11 +5,13 @@ import { MemberDirectoryList } from "@/components/members/member-directory-list"
 import { MemberTypeTabs } from "@/components/members/member-type-tabs";
 import { PageBanner } from "@/components/layout/page-banner";
 import {
-  MEMBER_SECTION_COPY,
+  MEMBER_SECTION_I18N_KEYS,
   SLUG_TO_CATEGORY,
   slugFromSearchParam,
 } from "@/lib/members/config";
 import { getMembersByCategory } from "@/lib/members/queries";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
 type PageProps = {
   searchParams: Promise<{
@@ -22,10 +24,11 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { type } = await searchParams;
   const slug = slugFromSearchParam(type);
-  const copy = MEMBER_SECTION_COPY[slug];
+  const keys = MEMBER_SECTION_I18N_KEYS[slug];
+  const lang = await getRequestLang();
   return {
-    title: copy.title,
-    description: copy.subtitle,
+    title: serverT(lang, keys.title),
+    description: serverT(lang, keys.subtitle),
   };
 }
 
@@ -46,20 +49,21 @@ function TabsFallback() {
 }
 
 export default async function MemberDirectoryPage({ searchParams }: PageProps) {
+  const st = await getServerT();
   const { type } = await searchParams;
   const slug = slugFromSearchParam(type);
   const category = SLUG_TO_CATEGORY[slug];
-  const copy = MEMBER_SECTION_COPY[slug];
+  const keys = MEMBER_SECTION_I18N_KEYS[slug];
   const members = await getMembersByCategory(category);
 
   return (
     <>
       <PageBanner
-        title={copy.title}
-        subtitle={copy.subtitle}
+        title={st(keys.title)}
+        subtitle={st(keys.subtitle)}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: copy.title },
+          { label: st("nav.home"), href: "/" },
+          { label: st(keys.title) },
         ]}
       />
 
@@ -70,7 +74,7 @@ export default async function MemberDirectoryPage({ searchParams }: PageProps) {
 
         {members.length === 0 ? (
           <p className="max-w-2xl text-muted-foreground">
-            {copy.emptyMessage}
+            {st(keys.emptyMessage)}
           </p>
         ) : (
           <MemberDirectoryList key={slug} members={members} />
@@ -81,7 +85,7 @@ export default async function MemberDirectoryPage({ searchParams }: PageProps) {
             href="/"
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            ← Back to home
+            {st("common.backToHome")}
           </Link>
         </p>
       </div>

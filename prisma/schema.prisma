@@ -123,23 +123,92 @@ model EmailVerificationToken {
   @@index([userId])
 }
 
-model DashboardContent {
+/// CMS blog posts (was `type: "blog"` on legacy `DashboardContent`).
+model DashboardBlog {
   id          String   @id @default(cuid()) @map("_id")
-  type        String
   title       String
   category    String
   description String?
   coverImage  String?
   videoUrl    String?
+  slug        String?
+  localeContent Json?
   createdById String?
   status      String?
   publishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@index([type, createdAt])
-  @@index([type, createdById])
-  @@index([type, status])
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([status])
+  @@index([slug])
+}
+
+/// CMS activity articles.
+model DashboardActivity {
+  id          String   @id @default(cuid()) @map("_id")
+  title       String
+  category    String
+  description String?
+  coverImage  String?
+  videoUrl    String?
+  slug        String?
+  localeContent Json?
+  createdById String?
+  status      String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([status])
+  @@index([slug])
+}
+
+/// Photo gallery CMS items.
+model DashboardPhoto {
+  id          String   @id @default(cuid()) @map("_id")
+  title       String
+  category    String
+  description String?
+  coverImage  String?
+  videoUrl    String?
+  slug        String?
+  localeContent Json?
+  createdById String?
+  status      String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([status])
+  @@index([slug])
+}
+
+/// Video gallery CMS items.
+model DashboardVideo {
+  id          String   @id @default(cuid()) @map("_id")
+  title       String
+  category    String
+  description String?
+  coverImage  String?
+  videoUrl    String?
+  slug        String?
+  localeContent Json?
+  createdById String?
+  status      String?
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([status])
+  @@index([slug])
 }
 
 model DashboardCategory {
@@ -161,6 +230,8 @@ model DashboardCarousel {
   imageUrl  String
   ctaLabel  String?
   ctaHref   String?
+  /// `{ "en": { title, subtitle, ctaLabel }, ... }`
+  localeContent Json?
   isActive  Boolean  @default(true)
   sortOrder Int      @default(1)
   createdAt DateTime @default(now())

@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useToastSystem } from "@/components/ui/toast-system";
+import { DashboardWriterLanguageSelect } from "@/components/dashboard/dashboard-locale-controls";
+import type { ContentLocale } from "@/lib/i18n/content-locale";
 
 function richTextToPlainText(value: string): string {
   return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
@@ -22,6 +24,8 @@ export function AddBlogPageForm() {
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+  const [sourceLocale, setSourceLocale] = useState<ContentLocale>("en");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,6 +52,7 @@ export function AddBlogPageForm() {
   }, [notify]);
 
   const onCreate = () => {
+    if (isSubmitting) return;
     const titleValue = title.trim();
     const descriptionValue = description.trim();
     const descriptionPlain = richTextToPlainText(descriptionValue);
@@ -70,23 +75,31 @@ export function AddBlogPageForm() {
       return;
     }
 
+    setIsSubmitting(true);
     void (async () => {
-      const res = await fetch("/api/dashboard/content/blog", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: titleValue,
-          category: categoryValue,
-          description: descriptionValue,
-          coverImage,
-        }),
-      });
-      if (!res.ok) {
+      try {
+        const res = await fetch("/api/dashboard/blog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceLocale,
+            title: titleValue,
+            category: categoryValue,
+            description: descriptionValue,
+            coverImage,
+          }),
+        });
+        if (!res.ok) {
+          notify("Could not create blog.", "error");
+          return;
+        }
+        notify("Blog created.", "success");
+        router.push("/dashboard/content/blog/blogs");
+      } catch {
         notify("Could not create blog.", "error");
-        return;
+      } finally {
+        setIsSubmitting(false);
       }
-      notify("Blog created.", "success");
-      router.push("/dashboard/content/blog/blogs");
     })();
   };
 
@@ -109,6 +122,12 @@ export function AddBlogPageForm() {
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         <div className="space-y-4">
+          <DashboardWriterLanguageSelect
+            id="create-blog-source-locale"
+            value={sourceLocale}
+            onChange={setSourceLocale}
+          />
+
           <div className="space-y-2">
             <Label htmlFor="create-content-title">Title</Label>
             <Input
@@ -162,7 +181,7 @@ export function AddBlogPageForm() {
             >
               Cancel
             </Link>
-            <Button type="button" onClick={onCreate}>
+            <Button type="button" onClick={onCreate} isLoading={isSubmitting} loadingText="Creating...">
               Create
             </Button>
           </div>

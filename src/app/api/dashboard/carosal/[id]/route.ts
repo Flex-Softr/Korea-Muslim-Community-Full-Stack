@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { deleteDashboardCarousel, updateDashboardCarousel } from "@/lib/dashboard/store";
+import type { CarouselLocaleMap } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
 
 async function ensureAdmin() {
@@ -17,6 +18,7 @@ export async function PATCH(
   }
   const { id } = await params;
   const body = (await request.json()) as {
+    localeContent?: CarouselLocaleMap;
     title?: string;
     subtitle?: string;
     imageUrl?: string;
@@ -27,6 +29,7 @@ export async function PATCH(
   };
 
   const updated = await updateDashboardCarousel(id, {
+    localeContent: body.localeContent,
     title: body.title,
     subtitle: body.subtitle,
     imageUrl: body.imageUrl,

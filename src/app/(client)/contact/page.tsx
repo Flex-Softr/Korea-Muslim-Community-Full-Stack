@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   Card,
   CardContent,
@@ -6,23 +7,33 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageBanner } from "@/components/layout/page-banner";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 import { ContactForm } from "./components/contact-form";
 
-export default function ContactPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getRequestLang();
+  return {
+    title: serverT(lang, "breadcrumbs.contact"),
+    description: serverT(lang, "pages.contact.subtitle"),
+  };
+}
+
+export default async function ContactPage() {
+  const st = await getServerT();
   return (
     <>
       <PageBanner
-        title="Contact"
-        subtitle="Send us a message — we read every submission and reply when a response is needed."
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
+        title={st("breadcrumbs.contact")}
+        subtitle={st("pages.contact.subtitle")}
+        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.contact") }]}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         <Card className="shadow-md ring-1 ring-border/60">
           <CardHeader>
-            <CardTitle>Message</CardTitle>
+            <CardTitle>{st("pages.contact.formCardTitle")}</CardTitle>
             <CardDescription>
-              Use the form below. For urgent matters, email us directly from the
-              footer.
+              {st("pages.contact.formCardDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>

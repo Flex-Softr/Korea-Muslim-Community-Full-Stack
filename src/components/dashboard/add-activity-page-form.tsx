@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useToastSystem } from "@/components/ui/toast-system";
+import { DashboardWriterLanguageSelect } from "@/components/dashboard/dashboard-locale-controls";
+import type { ContentLocale } from "@/lib/i18n/content-locale";
 
 function richTextToPlainText(value: string): string {
   return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
@@ -22,6 +24,8 @@ export function AddActivityPageForm() {
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+  const [sourceLocale, setSourceLocale] = useState<ContentLocale>("en");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,6 +52,7 @@ export function AddActivityPageForm() {
   }, [notify]);
 
   const onCreate = () => {
+    if (isSubmitting) return;
     const titleValue = title.trim();
     const descriptionValue = description.trim();
     const descriptionPlain = richTextToPlainText(descriptionValue);
@@ -70,23 +75,31 @@ export function AddActivityPageForm() {
       return;
     }
 
+    setIsSubmitting(true);
     void (async () => {
-      const res = await fetch("/api/dashboard/content/activity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: titleValue,
-          category: categoryValue,
-          description: descriptionValue,
-          coverImage,
-        }),
-      });
-      if (!res.ok) {
+      try {
+        const res = await fetch("/api/dashboard/activity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceLocale,
+            title: titleValue,
+            category: categoryValue,
+            description: descriptionValue,
+            coverImage,
+          }),
+        });
+        if (!res.ok) {
+          notify("Could not create activity.", "error");
+          return;
+        }
+        notify("Activity created.", "success");
+        router.push("/dashboard/content/activity/activities");
+      } catch {
         notify("Could not create activity.", "error");
-        return;
+      } finally {
+        setIsSubmitting(false);
       }
-      notify("Activity created.", "success");
-      router.push("/dashboard/content/activity/activities");
     })();
   };
 
@@ -109,6 +122,12 @@ export function AddActivityPageForm() {
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         <div className="space-y-4">
+          <DashboardWriterLanguageSelect
+            id="create-activity-source-locale"
+            value={sourceLocale}
+            onChange={setSourceLocale}
+          />
+
           <div className="space-y-2">
             <Label htmlFor="create-activity-title">Title</Label>
             <Input
@@ -162,7 +181,7 @@ export function AddActivityPageForm() {
             >
               Cancel
             </Link>
-            <Button type="button" onClick={onCreate}>
+            <Button type="button" onClick={onCreate} isLoading={isSubmitting} loadingText="Creating...">
               Create
             </Button>
           </div>

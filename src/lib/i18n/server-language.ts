@@ -1,11 +1,11 @@
-import type { Lang } from "@/lib/i18n/dictionary";
+import type { Lang } from "@/lib/i18n/lang";
 
 function normalizeLang(raw: string | null | undefined): Lang {
   if (!raw) return "bn";
-  const value = raw.toLowerCase().trim();
+  const value = raw.toLowerCase().trim().split("-")[0] ?? "";
   if (value === "en") return "en";
-  if (value === "bn") return "bn";
-  if (value === "kr" || value === "kor" || value === "ko") return "kr";
+  if (value === "bn" || value === "bd") return "bn";
+  if (value === "ko" || value === "kr" || value === "kor") return "ko";
   return "bn";
 }
 

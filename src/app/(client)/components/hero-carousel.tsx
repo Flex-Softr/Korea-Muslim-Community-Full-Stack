@@ -5,7 +5,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { useLanguage } from "@/components/providers/language-provider";
+import { pickCarouselFields } from "@/lib/i18n/content-locale";
+import type { CarouselLocaleMap } from "@/lib/i18n/content-locale";
 import { cn } from "@/lib/utils";
+
+export type HeroCarouselSource = {
+  id: string;
+  imageUrl: string;
+  ctaHref?: string;
+  sortOrder: number;
+  localeContent: CarouselLocaleMap;
+};
 
 type HeroSlide = {
   id: string;
@@ -17,27 +28,32 @@ type HeroSlide = {
   sortOrder: number;
 };
 
-export function HeroCarousel({ initialSlides = [] }: { initialSlides: HeroSlide[] }) {
-  const [slides] = useState<HeroSlide[]>(initialSlides);
+export function HeroCarousel({ carouselSources }: { carouselSources: HeroCarouselSource[] }) {
+  const { lang } = useLanguage();
+
+  const slides = useMemo((): HeroSlide[] => {
+    return carouselSources.map((slide) => {
+      const loc = pickCarouselFields(slide.localeContent, lang);
+      return {
+        id: slide.id,
+        title: loc.title,
+        subtitle: loc.subtitle,
+        imageUrl: slide.imageUrl,
+        ctaLabel: loc.ctaLabel?.trim() || undefined,
+        ctaHref: slide.ctaHref,
+        sortOrder: slide.sortOrder,
+      };
+    });
+  }, [carouselSources, lang]);
+
   const [index, setIndex] = useState(0);
 
-  // useEffect(() => {
-  //   let active = true;
-  //   void (async () => {
-  //     try {
-  //       const res = await fetch("/api/public/carosal", { cache: "no-store" });
-  //       const data = (await res.json()) as { items?: HeroSlide[] };
-  //       if (!res.ok || !active) return;
-  //       setSlides((data.items ?? []).sort((a, b) => a.sortOrder - b.sortOrder));
-  //     } catch {
-  //       if (!active) return;
-  //       setSlides([]);
-  //     }
-  //   })();
-  //   return () => {
-  //     active = false;
-  //   };
-  // }, []);
+  useEffect(() => {
+    setIndex((i) => {
+      if (slides.length === 0) return 0;
+      return i >= slides.length ? 0 : i;
+    });
+  }, [slides.length]);
 
   const hasSlides = slides.length > 0;
   const current = hasSlides ? slides[index] : null;
@@ -60,14 +76,9 @@ export function HeroCarousel({ initialSlides = [] }: { initialSlides: HeroSlide[
     setIndex((prev) => (prev + 1) % slides.length);
   };
 
-  // const imageSrc = useMemo(
-  //   () => current?.imageUrl || "/hero/carousel-slide-1.png",
-  //   [current?.imageUrl],
-  //);
-
   if (!current) return null;
 
-const imageSrc = current.imageUrl;
+  const imageSrc = current.imageUrl;
 
   return (
     <section

@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 export function HomeQuickContact() {
+  const { t } = useLanguage();
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -36,7 +38,7 @@ export function HomeQuickContact() {
 
     setPending(false);
     if (!res.ok) {
-      setError(data.error || "Something went wrong.");
+      setError(data.error || t("homeQuickContact.errorGeneric"));
       return;
     }
     setSent(true);
@@ -61,17 +63,16 @@ export function HomeQuickContact() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 lg:items-start">
           <div className="lg:col-span-5">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#2c7bb6] dark:text-sky-400">
-              Contact
+              {t("homeQuickContact.eyebrow")}
             </p>
             <h2
               id="home-quick-contact-heading"
               className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
             >
-              Get in touch
+              {t("homeQuickContact.heading")}
             </h2>
             <p className="mt-4 max-w-md text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Questions about programmes, volunteering, or how to connect with
-              the community? Send a short message — we read every note.
+              {t("homeQuickContact.intro")}
             </p>
 
             <ul className="mt-10 space-y-5">
@@ -80,9 +81,11 @@ export function HomeQuickContact() {
                   <Mail className="size-5" aria-hidden />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Email</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {t("homeQuickContact.emailTitle")}
+                  </p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    We reply when your message needs a response.
+                    {t("homeQuickContact.emailHint")}
                   </p>
                 </div>
               </li>
@@ -92,10 +95,10 @@ export function HomeQuickContact() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    Across Korea
+                    {t("homeQuickContact.locationTitle")}
                   </p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    Serving Muslims and friends of the community nationwide.
+                    {t("homeQuickContact.locationHint")}
                   </p>
                 </div>
               </li>
@@ -105,13 +108,13 @@ export function HomeQuickContact() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    Full contact page
+                    {t("homeQuickContact.fullPageTitle")}
                   </p>
                   <Link
                     href="/contact"
                     className="mt-0.5 inline-block text-sm font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                   >
-                    More ways to reach us →
+                    {t("homeQuickContact.fullPageLink")}
                   </Link>
                 </div>
               </li>
@@ -132,20 +135,20 @@ export function HomeQuickContact() {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="home-quick-name" className="text-foreground">
-                      Name
+                      {t("homeQuickContact.labelName")}
                     </Label>
                     <Input
                       id="home-quick-name"
                       name="name"
                       autoComplete="name"
                       required
-                      placeholder="Your name"
+                      placeholder={t("homeQuickContact.placeholderName")}
                       className="h-11 rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="home-quick-email" className="text-foreground">
-                      Email
+                      {t("homeQuickContact.labelEmail")}
                     </Label>
                     <Input
                       id="home-quick-email"
@@ -153,21 +156,21 @@ export function HomeQuickContact() {
                       type="email"
                       autoComplete="email"
                       required
-                      placeholder="you@example.com"
+                      placeholder={t("homeQuickContact.placeholderEmail")}
                       className="h-11 rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="home-quick-message" className="text-foreground">
-                    Message
+                    {t("homeQuickContact.labelMessage")}
                   </Label>
                   <Textarea
                     id="home-quick-message"
                     name="message"
                     required
                     rows={4}
-                    placeholder="How can we help?"
+                    placeholder={t("homeQuickContact.placeholderMessage")}
                     className="min-h-[7.5rem] resize-y rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
                   />
                 </div>
@@ -185,24 +188,23 @@ export function HomeQuickContact() {
                     className="h-11 rounded-xl bg-[#2c7bb6] px-6 text-sm font-semibold shadow-md shadow-[#2c7bb6]/20 hover:bg-[#256fa3] dark:shadow-sky-500/10"
                   >
                     {sent ? (
-                      "Message sent"
+                      t("homeQuickContact.sentButton")
                     ) : pending ? (
-                      "Sending…"
+                      t("homeQuickContact.sendingButton")
                     ) : (
                       <>
                         <Send className="me-2 size-4" aria-hidden />
-                        Send message
+                        {t("homeQuickContact.sendButton")}
                       </>
                     )}
                   </Button>
                   {sent ? (
                     <p className="text-sm text-muted-foreground" role="status">
-                      Thanks — we will get back to you if a reply is needed.
+                      {t("homeQuickContact.thanksStatus")}
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground sm:text-end sm:max-w-[14rem]">
-                      Same secure form as our contact page. Your details are only
-                      used to respond.
+                      {t("homeQuickContact.privacyNote")}
                     </p>
                   )}
                 </div>

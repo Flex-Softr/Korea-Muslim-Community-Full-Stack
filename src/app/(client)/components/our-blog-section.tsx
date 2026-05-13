@@ -1,22 +1,27 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ActivityNewsCard } from "@/components/activity/activity-news-card";
-import { activityDetailPath } from "@/data/activity-news";
-import { listBlogPosts } from "@/lib/content/repository";
-import { cn } from "@/lib/utils";
 import { BlogNewsCard } from "@/components/blog/blog-news-card";
+import { blogPostPath, type StudentNewsPost } from "@/data/student-news";
+import { useLanguage } from "@/components/providers/language-provider";
+import { pickLocalizedFields } from "@/lib/i18n/content-locale";
+import { cn } from "@/lib/utils";
+import { stripHtmlTags } from "@/lib/utils";
 
-export async function OurBlogSection({
+export function OurBlogSection({
   embedded = false,
   secondaryItemLimit,
+  sourceItems = [],
 }: {
   embedded?: boolean;
-  /** When set (e.g. on the home page), cap how many secondary cards appear below the featured story. */
   secondaryItemLimit?: number;
+  sourceItems?: StudentNewsPost[];
 }) {
-  const { items: allItems } = await listBlogPosts({ page: 1, pageSize: 200 });
+  const { t, lang } = useLanguage();
+  const allItems = sourceItems;
   const featuredItem = allItems[0] ?? null;
 
   if (!featuredItem) {
@@ -29,7 +34,7 @@ export async function OurBlogSection({
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="rounded-xl border border-border/70 bg-card p-6 text-sm text-muted-foreground">
-            No blog posts available yet.
+            {t("blog.sectionEmpty")}
           </div>
         </div>
       </section>
@@ -41,7 +46,14 @@ export async function OurBlogSection({
       ? allItems.slice(1, secondaryItemLimit + 1)
       : allItems.slice(1);
 
-  const featuredHref = activityDetailPath(featuredItem.slug);
+  const featuredHref = blogPostPath(featuredItem.slug);
+  const featuredLocalized = featuredItem.localeContent
+    ? pickLocalizedFields(featuredItem.localeContent, lang)
+    : null;
+  const featuredTitle = featuredLocalized?.title || featuredItem.title;
+  const featuredExcerpt =
+    featuredLocalized?.description?.trim() || featuredItem.excerpt;
+  const featuredCategory = featuredLocalized?.category || featuredItem.category;
 
   return (
     <section
@@ -49,17 +61,17 @@ export async function OurBlogSection({
         "w-full bg-muted/25 py-12 sm:py-14 dark:bg-muted/10",
         embedded ? "pt-6 sm:pt-8" : "border-t border-border/40",
       )}
-      aria-label={embedded ? "Community activity and news" : undefined}
-      aria-labelledby={embedded ? undefined : "our-activity-heading"}
+      aria-label={embedded ? t("blog.embeddedAria") : undefined}
+      aria-labelledby={embedded ? undefined : "our-blog-heading"}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {embedded ? (
           <div className="mb-8 flex justify-end sm:mb-10">
             <Link
-              href="/activity"
+              href="/blog"
               className="inline-flex h-9 w-fit items-center justify-center gap-1 rounded-md bg-[#2c7bb6] px-4 text-sm font-medium text-white shadow transition-colors hover:bg-[#256fa3]"
             >
-              View all blog posts
+              {t("blog.viewAllPosts")}
               <ArrowUpRight className="ms-1 size-4" aria-hidden />
             </Link>
           </div>
@@ -67,20 +79,20 @@ export async function OurBlogSection({
           <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
               <h2
-                id="our-activity-heading"
+                id="our-blog-heading"
                 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
               >
-                Our blog posts
+                {t("blog.homeHeading")}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-                Articles, announcements, and student life updates in a news format.
+                {t("pages.blog.subtitle")}
               </p>
             </div>
             <Link
               href="/blog"
               className="inline-flex h-9 w-fit items-center justify-center gap-1 rounded-md bg-[#2c7bb6] px-4 text-sm font-medium text-white shadow transition-colors hover:bg-[#256fa3]"
             >
-              View all blog posts
+              {t("blog.viewAllPosts")}
               <ArrowUpRight className="ms-1 size-4" aria-hidden />
             </Link>
           </div>
@@ -93,8 +105,8 @@ export async function OurBlogSection({
               className="relative aspect-[16/10] min-h-[200px] bg-muted lg:aspect-auto lg:min-h-[280px]"
             >
               <Image
-                  src={featuredItem.coverImage}
-                alt={featuredItem.title}
+                src={featuredItem.coverImage}
+                alt={featuredTitle}
                 fill
                 className="object-cover transition duration-500 hover:scale-[1.02]"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -108,7 +120,7 @@ export async function OurBlogSection({
                 </time>
                 <span className="text-border">·</span>
                 <Badge variant="secondary" className="font-normal">
-                  {featuredItem.category}
+                  {featuredCategory}
                 </Badge>
               </div>
               <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -116,17 +128,17 @@ export async function OurBlogSection({
                   href={featuredHref}
                   className="transition-colors hover:text-[#2c7bb6] dark:hover:text-sky-400"
                 >
-                  {featuredItem.title}
+                  {featuredTitle}
                 </Link>
               </h3>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                {featuredItem.excerpt}
+               {stripHtmlTags(featuredExcerpt)}
               </p>
               <Link
                 href={featuredHref}
                 className="mt-6 inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400"
               >
-                Continue reading
+                {t("activity.continueReading")}
                 <ArrowUpRight className="size-4" aria-hidden />
               </Link>
             </div>

@@ -19,7 +19,9 @@ export function BlogFeaturedCard({ post, className }: BlogFeaturedCardProps) {
   const translated = useTranslatedFields({
     locale: post.locale,
     title: post.title,
+    category: post.category,
     excerpt: post.excerpt,
+    localeContent: post.localeContent,
   });
 
   return (
@@ -57,7 +59,7 @@ export function BlogFeaturedCard({ post, className }: BlogFeaturedCardProps) {
               ·
             </span>
             <Badge variant="secondary" className="font-normal">
-              {post.category}
+              {translated.category}
             </Badge>
           </div>
           <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-3xl dark:group-hover:text-sky-300">

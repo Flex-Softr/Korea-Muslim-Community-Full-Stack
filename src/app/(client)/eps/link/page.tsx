@@ -1,15 +1,16 @@
 import { PageBanner } from "@/components/layout/page-banner";
+import { getServerT } from "@/lib/i18n/server-translate";
 
-export default function EPSLinkPage() {
+export default async function EPSLinkPage() {
+  const st = await getServerT();
     return (
       <>
         <PageBanner
-          title="EPS Link"
-          //subtitle="EPS Link"
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "EPS Link" }]}
+          title={st("breadcrumbs.epsLink")}
+          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.epsLink") }]}
         />
         <div>
-          <h1>EPS Link</h1>
+          <h1>{st("breadcrumbs.epsLink")}</h1>
         </div>
       </>
     )

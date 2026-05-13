@@ -30,6 +30,11 @@ function formatDate(dateIso: string): string {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
+const CONTENT_COLLECTION_API = {
+  blog: "/api/dashboard/blog",
+  activity: "/api/dashboard/activity",
+} as const;
+
 type ContentModuleProps = {
   contentType: "blog" | "activity";
   title: string;
@@ -70,7 +75,7 @@ function ContentRowsModule({
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/dashboard/content/${contentType}`, { cache: "no-store" });
+        const res = await fetch(CONTENT_COLLECTION_API[contentType], { cache: "no-store" });
         const data = (await res.json()) as {
           items?: EditableRow[];
           currentUserId?: string | null;
@@ -121,7 +126,7 @@ function ContentRowsModule({
       return;
     }
     void (async () => {
-      const res = await fetch(`/api/dashboard/content/${contentType}/${editTarget.id}`, {
+      const res = await fetch(`${CONTENT_COLLECTION_API[contentType]}/${editTarget.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, category }),
@@ -140,7 +145,7 @@ function ContentRowsModule({
   const confirmDelete = () => {
     if (!deleteTarget) return;
     void (async () => {
-      const res = await fetch(`/api/dashboard/content/${contentType}/${deleteTarget.id}`, {
+      const res = await fetch(`${CONTENT_COLLECTION_API[contentType]}/${deleteTarget.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {

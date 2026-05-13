@@ -1,7 +1,9 @@
+import type { LocaleContentMap } from "@/lib/i18n/content-locale";
+
 /** Student / community blog feed for `/blog` — separate from activity routes and data. */
 export type StudentNewsPost = {
   id: string;
-  locale?: "en" | "bn" | "kr";
+  locale?: "en" | "bn" | "ko";
   /** URL segment for `/blog/[slug]`. */
   slug: string;
   /** ISO date for `<time datetime>`, archive, and sorting. */
@@ -13,6 +15,8 @@ export type StudentNewsPost = {
   coverImage: string;
   /** Body for the article page; paragraphs separated by `\n\n`. */
   content: string;
+  /** Present for dashboard-backed posts — used client-side when switching UI language. */
+  localeContent?: LocaleContentMap | null;
 };
 
 export const STUDENT_NEWS_POSTS: StudentNewsPost[] = [];

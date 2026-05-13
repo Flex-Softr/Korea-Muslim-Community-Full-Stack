@@ -7,6 +7,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToastSystem } from "@/components/ui/toast-system";
+import { DashboardWriterLanguageSelect } from "@/components/dashboard/dashboard-locale-controls";
+import type { ContentLocale } from "@/lib/i18n/content-locale";
 
 export function AddVideoPageForm() {
   const router = useRouter();
@@ -15,6 +17,8 @@ export function AddVideoPageForm() {
   const [category, setCategory] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
+  const [sourceLocale, setSourceLocale] = useState<ContentLocale>("en");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -25,23 +29,32 @@ export function AddVideoPageForm() {
   }, []);
 
   const onCreate = () => {
+    if (isSubmitting) return;
     if (!title.trim() || !category.trim() || !videoUrl.trim()) {
       notify("Title, category, and video URL are required.", "warning");
       return;
     }
+    setIsSubmitting(true);
     void (async () => {
-      const res = await fetch("/api/dashboard/content/video", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim(),
-          category: category.trim(),
-          videoUrl: videoUrl.trim(),
-        }),
-      });
-      if (!res.ok) return notify("Could not create video.", "error");
-      notify("Video created.", "success");
-      router.push("/dashboard/content/video-gallery/videos");
+      try {
+        const res = await fetch("/api/dashboard/video", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceLocale,
+            title: title.trim(),
+            category: category.trim(),
+            videoUrl: videoUrl.trim(),
+          }),
+        });
+        if (!res.ok) return notify("Could not create video.", "error");
+        notify("Video created.", "success");
+        router.push("/dashboard/content/video-gallery/videos");
+      } catch {
+        notify("Could not create video.", "error");
+      } finally {
+        setIsSubmitting(false);
+      }
     })();
   };
 
@@ -52,6 +65,11 @@ export function AddVideoPageForm() {
         <Link href="/dashboard/content/video-gallery/videos" className={buttonVariants({ variant: "outline" })}>Back to all videos</Link>
       </div>
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm space-y-4">
+        <DashboardWriterLanguageSelect
+          id="create-video-source-locale"
+          value={sourceLocale}
+          onChange={setSourceLocale}
+        />
         <div className="space-y-2"><Label>Title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} /></div>
         <div className="space-y-2"><Label>Video URL</Label><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} /></div>
         <div className="space-y-2">
@@ -63,7 +81,9 @@ export function AddVideoPageForm() {
         </div>
         <div className="flex justify-end gap-2">
           <Link href="/dashboard/content/video-gallery/videos" className={buttonVariants({ variant: "outline" })}>Cancel</Link>
-          <Button type="button" onClick={onCreate}>Create</Button>
+          <Button type="button" onClick={onCreate} isLoading={isSubmitting} loadingText="Creating...">
+            Create
+          </Button>
         </div>
       </div>
     </section>

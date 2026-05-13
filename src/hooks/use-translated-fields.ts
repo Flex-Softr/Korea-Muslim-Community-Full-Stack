@@ -1,64 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useLanguage, type Lang } from "@/components/providers/language-provider";
-import { translateText } from "@/lib/translate";
+import { useLanguage } from "@/components/providers/language-provider";
+import {
+  pickLocalizedFields,
+  type LocaleContentMap,
+} from "@/lib/i18n/content-locale";
 
 type Input = {
   locale?: string | null;
   title?: string | null;
+  category?: string | null;
   description?: string | null;
   excerpt?: string | null;
+  localeContent?: LocaleContentMap | null;
 };
 
 type Output = {
   title: string;
+  category: string;
   description: string;
   excerpt: string;
   loading: boolean;
 };
 
-function normalizeLocale(locale?: string | null): Lang | null {
-  if (locale === "en" || locale === "bn" || locale === "kr") return locale;
-  if (locale === "kor" || locale === "ko") return "kr";
-  return null;
-}
-
+/**
+ * Localize CMS-backed fields from `localeContent` so cards can update instantly
+ * when UI language changes without route refresh.
+ */
 export function useTranslatedFields(content: Input): Output {
   const { lang } = useLanguage();
-  const source = normalizeLocale(content.locale) ?? "en";
-  const original = {
-    title: content.title ?? "",
-    description: content.description ?? "",
-    excerpt: content.excerpt ?? "",
+  const localized = content.localeContent
+    ? pickLocalizedFields(content.localeContent, lang)
+    : null;
+
+  const title = localized?.title?.trim() || content.title || "";
+  const category = localized?.category?.trim() || content.category || "";
+  const description = localized?.description || content.description || "";
+  const excerpt = localized?.description?.trim() || content.excerpt || description;
+
+  return {
+    title,
+    category,
+    description,
+    excerpt,
+    loading: false,
   };
-  const [state, setState] = useState<Pick<Output, "title" | "description" | "excerpt">>({
-    title: original.title,
-    description: original.description,
-    excerpt: original.excerpt,
-  });
-
-  useEffect(() => {
-    if (source === lang) return;
-
-    let cancelled = false;
-    void (async () => {
-      const [title, description, excerpt] = await Promise.all([
-        translateText(original.title, lang, source),
-        translateText(original.description, lang, source),
-        translateText(original.excerpt, lang, source),
-      ]);
-      if (cancelled) return;
-      setState({ title, description, excerpt });
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lang, original.description, original.excerpt, original.title, source]);
-
-  if (source === lang) {
-    return { ...original, loading: false };
-  }
-  return { ...state, loading: false };
 }

@@ -8,6 +8,8 @@ import { ImageUploader } from "@/components/ui/image-uploader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToastSystem } from "@/components/ui/toast-system";
+import { DashboardWriterLanguageSelect } from "@/components/dashboard/dashboard-locale-controls";
+import type { ContentLocale } from "@/lib/i18n/content-locale";
 
 export function AddPhotoPageForm() {
   const router = useRouter();
@@ -16,6 +18,8 @@ export function AddPhotoPageForm() {
   const [category, setCategory] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+  const [sourceLocale, setSourceLocale] = useState<ContentLocale>("en");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -26,23 +30,32 @@ export function AddPhotoPageForm() {
   }, []);
 
   const onCreate = () => {
+    if (isSubmitting) return;
     if (!caption.trim() || !category.trim() || !coverImage) {
       notify("Caption, category, and image are required.", "warning");
       return;
     }
+    setIsSubmitting(true);
     void (async () => {
-      const res = await fetch("/api/dashboard/content/photo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: caption.trim(),
-          category: category.trim(),
-          coverImage,
-        }),
-      });
-      if (!res.ok) return notify("Could not create photo.", "error");
-      notify("Photo created.", "success");
-      router.push("/dashboard/content/photo-gallery/photos");
+      try {
+        const res = await fetch("/api/dashboard/photo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sourceLocale,
+            title: caption.trim(),
+            category: category.trim(),
+            coverImage,
+          }),
+        });
+        if (!res.ok) return notify("Could not create photo.", "error");
+        notify("Photo created.", "success");
+        router.push("/dashboard/content/photo-gallery/photos");
+      } catch {
+        notify("Could not create photo.", "error");
+      } finally {
+        setIsSubmitting(false);
+      }
     })();
   };
 
@@ -58,6 +71,11 @@ export function AddPhotoPageForm() {
         </Link>
       </div>
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm space-y-4">
+        <DashboardWriterLanguageSelect
+          id="create-photo-source-locale"
+          value={sourceLocale}
+          onChange={setSourceLocale}
+        />
         <div className="space-y-2">
           <Label htmlFor="photo-caption">Caption</Label>
           <Input id="photo-caption" value={caption} onChange={(e) => setCaption(e.target.value)} />
@@ -77,7 +95,9 @@ export function AddPhotoPageForm() {
         </div>
         <div className="flex justify-end gap-2">
           <Link href="/dashboard/content/photo-gallery/photos" className={buttonVariants({ variant: "outline" })}>Cancel</Link>
-          <Button type="button" onClick={onCreate}>Create</Button>
+          <Button type="button" onClick={onCreate} isLoading={isSubmitting} loadingText="Creating...">
+            Create
+          </Button>
         </div>
       </div>
     </section>

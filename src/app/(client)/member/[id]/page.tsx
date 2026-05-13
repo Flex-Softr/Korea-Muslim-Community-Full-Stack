@@ -9,13 +9,15 @@ import { MemberProfileSocialLinks } from "@/components/members/member-profile-so
 import { PageBanner } from "@/components/layout/page-banner";
 import {
   CATEGORY_TO_SLUG,
-  MEMBER_SECTION_COPY,
+  MEMBER_SECTION_I18N_KEYS,
   memberListingHref,
   type MemberCategory,
   type MemberSlug,
 } from "@/lib/members/config";
 import { canViewRestrictedProfile } from "@/lib/members/member-profile-fields";
 import { getMemberById } from "@/lib/members/queries";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -25,8 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const member = await getMemberById(id);
   if (!member) {
-    return { title: "Member" };
+    const lang = await getRequestLang();
+    return { title: serverT(lang, "breadcrumbs.memberProfile") };
   }
+  const lang = await getRequestLang();
   const desc =
     member.aboutSummary ??
     member.bio ??
@@ -35,12 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     member.title ??
     member.name;
   return {
-    title: `${member.name} · Alumni profile`,
+    title: `${member.name} · ${serverT(lang, "breadcrumbs.alumniProfile")}`,
     description: desc,
   };
 }
 
 export default async function MemberDetailPage({ params }: PageProps) {
+  const st = await getServerT();
   const { id } = await params;
   const member = await getMemberById(id);
   if (!member) {
@@ -55,7 +60,9 @@ export default async function MemberDetailPage({ params }: PageProps) {
 
   const category = member.category as MemberCategory;
   const slug: MemberSlug = CATEGORY_TO_SLUG[category];
-  const section = MEMBER_SECTION_COPY[slug];
+  const keys = MEMBER_SECTION_I18N_KEYS[slug];
+  const sectionTitle = st(keys.title);
+  const sectionSubtitle = st(keys.subtitle);
   const listingHref = memberListingHref(slug);
 
   const academicLine = [member.universityKr, member.degree]
@@ -67,7 +74,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
     member.title ??
     member.aboutSummary ??
     (academicLine ? academicLine : null) ??
-    section.subtitle;
+    sectionSubtitle;
 
   return (
     <>
@@ -85,8 +92,8 @@ export default async function MemberDetailPage({ params }: PageProps) {
         }
         subtitle={bannerSubtitle}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: section.title, href: listingHref },
+          { label: st("nav.home"), href: "/" },
+          { label: sectionTitle, href: listingHref },
           { label: member.name },
         ]}
       />
@@ -103,7 +110,8 @@ export default async function MemberDetailPage({ params }: PageProps) {
               className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
             >
               <ArrowLeft className="size-4 shrink-0" aria-hidden />
-              Back to <span className="capitalize">{section.title.toLowerCase()}</span> 
+              {st("members.detail.backTo")}{" "}
+              <span>{sectionTitle}</span>
             </Link>
 
             <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
@@ -111,7 +119,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
                 <div className="lg:sticky lg:top-24">
                   <MemberProfileSidebar
                     member={member}
-                    sectionListTitle={section.title}
+                    sectionListTitle={sectionTitle}
                     showSocialLinks={canSeeRestricted}
                   />
                 </div>
@@ -122,7 +130,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
                   member={member}
                   canSeeRestricted={canSeeRestricted}
                   listingHref={listingHref}
-                  sectionListTitle={section.title}
+                  sectionListTitle={sectionTitle}
                   hideIdentityHeader
                 />
               </div>

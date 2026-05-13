@@ -1,14 +1,15 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageContent } from "../../components/page-content";
 import { PageSidebar } from "../../components/page-sidebar";
+import { getServerT } from "@/lib/i18n/server-translate";
 
-export default function StudentDivisionPage() {
+export default async function StudentDivisionPage() {
+  const st = await getServerT();
     return (
       <>
         <PageBanner
-          title="Student Division"
-          //subtitle="Student Division"
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Student Division" }]}
+          title={st("nav.studentDivision")}
+          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("nav.studentDivision") }]}
         />
           <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
           <div className="sm:w-1/3 w-full">

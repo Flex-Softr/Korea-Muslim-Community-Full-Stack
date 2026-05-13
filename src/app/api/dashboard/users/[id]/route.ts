@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { listDashboardContentByCreator } from "@/lib/dashboard/store";
+import { listDashboardBlogsByCreator } from "@/lib/dashboard/store";
 import { isMemberCategory } from "@/lib/members/config";
 import { hasMinimumRole } from "@/lib/roles";
 import { isSuspendedUser, setSuspendedUser } from "@/lib/dashboard/user-status-store";
@@ -48,7 +48,7 @@ export async function GET(
       imageUrl: true,
     },
   });
-  const submittedBlogs = (await listDashboardContentByCreator("blog", user.id)).map((item) => ({
+  const submittedBlogs = (await listDashboardBlogsByCreator(user.id)).map((item) => ({
     id: item.id,
     title: item.title,
     category: item.category,

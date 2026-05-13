@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
 import { listActivityItems } from "@/lib/content/repository";
 import { ActivityListing } from "./activity-listing";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
-export const metadata: Metadata = {
-  title: "Activity",
-  description:
-    "News and updates from Korea Muslim Community — programmes and outreach across Korea.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getRequestLang();
+  return {
+    title: serverT(lang, "common.activity"),
+    description: serverT(lang, "pages.activity.subtitle"),
+  };
+}
 
 type ActivityPageProps = {
   searchParams?: Promise<{
@@ -18,20 +22,25 @@ type ActivityPageProps = {
 };
 
 export default async function ActivityPage({ searchParams }: ActivityPageProps) {
+  const st = await getServerT();
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
   const yearParsed = params.year ? Number.parseInt(params.year, 10) : null;
   const year = yearParsed != null && Number.isFinite(yearParsed) ? yearParsed : null;
   const pageParsed = params.page ? Number.parseInt(params.page, 10) : 1;
   const page = Number.isFinite(pageParsed) ? pageParsed : 1;
-  const all = await listActivityItems({ page: 1, pageSize: 200 });
+  const all = await listActivityItems(
+    { page: 1, pageSize: 200 },
+    undefined,
+    { maxRowsFromDb: 200 },
+  );
 
   return (
     <>
       <PageBanner
-        title="Activity"
-        subtitle="Reports and updates in a news format — programmes and outreach across Korea."
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Activity" }]}
+        title={st("common.activity")}
+        subtitle={st("pages.activity.subtitle")}
+        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.activity") }]}
       />
       <ActivityListing
         items={all.items}

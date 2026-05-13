@@ -1,14 +1,15 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageSidebar } from "../../components/page-sidebar";
 import { PageContent } from "../../components/page-content";
+import { getServerT } from "@/lib/i18n/server-translate";
 
-export default function OrganizationalMethodPage() {
+export default async function OrganizationalMethodPage() {
+  const st = await getServerT();
     return (
       <>
         <PageBanner
-          title="Organizational Method"
-          //subtitle="Organizational Method"
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Organizational Method" }]}
+          title={st("nav.organizationalMethod")}
+          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("nav.organizationalMethod") }]}
         />
          <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
           <div className="sm:w-1/3 w-full">

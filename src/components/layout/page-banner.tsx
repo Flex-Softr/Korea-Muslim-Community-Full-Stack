@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { getServerT } from "@/lib/i18n/server-translate";
 import { cn } from "@/lib/utils";
 
 export type PageBannerBreadcrumb = {
@@ -25,15 +26,16 @@ export type PageBannerProps = {
 /**
  * Full-width page header for public (client) routes. Matches the primary blue brand bar.
  */
-export function PageBanner({
+export async function PageBanner({
   title,
   subtitle,
   afterTitle,
   breadcrumbs,
   className,
 }: PageBannerProps) {
+  const st = await getServerT();
   const crumbs: PageBannerBreadcrumb[] =
-    breadcrumbs ?? [{ label: "Home", href: "/" }, { label: title }];
+    breadcrumbs ?? [{ label: st("nav.home"), href: "/" }, { label: title }];
 
   return (
     <header

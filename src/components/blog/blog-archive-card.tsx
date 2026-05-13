@@ -21,7 +21,9 @@ export function BlogArchiveCard({
   const translated = useTranslatedFields({
     locale: post.locale,
     title: post.title,
+    category: post.category,
     excerpt: post.excerpt,
+    localeContent: post.localeContent,
   });
 
   return (
@@ -46,7 +48,7 @@ export function BlogArchiveCard({
               ·
             </span>
             <Badge variant="secondary" className="font-normal">
-              {post.category}
+              {translated.category}
             </Badge>
           </div>
           <h3 className="mt-2 text-base font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-lg dark:group-hover:text-sky-300">

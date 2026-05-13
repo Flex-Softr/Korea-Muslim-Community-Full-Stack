@@ -33,9 +33,11 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeButtonClassName,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  closeButtonClassName?: string;
 }) {
   return (
     <DialogPortal>
@@ -51,7 +53,10 @@ function DialogContent({
         {showCloseButton ? (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute end-3 top-3 z-10 inline-flex size-9 items-center justify-center rounded-lg border border-transparent bg-background/90 text-foreground shadow-sm ring-1 ring-border/60 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+            className={cn(
+              "absolute end-3 top-3 z-10 inline-flex size-9 items-center justify-center rounded-lg border border-transparent bg-background/90 text-foreground shadow-sm ring-1 ring-border/60 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring",
+              closeButtonClassName,
+            )}
             aria-label="Close"
           >
             <X className="size-4" />

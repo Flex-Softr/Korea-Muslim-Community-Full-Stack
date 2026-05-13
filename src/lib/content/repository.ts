@@ -1,16 +1,40 @@
 import { ACTIVITY_NEWS, type ActivityNewsItem, getActivityBySlug } from "@/data/activity-news";
 import { PHOTO_GALLERY_ITEMS, type PhotoGalleryItem, VIDEO_GALLERY_ITEMS, type VideoGalleryItem } from "@/data/gallery-media";
 import { STUDENT_NEWS_POSTS, type StudentNewsPost, getBlogPostBySlug } from "@/data/student-news";
+import {
+  getPublishedDashboardActivityBySlug,
+  getPublishedDashboardBlogBySlug,
+} from "@/lib/dashboard/store";
 import type {
   CategoryOption,
   ContentListQuery,
   PaginatedResponse,
   YearOption,
 } from "@/lib/content/types";
+import {
+  canonicalCategory,
+  legacyLocaleMapFromFlat,
+  parseLocaleContentMap,
+  pickLocalizedFields,
+} from "@/lib/i18n/content-locale";
+import type { Lang } from "@/lib/i18n/lang";
 import { getRequestLang } from "@/lib/i18n/server-language";
+import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
 import { prisma } from "@/lib/prisma";
 import { clampPage, totalPagesFromCount } from "@/lib/pagination/get-pagination-items";
-import { translateText } from "@/lib/translate";
+
+type DashboardContentModelDelegate = {
+  findMany(args: unknown): Promise<PrismaContentDoc[]>;
+};
+
+type DashboardPrismaClient = typeof prisma & {
+  dashboardBlog: DashboardContentModelDelegate;
+  dashboardActivity: DashboardContentModelDelegate;
+  dashboardPhoto: DashboardContentModelDelegate;
+  dashboardVideo: DashboardContentModelDelegate;
+};
+
+const dashboardPrisma = prisma as DashboardPrismaClient;
 
 function categoryOptionsFrom<T extends { category: string }>(
   items: T[],
@@ -26,7 +50,7 @@ function categoryOptionsFrom<T extends { category: string }>(
 
 function yearFromIso(dateIso?: string): number | null {
   if (!dateIso) return null;
-  const y = Number(dateIso.slice(0, 4));
+  const y = Number.parseInt(dateIso.slice(0, 4), 10);
   return Number.isFinite(y) ? y : null;
 }
 
@@ -65,7 +89,7 @@ function stripHtml(input: string): string {
   return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-type DashboardContentRow = {
+type PrismaContentDoc = {
   id: string;
   title: string;
   category: string;
@@ -73,110 +97,153 @@ type DashboardContentRow = {
   description: string | null;
   coverImage: string | null;
   videoUrl: string | null;
+  slug: string | null;
+  localeContent: unknown;
 };
 
-async function listPublishedContentByType(type: "blog" | "activity" | "photo" | "video"): Promise<DashboardContentRow[] | null> {
-  const delegate = (prisma as unknown as {
-    dashboardContent?: {
-      findMany: (args: unknown) => Promise<DashboardContentRow[]>;
-    };
-  }).dashboardContent;
-  if (!delegate?.findMany) return null;
+function resolveLocaleMap(row: PrismaContentDoc) {
+  return (
+    parseLocaleContentMap(row.localeContent) ??
+    legacyLocaleMapFromFlat(row.title, row.category, row.description ?? "")
+  );
+}
+
+function resolveContentSlug(row: PrismaContentDoc, map: ReturnType<typeof resolveLocaleMap>): string {
+  if (row.slug?.trim()) return row.slug.trim();
+  return slugify(map.en.title) || slugify(map.ko.title) || slugify(map.bn.title) || row.id;
+}
+
+type ListPublishedOpts = {
+  /** When set, only the newest N rows are read from the DB (plus a small buffer for videos with empty URLs). */
+  take?: number;
+};
+
+async function listPublishedContentByType(
+  type: "blog" | "activity" | "photo" | "video",
+  options?: ListPublishedOpts,
+): Promise<PrismaContentDoc[] | null> {
+  const where = { OR: [{ status: "published" as const }, { status: null }] };
+  const take = options?.take;
   try {
-    return await delegate.findMany({
-      where: {
-        type,
-        OR: [{ status: "published" }, { status: null }],
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    switch (type) {
+      case "blog":
+        return await dashboardPrisma.dashboardBlog.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          ...(take != null ? { take } : {}),
+        });
+      case "activity":
+        return await dashboardPrisma.dashboardActivity.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          ...(take != null ? { take } : {}),
+        });
+      case "photo":
+        return await dashboardPrisma.dashboardPhoto.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          ...(take != null ? { take } : {}),
+        });
+      case "video": {
+        const buffer =
+          take != null ? Math.min(Math.max(take * 6, take + 8), 400) : undefined;
+        const rows = await dashboardPrisma.dashboardVideo.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          ...(buffer != null ? { take: buffer } : {}),
+        });
+        const withUrl = rows.filter((row: PrismaContentDoc) =>
+          !!row.videoUrl?.trim(),
+        );
+        if (take != null) {
+          return withUrl.slice(0, take);
+        }
+        return withUrl;
+      }
+    }
   } catch {
     return null;
   }
 }
 
-function mapDbBlogPost(row: {
-  id: string;
-  title: string;
-  category: string;
-  createdAt: Date;
-  description: string | null;
-  coverImage: string | null;
-}): StudentNewsPost {
+function mapDbBlogPost(row: PrismaContentDoc, lang: Lang): StudentNewsPost {
+  const map = resolveLocaleMap(row);
+  const loc = pickLocalizedFields(map, lang);
   const dateIso = row.createdAt.toISOString();
-  const plain = stripHtml(row.description ?? "");
+  const plain = stripHtml(loc.description);
+  const slug = resolveContentSlug(row, map);
   return {
     id: row.id,
-    locale: "en",
-    slug: slugify(row.title),
+    locale: lang,
+    slug,
     dateIso,
     date: formatHumanDate(dateIso),
-    category: row.category || "General",
-    title: row.title,
-    excerpt: plain.slice(0, 180) || row.title,
+    category: canonicalCategory(map),
+    title: loc.title,
+    excerpt: plain.slice(0, 180) || loc.title,
     coverImage: row.coverImage || "/brand/logo.png",
-    content: row.description || "",
+    content: loc.description,
+    localeContent: map,
   };
 }
 
-function mapDbActivityItem(row: {
-  id: string;
-  title: string;
-  category: string;
-  createdAt: Date;
-  description: string | null;
-  coverImage: string | null;
-}): ActivityNewsItem {
+function mapDbActivityItem(row: PrismaContentDoc, lang: Lang): ActivityNewsItem {
+  const map = resolveLocaleMap(row);
+  const loc = pickLocalizedFields(map, lang);
   const dateIso = row.createdAt.toISOString();
-  const plain = stripHtml(row.description ?? "");
+  const plain = stripHtml(loc.description);
+  const slug = resolveContentSlug(row, map);
   return {
     id: row.id,
-    locale: "en",
-    slug: slugify(row.title),
+    locale: lang,
+    slug,
     dateIso,
     date: formatHumanDate(dateIso),
-    category: row.category || "General",
-    title: row.title,
-    excerpt: plain.slice(0, 180) || row.title,
+    category: canonicalCategory(map),
+    title: loc.title,
+    excerpt: plain.slice(0, 180) || loc.title,
     imageSrc: row.coverImage || "/brand/logo.png",
-    content: row.description || "",
+    content: loc.description,
+    localeContent: map,
   };
 }
 
-function mapDbPhotoItem(row: {
-  id: string;
-  title: string;
-  category: string;
-  createdAt: Date;
-  coverImage: string | null;
-}): PhotoGalleryItem {
+function mapDbPhotoItem(row: PrismaContentDoc, lang: Lang): PhotoGalleryItem {
+  const map = resolveLocaleMap(row);
+  const loc = pickLocalizedFields(map, lang);
   return {
     id: row.id,
-    category: row.category || "General",
-    title: row.title,
-    caption: row.title,
+    category: canonicalCategory(map),
+    title: loc.title,
+    caption: loc.title,
     imageSrc: row.coverImage || "/brand/logo.png",
     gridClass: "md:col-span-4",
     minHClass: "min-h-[220px]",
     dateIso: row.createdAt.toISOString(),
+    localeContent: map,
   };
 }
 
-function mapDbVideoItem(row: {
-  id: string;
-  title: string;
-  category: string;
-  createdAt: Date;
-  videoUrl: string | null;
-}): VideoGalleryItem {
+function mapDbVideoItem(row: PrismaContentDoc, lang: Lang): VideoGalleryItem {
+  const map = resolveLocaleMap(row);
+  const loc = pickLocalizedFields(map, lang);
   return {
     id: row.id,
-    category: row.category || "General",
-    title: row.title,
+    category: canonicalCategory(map),
+    title: loc.title,
     thumbClass: "from-[#2c7bb6] to-sky-400",
     embedUrl: row.videoUrl || "",
     dateIso: row.createdAt.toISOString(),
+    localeContent: map,
   };
+}
+
+function mapStaticBlog(post: StudentNewsPost, lang: Lang): StudentNewsPost {
+  return { ...post, locale: lang };
+}
+
+function mapStaticActivity(item: ActivityNewsItem, lang: Lang): ActivityNewsItem {
+  return { ...item, locale: lang };
 }
 
 function applyFilters<T extends { category: string; dateIso?: string }>(
@@ -193,7 +260,13 @@ function applyFilters<T extends { category: string; dateIso?: string }>(
   });
 }
 
-function paginate<T>(items: T[], query: ContentListQuery): { items: T[]; page: number; pageSize: number; totalItems: number; totalPages: number } {
+function paginate<T>(items: T[], query: ContentListQuery): {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+} {
   const pageSize = Math.max(1, Math.floor(query.pageSize ?? 9));
   const totalItems = items.length;
   const totalPages = totalPagesFromCount(totalItems, pageSize);
@@ -208,58 +281,47 @@ function paginate<T>(items: T[], query: ContentListQuery): { items: T[]; page: n
   };
 }
 
-async function translateBlogPost(
-  post: StudentNewsPost,
-  lang: "en" | "bn" | "kr",
-): Promise<StudentNewsPost> {
-  const source = post.locale ?? "en";
-  if (source === lang) return post;
-  const [title, excerpt, content, category] = await Promise.all([
-    translateText(post.title, lang, source),
-    translateText(post.excerpt, lang, source),
-    translateText(post.content, lang, source),
-    translateText(post.category, lang, source),
-  ]);
-  return { ...post, title, excerpt, content, category };
-}
+export type ListContentRepositoryOpts = {
+  maxRowsFromDb?: number;
+};
 
-async function translateActivityItem(
-  item: ActivityNewsItem,
-  lang: "en" | "bn" | "kr",
-): Promise<ActivityNewsItem> {
-  const source = item.locale ?? "en";
-  if (source === lang) return item;
-  const [title, excerpt, content, category] = await Promise.all([
-    translateText(item.title, lang, source),
-    translateText(item.excerpt, lang, source),
-    translateText(item.content, lang, source),
-    translateText(item.category, lang, source),
-  ]);
-  return { ...item, title, excerpt, content, category };
+/** When listing query is page 1 with no filters, cap DB reads to `pageSize` (pagination beyond page 1 needs a full scan). */
+export function repositoryOptsForListQuery(
+  query: ContentListQuery,
+): ListContentRepositoryOpts | undefined {
+  const page = query.page ?? 1;
+  const ps = query.pageSize;
+  if (page !== 1 || query.category || query.year != null || ps == null) {
+    return undefined;
+  }
+  return { maxRowsFromDb: ps };
 }
 
 export async function listBlogPosts(
   query: ContentListQuery,
+  /** When set (e.g. from `?lang=` on API), avoids relying on cookie timing alone. */
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
 ): Promise<PaginatedResponse<StudentNewsPost>> {
-  const requestLang = await getRequestLang();
-  const dbRows = await listPublishedContentByType("blog");
+  const requestLang = lang ?? (await getRequestLang());
+  const dbTake = opts?.maxRowsFromDb;
+  const dbRows = await listPublishedContentByType(
+    "blog",
+    dbTake != null ? { take: dbTake } : undefined,
+  );
+  const staticSorted = [...STUDENT_NEWS_POSTS].sort((a, b) =>
+    b.dateIso.localeCompare(a.dateIso),
+  );
+  const staticSlice =
+    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
   const base = dbRows
-    ? dbRows.map(mapDbBlogPost)
-    : [...STUDENT_NEWS_POSTS].sort((a, b) => b.dateIso.localeCompare(a.dateIso));
+    ? dbRows.map((row) => mapDbBlogPost(row, requestLang))
+    : staticSlice.map((p) => mapStaticBlog(p, requestLang));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
-  const translatedItems = await Promise.all(
-    paged.items.map((item) => translateBlogPost(item, requestLang)),
-  );
-  const translatedCategories = await Promise.all(
-    categoryOptionsFrom(base).map(async (category) => ({
-      ...category,
-      label: await translateText(category.label, requestLang, "en"),
-    })),
-  );
   return {
-    items: translatedItems,
-    categories: translatedCategories,
+    items: paged.items,
+    categories: categoryOptionsFrom(base),
     years: yearOptionsFrom(base),
     pagination: {
       page: paged.page,
@@ -270,42 +332,54 @@ export async function listBlogPosts(
   };
 }
 
-export async function getBlogPost(slug: string): Promise<StudentNewsPost | null> {
-  const requestLang = await getRequestLang();
-  const dbRows = await listPublishedContentByType("blog");
-  if (dbRows) {
-    const dbMatch = dbRows
-      .map(mapDbBlogPost)
-      .find((post) => post.slug === slug);
-    if (dbMatch) return translateBlogPost(dbMatch, requestLang);
+export async function getBlogPost(slug: string, lang?: Lang): Promise<StudentNewsPost | null> {
+  const requestLang = lang ?? (await getRequestLang());
+  const row = await getPublishedDashboardBlogBySlug(slug);
+  if (row) {
+    return mapDbBlogPost(
+      {
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        createdAt: new Date(row.dateIso),
+        description: row.description ?? null,
+        coverImage: row.coverImage ?? null,
+        videoUrl: row.videoUrl ?? null,
+        slug: row.slug,
+        localeContent: row.localeContent,
+      },
+      requestLang,
+    );
   }
   const staticMatch = getBlogPostBySlug(slug) ?? null;
   if (!staticMatch) return null;
-  return translateBlogPost(staticMatch, requestLang);
+  return mapStaticBlog(staticMatch, requestLang);
 }
 
 export async function listActivityItems(
   query: ContentListQuery,
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
 ): Promise<PaginatedResponse<ActivityNewsItem>> {
-  const requestLang = await getRequestLang();
-  const dbRows = await listPublishedContentByType("activity");
+  const requestLang = lang ?? (await getRequestLang());
+  const dbTake = opts?.maxRowsFromDb;
+  const dbRows = await listPublishedContentByType(
+    "activity",
+    dbTake != null ? { take: dbTake } : undefined,
+  );
+  const staticSorted = [...ACTIVITY_NEWS].sort((a, b) =>
+    (b.dateIso ?? "").localeCompare(a.dateIso ?? ""),
+  );
+  const staticSlice =
+    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
   const base = dbRows
-    ? dbRows.map(mapDbActivityItem)
-    : [...ACTIVITY_NEWS].sort((a, b) => (b.dateIso ?? "").localeCompare(a.dateIso ?? ""));
+    ? dbRows.map((row) => mapDbActivityItem(row, requestLang))
+    : staticSlice.map((item) => mapStaticActivity(item, requestLang));
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
-  const translatedItems = await Promise.all(
-    paged.items.map((item) => translateActivityItem(item, requestLang)),
-  );
-  const translatedCategories = await Promise.all(
-    categoryOptionsFrom(base).map(async (category) => ({
-      ...category,
-      label: await translateText(category.label, requestLang, "en"),
-    })),
-  );
   return {
-    items: translatedItems,
-    categories: translatedCategories,
+    items: paged.items,
+    categories: categoryOptionsFrom(base),
     years: yearOptionsFrom(base),
     pagination: {
       page: paged.page,
@@ -316,29 +390,49 @@ export async function listActivityItems(
   };
 }
 
-export async function getActivityItem(
-  slug: string,
-): Promise<ActivityNewsItem | null> {
-  const requestLang = await getRequestLang();
-  const dbRows = await listPublishedContentByType("activity");
-  if (dbRows) {
-    const dbMatch = dbRows
-      .map(mapDbActivityItem)
-      .find((item) => item.slug === slug);
-    if (dbMatch) return translateActivityItem(dbMatch, requestLang);
+export async function getActivityItem(slug: string, lang?: Lang): Promise<ActivityNewsItem | null> {
+  const requestLang = lang ?? (await getRequestLang());
+  const row = await getPublishedDashboardActivityBySlug(slug);
+  if (row) {
+    return mapDbActivityItem(
+      {
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        createdAt: new Date(row.dateIso),
+        description: row.description ?? null,
+        coverImage: row.coverImage ?? null,
+        videoUrl: row.videoUrl ?? null,
+        slug: row.slug,
+        localeContent: row.localeContent,
+      },
+      requestLang,
+    );
   }
   const staticMatch = getActivityBySlug(slug) ?? null;
   if (!staticMatch) return null;
-  return translateActivityItem(staticMatch, requestLang);
+  return mapStaticActivity(staticMatch, requestLang);
 }
 
 export async function listPhotoItems(
   query: ContentListQuery,
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
 ): Promise<PaginatedResponse<PhotoGalleryItem>> {
-  const dbRows = await listPublishedContentByType("photo");
+  const requestLang = lang ?? (await getRequestLang());
+  const dbTake = opts?.maxRowsFromDb;
+  const dbRows = await listPublishedContentByType(
+    "photo",
+    dbTake != null ? { take: dbTake } : undefined,
+  );
+  const staticSorted = [...PHOTO_GALLERY_ITEMS].sort((a, b) =>
+    b.dateIso.localeCompare(a.dateIso),
+  );
+  const staticSlice =
+    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
   const base = dbRows
-    ? dbRows.map(mapDbPhotoItem)
-    : [...PHOTO_GALLERY_ITEMS].sort((a, b) => b.dateIso.localeCompare(a.dateIso));
+    ? dbRows.map((row) => mapDbPhotoItem(row, requestLang))
+    : staticSlice;
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {
@@ -356,13 +450,25 @@ export async function listPhotoItems(
 
 export async function listVideoItems(
   query: ContentListQuery,
+  lang?: Lang,
+  opts?: ListContentRepositoryOpts,
 ): Promise<PaginatedResponse<VideoGalleryItem>> {
-  const dbRows = await listPublishedContentByType("video");
+  const requestLang = lang ?? (await getRequestLang());
+  const dbTake = opts?.maxRowsFromDb;
+  const dbRows = await listPublishedContentByType(
+    "video",
+    dbTake != null ? { take: dbTake } : undefined,
+  );
+  const staticSorted = [...VIDEO_GALLERY_ITEMS].sort((a, b) =>
+    b.dateIso.localeCompare(a.dateIso),
+  );
+  const staticSlice =
+    dbTake != null ? staticSorted.slice(0, dbTake) : staticSorted;
   const base = dbRows
     ? dbRows
         .filter((row) => !!row.videoUrl?.trim())
-        .map(mapDbVideoItem)
-    : [...VIDEO_GALLERY_ITEMS].sort((a, b) => b.dateIso.localeCompare(a.dateIso));
+        .map((row) => mapDbVideoItem(row, requestLang))
+    : staticSlice;
   const filtered = applyFilters(base, query);
   const paged = paginate(filtered, query);
   return {

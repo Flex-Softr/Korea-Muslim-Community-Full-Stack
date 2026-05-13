@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PHOTO_GALLERY_ITEMS, type PhotoGalleryItem } from "@/data/gallery-media";
+import { useLanguage } from "@/components/providers/language-provider";
+import { pickLocalizedFields } from "@/lib/i18n/content-locale";
 import { cn } from "@/lib/utils";
 
 type GalleryItem = PhotoGalleryItem;
@@ -81,6 +83,7 @@ export function PhotoGallery({
   paginated?: boolean;
   sourceItems?: GalleryItem[];
 }) {
+  const { t, lang } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -88,10 +91,20 @@ export function PhotoGallery({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [localCategory, setLocalCategory] = useState<string | null>(null);
   const [localYear, setLocalYear] = useState<number | null>(null);
-  const baseItems = useMemo(
-    () => sourceItems ?? PHOTO_GALLERY_ITEMS,
-    [sourceItems],
-  );
+  const baseItems = useMemo(() => {
+    const items = sourceItems ?? PHOTO_GALLERY_ITEMS;
+    return items.map((item) => {
+      if (!item.localeContent) return item;
+      const localized = pickLocalizedFields(item.localeContent, lang);
+      const title = localized.title?.trim() || item.title;
+      return {
+        ...item,
+        category: localized.category?.trim() || item.category,
+        title,
+        caption: title,
+      };
+    });
+  }, [lang, sourceItems]);
   const parsedCategory = useMemo(() => {
     const category = searchParams.get("category");
     return category?.trim() ? category : null;
@@ -271,7 +284,7 @@ export function PhotoGallery({
           ? "pb-12 pt-6 sm:pb-16 sm:pt-8"
           : "border-t border-border/40 py-12 sm:py-14",
       )}
-      aria-label={embedded ? "Photo gallery" : undefined}
+      aria-label={embedded ? t("photoGallery.embeddedAria") : undefined}
       aria-labelledby={embedded ? undefined : "gallery-section-heading"}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -281,11 +294,10 @@ export function PhotoGallery({
               id="gallery-section-heading"
               className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
             >
-              Gallery
+              {t("breadcrumbs.gallery")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Photo highlights from programmes, service, and community life.
-              Select an image to view it larger with caption.
+              {t("pages.gallery.subtitle")}
             </p>
           </div>
         ) : null}
@@ -296,6 +308,10 @@ export function PhotoGallery({
               categories={galleryCategories}
               selectedCategory={selectedCategory}
               onSelectCategory={handleSelectCategory}
+              title={t("photoGallery.filterByCategory")}
+              allLabel={t("photoGallery.allCategories")}
+              clearLabel={t("photoGallery.clearCategory")}
+              ariaLabel={t("photoGallery.categoriesAria")}
               className="mb-4"
             />
             <ActivityCategoryFilter
@@ -304,10 +320,10 @@ export function PhotoGallery({
                 selectedYear != null ? String(selectedYear) : null
               }
               onSelectCategory={handleSelectYear}
-              title="Filter by year"
-              allLabel="All years"
-              clearLabel="Clear year"
-              ariaLabel="Photo years"
+              title={t("blog.filterByYear")}
+              allLabel={t("blog.allYears")}
+              clearLabel={t("blog.clearYear")}
+              ariaLabel={t("photoGallery.yearsAria")}
               className="mb-8 sm:mb-10"
             />
           </>
@@ -317,7 +333,7 @@ export function PhotoGallery({
           <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
             {fullList.length === 0 ? (
               <>
-                No photos match your filters. Try another filter or{" "}
+                {t("photoGallery.noMatchPrefix")}{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -326,27 +342,25 @@ export function PhotoGallery({
                   }}
                   className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                 >
-                  show all
+                  {t("blog.showAll")}
                 </button>
                 .
               </>
             ) : (
               <>
-                Showing{" "}
-                <span className="font-medium text-foreground">
-                  {offset + 1}–{offset + items.length}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-foreground">
-                  {fullList.length}
-                </span>{" "}
-                {fullList.length === 1 ? "photo" : "photos"}
-                {selectedCategory != null || selectedYear != null ? (
-                  <>
-                    {" "}
-                    with filters
-                  </>
-                ) : null}
+                {t(
+                  fullList.length === 1
+                    ? "photoGallery.summaryPhoto"
+                    : "photoGallery.summaryPhotos",
+                  {
+                    start: offset + 1,
+                    end: offset + items.length,
+                    total: fullList.length,
+                  },
+                )}
+                {selectedCategory != null || selectedYear != null
+                  ? ` ${t("photoGallery.withFilters")}`
+                  : null}
               </>
             )}
           </p>
@@ -394,7 +408,7 @@ export function PhotoGallery({
             totalPages={totalPages}
             onPageChange={handlePageChange}
             className="mt-10"
-            ariaLabel="Photo gallery pagination"
+            ariaLabel={t("photoGallery.paginationAria")}
             showSummary
             align="center"
           />
@@ -431,13 +445,13 @@ export function PhotoGallery({
                     {active.caption}
                   </DialogTitle>
                   <DialogDescription className="sr-only">
-                    Photo caption
+                    {t("photoGallery.captionSrOnly")}
                   </DialogDescription>
                 </div>
                 <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-4">
                   <LightboxArrowButton
                     direction="prev"
-                    label="Previous image"
+                    label={t("photoGallery.prevImage")}
                     onClick={goPrev}
                   />
                   <span className="text-xs text-muted-foreground tabular-nums">
@@ -445,7 +459,7 @@ export function PhotoGallery({
                   </span>
                   <LightboxArrowButton
                     direction="next"
-                    label="Next image"
+                    label={t("photoGallery.nextImage")}
                     onClick={goNext}
                   />
                 </div>

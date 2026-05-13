@@ -4,14 +4,19 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   MEMBER_SLUGS,
-  MEMBER_NAV_LABELS,
+  MEMBER_NAV_LABEL_KEYS,
   slugFromSearchParam,
   type MemberSlug,
 } from "@/lib/members/config";
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
+
+type LooseTranslate = (key: string) => string;
 
 export function MemberTypeTabs({ className }: { className?: string }) {
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
+  const tt = t as LooseTranslate;
   const current = slugFromSearchParam(searchParams.get("type"));
 
   return (
@@ -37,7 +42,7 @@ export function MemberTypeTabs({ className }: { className?: string }) {
             )}
             scroll={false}
           >
-            {MEMBER_NAV_LABELS[slug]}
+            {tt(MEMBER_NAV_LABEL_KEYS[slug])}
           </Link>
         );
       })}

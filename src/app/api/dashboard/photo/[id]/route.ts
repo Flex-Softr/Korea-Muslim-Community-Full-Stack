@@ -1,32 +1,23 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import {
-  deleteDashboardContent,
-  getDashboardContentById,
-  updateDashboardContent,
-  type DashboardContentType,
+  deleteDashboardPhoto,
+  getDashboardPhotoById,
+  updateDashboardPhoto,
 } from "@/lib/dashboard/store";
+import type { LocaleContentMap } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
-
-function parseType(value: string): DashboardContentType | null {
-  if (value === "blog" || value === "activity" || value === "photo" || value === "video") return value;
-  return null;
-}
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ type: string; id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
-  const { type, id } = await params;
-  const parsed = parseType(type);
-  if (!parsed) {
-    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-  }
+  const { id } = await params;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const existing = await getDashboardContentById(parsed, id);
+  const existing = await getDashboardPhotoById(id);
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -36,6 +27,7 @@ export async function PATCH(
   }
 
   const body = (await request.json()) as {
+    localeContent?: LocaleContentMap;
     title?: string;
     category?: string;
     description?: string;
@@ -46,7 +38,15 @@ export async function PATCH(
   if (body.category !== undefined && !body.category.trim()) {
     return NextResponse.json({ error: "Category is required" }, { status: 400 });
   }
-  const updated = await updateDashboardContent(parsed, id, body);
+  const updated = await updateDashboardPhoto(id, {
+    localeContent: body.localeContent,
+    title: body.title,
+    category: body.category,
+    description: body.description,
+    coverImage: body.coverImage,
+    videoUrl: body.videoUrl,
+    status: body.status,
+  });
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -55,18 +55,14 @@ export async function PATCH(
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ type: string; id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
-  const { type, id } = await params;
-  const parsed = parseType(type);
-  if (!parsed) {
-    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-  }
+  const { id } = await params;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const row = await getDashboardContentById(parsed, id);
+  const row = await getDashboardPhotoById(id);
   if (!row) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -79,18 +75,14 @@ export async function GET(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: Promise<{ type: string; id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
-  const { type, id } = await params;
-  const parsed = parseType(type);
-  if (!parsed) {
-    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-  }
+  const { id } = await params;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const existing = await getDashboardContentById(parsed, id);
+  const existing = await getDashboardPhotoById(id);
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -98,7 +90,7 @@ export async function DELETE(
   if (!canManageAll && existing.createdById !== session.user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const removed = await deleteDashboardContent(parsed, id);
+  const removed = await deleteDashboardPhoto(id);
   if (!removed) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

@@ -1,5 +1,5 @@
 import {
-  MEMBER_NAV_LABELS,
+  MEMBER_NAV_LABEL_KEYS,
   MEMBER_SLUGS,
   memberListingHref,
   slugFromSearchParam,
@@ -11,7 +11,7 @@ import {
  */
 export type SiteNavItem = {
   kind: "link" | "submenu";
-  label: string;
+  labelKey: string;
   href?: string;
   id?: string;
   items?: SiteNavItem[];
@@ -20,101 +20,149 @@ export type SiteNavItem = {
 /**
  * Member sublinks
  */
-const memberSubLinks: SiteNavItem[] = MEMBER_SLUGS.map((slug) => ({
+const memberSubLinks: SiteNavItem[] = MEMBER_SLUGS.map((slug: MemberSlug) => ({
   kind: "link",
   href: memberListingHref(slug),
-  label: MEMBER_NAV_LABELS[slug],
+  labelKey: MEMBER_NAV_LABEL_KEYS[slug],
 }));
 
 /**
  * MAIN NAV
  */
 export const SITE_NAV: SiteNavItem[] = [
-  { kind: "link", href: "/", label: "Home" },
-  // { kind: "link", href: "/about", label: "About" },
-  // { kind: "link", href: "/activity", label: "Activity" },
-  // { kind: "link", href: "/blog", label: "Blog" },
+  { kind: "link", href: "/", labelKey: "nav.home" },
+  {
+    kind: "submenu",
+    id: "organization-activities",
+    labelKey: "nav.organizationActivities",
+    items: [
+      {
+        kind: "submenu",
+        id: "introduction",
+        labelKey: "nav.introduction",
+        items: [
+          {
+            kind: "link",
+            href: "/introduction/brief-introduction",
+            labelKey: "nav.briefIntroduction",
+          },
+          {
+            kind: "link",
+            href: "/introduction/constitution",
+            labelKey: "nav.constitution",
+          },
+          {
+            kind: "link",
+            href: "/introduction/organizational-method",
+            labelKey: "nav.organizationalMethod",
+          },
+          {
+            kind: "link",
+            href: "/introduction/policies",
+            labelKey: "nav.policies",
+          },
+          {
+            kind: "link",
+            href: "/introduction/history-and-tradition",
+            labelKey: "nav.historyAndTradition",
+          },
+          {
+            kind: "link",
+            href: "/introduction/introductory-registration",
+            labelKey: "nav.introductoryRegistration",
+          },
+        ],
+      },
+      {
+        kind: "submenu",
+        id: "organizational-structure",
+        labelKey: "nav.organizationalStructure",
+        items: [
+          {
+            kind: "submenu",
+            id: "central-organization",
+            labelKey: "nav.centralOrganization",
+            items: [
+              {
+                kind: "link",
+                href: "/organizational-structure/central-organization/central-working-procedure",
+                labelKey: "nav.centralWorkingProcedure",
+              },
+              {
+                kind: "link",
+                href: "/organizational-structure/central-organization/central-shura-council",
+                labelKey: "nav.centralShuraCouncil",
+              },
+              {
+                kind: "link",
+                href: "/organizational-structure/central-organization/other-leadership",
+                labelKey: "nav.otherLeadership",
+              },
+            ],
+          },
+          {
+            kind: "link",
+            href: "/procedure/women-s-division",
+            labelKey: "nav.womensDivision",
+          },
+          {
+            kind: "link",
+            href: "/procedure/student-division",
+            labelKey: "nav.studentDivision",
+          },
+          {
+            kind: "link",
+            href: "/procedure/professional-division",
+            labelKey: "nav.professionalDivision",
+          },
+          {
+            kind: "link",
+            href: "/procedure/national-and-international",
+            labelKey: "nav.nationalAndInternational",
+          },
+        ],
+      },
+    ],
+  },
 
-    /**
-   * Community & Procedure
-   */
-    {
-      kind: "submenu",
-      id: "organization-activities",
-      label: "Organization & Activities",
-      items: [
-        {
-          kind: "submenu",
-          id: "introduction",
-          label: "Introduction",
-          items: [
-            { kind: "link", href: "/introduction/brief-introduction", label: "Brief Introduction" },
-            { kind: "link", href: "/introduction/constitution", label: "Constitution" },
-            { kind: "link", href: "/introduction/organizational-method", label: "Organizational Method" },
-            { kind: "link", href: "/introduction/policies", label: "Policies" },
-            { kind: "link", href: "/introduction/history-and-tradition", label: "History & Tradition" },
-            { kind: "link", href: "/introduction/introductory-registration", label: "Introductory Registration" },
-          ],
-        },
-        {
-          kind: "submenu",
-          id: "organizational-structure",
-          label: "Organizational Structure",
-          items: [
-            { kind: "submenu",
-              id: "central-organization",
-              label: "Central Organization",
-              items: [
-                { kind: "link", href: "/organizational-structure/central-organization/central-working-procedure", label: "Central Working Procedure" },
-                { kind: "link", href: "/organizational-structure/central-organization/central-shura-council", label: "Central Shura (Council)" },
-                { kind: "link", href: "/organizational-structure/central-organization/other-leadership", label: "Other Leadership" },
-              ],
-            },
-            { kind: "link", href: "/procedure/women-s-division", label: "Women’s Division" },
-            { kind: "link", href: "/procedure/student-division", label: "Student Division" },
-            { kind: "link", href: "/procedure/professional-division", label: "Professional Division" },
-            { kind: "link", href: "/procedure/national-and-international", label: "National & International" },
-          ],
-        },
-      ],
-    },
-
-    
   {
     kind: "submenu",
     id: "media",
-    label: "Media",
+    labelKey: "nav.media",
     items: [
-      { kind: "link", href: "/photo-gallery", label: "Photo Gallery" },
-      { kind: "link", href: "/video-gallery", label: "Video Gallery" },
+      {
+        kind: "link",
+        href: "/photo-gallery",
+        labelKey: "nav.photoGallery",
+      },
+      {
+        kind: "link",
+        href: "/video-gallery",
+        labelKey: "nav.videoGallery",
+      },
     ],
   },
 
   {
     kind: "submenu",
     id: "members",
-    label: "Members",
+    labelKey: "nav.members",
     items: memberSubLinks,
   },
 
-
-  /**
-   * ✅ NEW: EPS MENU
-   */
   {
     kind: "submenu",
     id: "eps",
-    label: "EPS",
+    labelKey: "nav.eps",
     items: [
-      { kind: "link", href: "/eps/form", label: "Form" },
-      { kind: "link", href: "/eps/link", label: "Link" },
-      { kind: "link", href: "/eps/app", label: "App" },
+      { kind: "link", href: "/eps/form", labelKey: "nav.epsForm" },
+      { kind: "link", href: "/eps/link", labelKey: "nav.epsLink" },
+      { kind: "link", href: "/eps/app", labelKey: "nav.epsApp" },
     ],
   },
-  { kind: "link", href: "/students", label: "Students" },
-{ kind: "link", href: "/education", label: "Education" },
-{ kind: "link", href: "/mosque", label: "Mosque" },
-  // { kind: "link", href: "/donation", label: "Donation" },
+  { kind: "link", href: "/students", labelKey: "nav.students" },
+  { kind: "link", href: "/education", labelKey: "nav.education" },
+  { kind: "link", href: "/mosque", labelKey: "nav.mosque" },
 ];
 
 /**
@@ -147,108 +195,3 @@ export function isTopLinkActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
-
-
-// import {
-//   MEMBER_NAV_LABELS,
-//   MEMBER_SLUGS,
-//   memberListingHref,
-//   slugFromSearchParam,
-//   type MemberSlug,
-// } from "@/lib/members/config";
-
-// /** Single destination inside a submenu (or standalone link target). */
-// export type SiteNavSubLink = {
-//   href: string;
-//   label: string;
-//   /** When set, active only if pathname is `/member` and `?type=` matches this slug. */
-//   memberSlug?: MemberSlug;
-// };
-
-// export type SiteNavSubmenu = {
-//   kind: "submenu";
-//   /** Stable id for mobile accordion state */
-//   id: string;
-//   label: string;
-//   items: SiteNavSubLink[];
-// };
-
-// export type SiteNavLink = {
-//   kind: "link";
-//   href: string;
-//   label: string;
-// };
-
-// export type SiteNavEntry = SiteNavLink | SiteNavSubmenu;
-
-// const memberSubLinks: SiteNavSubLink[] = MEMBER_SLUGS.map((slug) => ({
-//   href: memberListingHref(slug),
-//   label: MEMBER_NAV_LABELS[slug],
-//   memberSlug: slug,
-// }));
-
-// /**
-//  * Main site navigation — one array drives desktop and mobile.
-//  * Edit structure here only; submenus render as dropdowns (desktop) and accordions (mobile).
-//  */
-// export const SITE_NAV: SiteNavEntry[] = [
-//   { kind: "link", href: "/", label: "Home" },
-//   { kind: "link", href: "/about", label: "About" },
-//   { kind: "link", href: "/activity", label: "Activity" },
-//   { kind: "link", href: "/blog", label: "Blog" },
-//   {
-//     kind: "submenu",
-//     id: "media",
-//     label: "Media",
-//     items: [
-//       { href: "/photo-gallery", label: "Photo Gallery" },
-//       { href: "/video-gallery", label: "Video Gallery" },
-//     ],
-//   },
-//   {
-//     kind: "submenu",
-//     id: "members",
-//     label: "Members",
-//     items: memberSubLinks,
-//   },
- 
-//   { kind: "link", href: "/donation", label: "Donation" },
-// ];
-
-// export function isSubLinkActive(
-//   pathname: string,
-//   searchParams: URLSearchParams | null,
-//   item: SiteNavSubLink,
-// ): boolean {
-//   if (item.memberSlug) {
-//     if (pathname !== "/member" || !searchParams) {
-//       return false;
-//     }
-//     return slugFromSearchParam(searchParams.get("type")) === item.memberSlug;
-//   }
-//   const base = item.href.split("?")[0] ?? item.href;
-//   if (base === "/") {
-//     return pathname === "/";
-//   }
-//   return pathname === base || pathname.startsWith(`${base}/`);
-// }
-
-// export function isSubmenuActive(
-//   pathname: string,
-//   searchParams: URLSearchParams | null,
-//   entry: SiteNavSubmenu,
-// ): boolean {
-//   return entry.items.some((item) =>
-//     isSubLinkActive(pathname, searchParams, item),
-//   );
-// }
-
-// export function isTopLinkActive(
-//   pathname: string,
-//   href: string,
-// ): boolean {
-//   if (href === "/") {
-//     return pathname === "/";
-//   }
-//   return pathname === href || pathname.startsWith(`${href}/`);
-// }
