@@ -1,10 +1,54 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { buildCarouselLocaleMapFromSource } from "@/lib/i18n/build-carousel-locale";
+import { buildLocaleContentMapFromSource } from "@/lib/i18n/build-locale-content";
+import {
+  canonicalCategory,
+  legacyCarouselMapFromFlat,
+  legacyLocaleMapFromFlat,
+  parseCarouselLocaleMap,
+  parseLocaleContentMap,
+  type CarouselLocaleMap,
+  type ContentLocale,
+  type LocaleContentMap,
+} from "@/lib/i18n/content-locale";
 
 export type DashboardContentType = "blog" | "activity" | "photo" | "video";
 export type DashboardCategoryType = "blog" | "activity" | "photo" | "video";
+
+type DashboardContentModelDelegate = {
+  findFirst(args: unknown): Promise<unknown>;
+  findMany(args: unknown): Promise<unknown[]>;
+  create(args: unknown): Promise<unknown>;
+  update(args: unknown): Promise<unknown>;
+  deleteMany(args: unknown): Promise<{ count: number }>;
+};
+
+type DashboardPrismaClient = typeof prisma & {
+  dashboardBlog: DashboardContentModelDelegate;
+  dashboardActivity: DashboardContentModelDelegate;
+  dashboardPhoto: DashboardContentModelDelegate;
+  dashboardVideo: DashboardContentModelDelegate;
+};
+
+const dashboardPrisma = prisma as DashboardPrismaClient;
+
+function prismaContentTable(type: DashboardContentType): DashboardContentModelDelegate {
+  switch (type) {
+    case "blog":
+      return dashboardPrisma.dashboardBlog;
+    case "activity":
+      return dashboardPrisma.dashboardActivity;
+    case "photo":
+      return dashboardPrisma.dashboardPhoto;
+    case "video":
+      return dashboardPrisma.dashboardVideo;
+  }
+}
+
 export type DashboardCarouselRow = {
   id: string;
+  localeContent: CarouselLocaleMap;
   title: string;
   subtitle: string;
   imageUrl: string;
@@ -17,6 +61,8 @@ export type DashboardCarouselRow = {
 
 export type DashboardContentRow = {
   id: string;
+  slug: string;
+  localeContent: LocaleContentMap;
   title: string;
   category: string;
   dateIso: string;
@@ -34,6 +80,8 @@ export type DashboardCategoryRow = {
   type: DashboardCategoryType;
 };
 
+export type PublicDashboardBlog = DashboardContentRow;
+
 function slugify(input: string): string {
   return input
     .toLowerCase()
@@ -43,7 +91,7 @@ function slugify(input: string): string {
     .replace(/-+/g, "-");
 }
 
-function mapContentRow(row: {
+type DbContentRow = {
   id: string;
   title: string;
   category: string;
@@ -53,13 +101,33 @@ function mapContentRow(row: {
   videoUrl: string | null;
   createdById: string | null;
   status: string | null;
-}): DashboardContentRow {
+  slug: string | null;
+  localeContent: Prisma.JsonValue | null;
+};
+
+function resolveLocaleMap(row: DbContentRow): LocaleContentMap {
+  const parsed = parseLocaleContentMap(row.localeContent);
+  if (parsed) return parsed;
+  return legacyLocaleMapFromFlat(row.title, row.category, row.description ?? "");
+}
+
+function resolveSlug(row: DbContentRow, map: LocaleContentMap): string {
+  if (row.slug?.trim()) return row.slug.trim();
+  return slugify(map.en.title) || slugify(map.ko.title) || slugify(map.bn.title) || row.id;
+}
+
+function mapContentRow(row: DbContentRow): DashboardContentRow {
+  const localeContent = resolveLocaleMap(row);
+  const slug = resolveSlug(row, localeContent);
+  const en = localeContent.en;
   return {
     id: row.id,
-    title: row.title,
-    category: row.category,
+    slug,
+    localeContent,
+    title: en.title || localeContent.ko.title || localeContent.bn.title,
+    category: canonicalCategory(localeContent),
     dateIso: row.createdAt.toISOString(),
-    description: row.description ?? undefined,
+    description: en.description || localeContent.ko.description || localeContent.bn.description,
     coverImage: row.coverImage ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     createdById: row.createdById ?? undefined,
@@ -67,27 +135,79 @@ function mapContentRow(row: {
   };
 }
 
+type DbCarouselRow = {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+  ctaLabel: string | null;
+  ctaHref: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  localeContent: Prisma.JsonValue | null;
+};
+
+function resolveCarouselMap(row: DbCarouselRow): CarouselLocaleMap {
+  const parsed = parseCarouselLocaleMap(row.localeContent);
+  if (parsed) return parsed;
+  return legacyCarouselMapFromFlat(row.title, row.subtitle, row.ctaLabel ?? "");
+}
+
+function mapCarouselRow(row: DbCarouselRow): DashboardCarouselRow {
+  const localeContent = resolveCarouselMap(row);
+  const en = localeContent.en;
+  return {
+    id: row.id,
+    localeContent,
+    title: en.title || localeContent.ko.title || localeContent.bn.title,
+    subtitle: en.subtitle || localeContent.ko.subtitle || localeContent.bn.subtitle,
+    imageUrl: row.imageUrl,
+    ctaLabel: en.ctaLabel || localeContent.ko.ctaLabel || localeContent.bn.ctaLabel || undefined,
+    ctaHref: row.ctaHref ?? undefined,
+    isActive: row.isActive,
+    sortOrder: row.sortOrder,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
+
+async function allocateUniqueContentSlug(type: DashboardContentType, base: string): Promise<string> {
+  let s = (base || "item").slice(0, 120);
+  const table = prismaContentTable(type);
+  for (let i = 0; i < 80; i += 1) {
+    const candidate = i === 0 ? s : `${base}-${i + 1}`.slice(0, 120);
+    const exists = await table.findFirst({
+      where: { slug: candidate },
+      select: { id: true },
+    });
+    if (!exists) return candidate;
+  }
+  return `${base}-${Date.now()}`.slice(0, 120);
+}
+
 export async function listDashboardContent(type: DashboardContentType): Promise<DashboardContentRow[]> {
-  const rows = await prisma.dashboardContent.findMany({
-    where: { type },
+  const rows = await prismaContentTable(type).findMany({
     orderBy: { createdAt: "desc" },
   });
-  return rows.map(mapContentRow);
+  return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
 
 export async function getDashboardContentById(
   type: DashboardContentType,
   id: string,
 ): Promise<DashboardContentRow | null> {
-  const row = await prisma.dashboardContent.findFirst({
-    where: { id, type },
+  const row = await prismaContentTable(type).findFirst({
+    where: { id },
   });
-  return row ? mapContentRow(row) : null;
+  return row ? mapContentRow(row as DbContentRow) : null;
 }
 
 export async function createDashboardContent(
   type: DashboardContentType,
-  input: Pick<DashboardContentRow, "title" | "category"> & {
+  input: {
+    sourceLocale: ContentLocale;
+    title: string;
+    category: string;
     description?: string;
     coverImage?: string;
     videoUrl?: string;
@@ -95,99 +215,236 @@ export async function createDashboardContent(
     status?: "pending" | "published";
   },
 ): Promise<DashboardContentRow> {
-  const resolvedStatus =
-    input.status ?? (type === "blog" ? "pending" : "published");
-  const created = await prisma.dashboardContent.create({
+  const resolvedStatus = input.status ?? (type === "blog" ? "pending" : "published");
+  const localeContent = buildLocaleContentMapFromSource(input.sourceLocale, {
+    title: input.title.trim(),
+    category: input.category.trim(),
+    description: (input.description ?? "").trim(),
+  });
+  const baseSlug =
+    slugify(localeContent.en.title) ||
+    slugify(localeContent[input.sourceLocale].title) ||
+    "content";
+  const uniqueSlug = await allocateUniqueContentSlug(type, baseSlug);
+  const en = localeContent.en;
+  const created = await prismaContentTable(type).create({
     data: {
-      type,
-      title: input.title.trim(),
-      category: input.category.trim(),
-      description: input.description?.trim() ?? "",
+      title: en.title || localeContent.ko.title || localeContent.bn.title,
+      category: canonicalCategory(localeContent),
+      description: en.description || localeContent.ko.description || localeContent.bn.description,
       coverImage: input.coverImage?.trim() ?? "",
       videoUrl: input.videoUrl?.trim() || null,
       createdById: input.createdById,
       status: resolvedStatus,
       publishedAt: resolvedStatus === "published" ? new Date() : null,
+      slug: uniqueSlug,
+      localeContent: localeContent as unknown as Prisma.InputJsonValue,
     },
   });
-  return mapContentRow(created);
+  return mapContentRow(created as DbContentRow);
 }
 
 export async function listDashboardContentByCreator(
   type: DashboardContentType,
   creatorId: string,
 ): Promise<DashboardContentRow[]> {
-  const rows = await prisma.dashboardContent.findMany({
-    where: { type, createdById: creatorId },
+  const rows = await prismaContentTable(type).findMany({
+    where: { createdById: creatorId },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map(mapContentRow);
+  return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
 
 export async function listPendingBlogs(): Promise<DashboardContentRow[]> {
-  const rows = await prisma.dashboardContent.findMany({
-    where: { type: "blog", status: "pending" },
+  const rows = await dashboardPrisma.dashboardBlog.findMany({
+    where: { status: "pending" },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map(mapContentRow);
+  return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
 
-export type PublicDashboardBlog = DashboardContentRow & {
-  slug: string;
-};
-
 export async function listPublishedDashboardBlogs(): Promise<PublicDashboardBlog[]> {
-  const rows = await prisma.dashboardContent.findMany({
-    where: { type: "blog", status: "published" },
+  const rows = await dashboardPrisma.dashboardBlog.findMany({
+    where: { OR: [{ status: "published" }, { status: null }] },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map((row) => {
-    const item = mapContentRow(row);
-    return {
-      ...item,
-      slug: slugify(item.title),
-    };
-  });
+  return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
 
 export async function getPublishedDashboardBlogBySlug(slug: string): Promise<PublicDashboardBlog | null> {
-  const items = await listPublishedDashboardBlogs();
-  return items.find((item) => item.slug === slug) ?? null;
+  const direct = await dashboardPrisma.dashboardBlog.findFirst({
+    where: {
+      slug,
+      OR: [{ status: "published" }, { status: null }],
+    },
+  });
+  if (direct) {
+    return mapContentRow(direct as DbContentRow);
+  }
+  const rows = await dashboardPrisma.dashboardBlog.findMany({
+    where: { OR: [{ status: "published" }, { status: null }] },
+  });
+  for (const row of rows) {
+    const mapped = mapContentRow(row as DbContentRow);
+    if (mapped.slug === slug) return mapped;
+    const map = mapped.localeContent;
+    if (slugify(map.en.title) === slug) return mapped;
+  }
+  return null;
 }
 
 export async function updateDashboardContent(
   type: DashboardContentType,
   id: string,
-  input: Partial<
-    Pick<
-      DashboardContentRow,
-      "title" | "category" | "description" | "coverImage" | "videoUrl" | "status"
-    >
-  >,
+  input: Partial<{
+    localeContent: LocaleContentMap;
+    title: string;
+    category: string;
+    description: string;
+    coverImage: string;
+    videoUrl: string;
+    status: "pending" | "published";
+  }>,
 ): Promise<DashboardContentRow | null> {
-  const existing = await prisma.dashboardContent.findFirst({ where: { id, type } });
+  const existing = await prismaContentTable(type).findFirst({ where: { id } });
   if (!existing) return null;
 
-  const updated = await prisma.dashboardContent.update({
-    where: { id },
-    data: {
-      title: input.title?.trim(),
-      category: input.category?.trim(),
-      description:
-        input.description !== undefined ? input.description.trim() : undefined,
-      coverImage:
-        input.coverImage !== undefined ? input.coverImage.trim() : undefined,
-      videoUrl: input.videoUrl !== undefined ? input.videoUrl.trim() || null : undefined,
-      status: input.status,
-      publishedAt: input.status === "published" ? new Date() : undefined,
-    },
-  });
+  let localeContent = resolveLocaleMap(existing as DbContentRow);
+
+  if (input.localeContent) {
+    localeContent = input.localeContent;
+  } else if (
+    input.title !== undefined ||
+    input.category !== undefined ||
+    input.description !== undefined
+  ) {
+    const en = { ...localeContent.en };
+    if (input.title !== undefined) en.title = input.title.trim();
+    if (input.category !== undefined) en.category = input.category.trim();
+    if (input.description !== undefined) en.description = input.description.trim();
+    localeContent = { ...localeContent, en };
+  }
+
+  const en = localeContent.en;
+  const data = {
+    title: en.title || localeContent.ko.title || localeContent.bn.title,
+    category: canonicalCategory(localeContent),
+    description: en.description || localeContent.ko.description || localeContent.bn.description,
+    localeContent: localeContent as unknown as Prisma.InputJsonValue,
+    ...(input.coverImage !== undefined ? { coverImage: input.coverImage.trim() } : {}),
+    ...(input.videoUrl !== undefined ? { videoUrl: input.videoUrl.trim() || null } : {}),
+    ...(input.status !== undefined
+      ? {
+          status: input.status,
+          publishedAt: input.status === "published" ? new Date() : null,
+        }
+      : {}),
+  };
+
+  let updated: DbContentRow;
+  switch (type) {
+    case "blog":
+      updated = (await dashboardPrisma.dashboardBlog.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "activity":
+      updated = (await dashboardPrisma.dashboardActivity.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "photo":
+      updated = (await dashboardPrisma.dashboardPhoto.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "video":
+      updated = (await dashboardPrisma.dashboardVideo.update({ where: { id }, data })) as DbContentRow;
+      break;
+  }
   return mapContentRow(updated);
 }
 
 export async function deleteDashboardContent(type: DashboardContentType, id: string): Promise<boolean> {
-  const deleted = await prisma.dashboardContent.deleteMany({ where: { id, type } });
+  const deleted = await prismaContentTable(type).deleteMany({ where: { id } });
   return deleted.count > 0;
+}
+
+type CreateDashboardContentPayload = Parameters<typeof createDashboardContent>[1];
+type UpdateDashboardContentPayload = Parameters<typeof updateDashboardContent>[2];
+
+/** Blog CMS — mirrors `listDashboardCarousel` / dedicated collection `DashboardBlog`. */
+export async function listDashboardBlogs() {
+  return listDashboardContent("blog");
+}
+export async function listDashboardBlogsByCreator(creatorId: string) {
+  return listDashboardContentByCreator("blog", creatorId);
+}
+export async function getDashboardBlogById(id: string) {
+  return getDashboardContentById("blog", id);
+}
+export async function createDashboardBlog(input: CreateDashboardContentPayload) {
+  return createDashboardContent("blog", input);
+}
+export async function updateDashboardBlog(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("blog", id, input);
+}
+export async function deleteDashboardBlog(id: string) {
+  return deleteDashboardContent("blog", id);
+}
+
+/** Activity CMS — collection `DashboardActivity`. */
+export async function listDashboardActivities() {
+  return listDashboardContent("activity");
+}
+export async function listDashboardActivitiesByCreator(creatorId: string) {
+  return listDashboardContentByCreator("activity", creatorId);
+}
+export async function getDashboardActivityById(id: string) {
+  return getDashboardContentById("activity", id);
+}
+export async function createDashboardActivity(input: CreateDashboardContentPayload) {
+  return createDashboardContent("activity", input);
+}
+export async function updateDashboardActivity(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("activity", id, input);
+}
+export async function deleteDashboardActivity(id: string) {
+  return deleteDashboardContent("activity", id);
+}
+
+/** Photo gallery CMS — collection `DashboardPhoto`. */
+export async function listDashboardPhotos() {
+  return listDashboardContent("photo");
+}
+export async function listDashboardPhotosByCreator(creatorId: string) {
+  return listDashboardContentByCreator("photo", creatorId);
+}
+export async function getDashboardPhotoById(id: string) {
+  return getDashboardContentById("photo", id);
+}
+export async function createDashboardPhoto(input: CreateDashboardContentPayload) {
+  return createDashboardContent("photo", input);
+}
+export async function updateDashboardPhoto(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("photo", id, input);
+}
+export async function deleteDashboardPhoto(id: string) {
+  return deleteDashboardContent("photo", id);
+}
+
+/** Video gallery CMS — collection `DashboardVideo`. */
+export async function listDashboardVideos() {
+  return listDashboardContent("video");
+}
+export async function listDashboardVideosByCreator(creatorId: string) {
+  return listDashboardContentByCreator("video", creatorId);
+}
+export async function getDashboardVideoById(id: string) {
+  return getDashboardContentById("video", id);
+}
+export async function createDashboardVideo(input: CreateDashboardContentPayload) {
+  return createDashboardContent("video", input);
+}
+export async function updateDashboardVideo(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("video", id, input);
+}
+export async function deleteDashboardVideo(id: string) {
+  return deleteDashboardContent("video", id);
 }
 
 export async function listDashboardCategories(type: DashboardCategoryType): Promise<DashboardCategoryRow[]> {
@@ -257,6 +514,28 @@ export async function updateDashboardCategory(
   }
 }
 
+export async function getPublishedDashboardActivityBySlug(slug: string): Promise<DashboardContentRow | null> {
+  const direct = await dashboardPrisma.dashboardActivity.findFirst({
+    where: {
+      slug,
+      OR: [{ status: "published" }, { status: null }],
+    },
+  });
+  if (direct) {
+    return mapContentRow(direct as DbContentRow);
+  }
+  const rows = await dashboardPrisma.dashboardActivity.findMany({
+    where: { OR: [{ status: "published" }, { status: null }] },
+  });
+  for (const row of rows) {
+    const mapped = mapContentRow(row as DbContentRow);
+    if (mapped.slug === slug) return mapped;
+    const map = mapped.localeContent;
+    if (slugify(map.en.title) === slug) return mapped;
+  }
+  return null;
+}
+
 export async function deleteDashboardCategory(type: DashboardCategoryType, id: string): Promise<boolean> {
   const deleted = await prisma.dashboardCategory.deleteMany({ where: { id, type } });
   return deleted.count > 0;
@@ -266,83 +545,84 @@ export async function listDashboardCarousel(): Promise<DashboardCarouselRow[]> {
   const rows = await prisma.dashboardCarousel.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    subtitle: row.subtitle,
-    imageUrl: row.imageUrl,
-    ctaLabel: row.ctaLabel ?? undefined,
-    ctaHref: row.ctaHref ?? undefined,
-    isActive: row.isActive,
-    sortOrder: row.sortOrder,
-    createdAt: row.createdAt.toISOString(),
-  }));
+  return rows.map((row) => mapCarouselRow(row as DbCarouselRow));
 }
 
 export async function createDashboardCarousel(
   input: Pick<
     DashboardCarouselRow,
-    "title" | "subtitle" | "imageUrl" | "ctaLabel" | "ctaHref" | "isActive" | "sortOrder"
-  >,
+    "imageUrl" | "ctaHref" | "isActive" | "sortOrder"
+  > & {
+    sourceLocale: ContentLocale;
+    title: string;
+    subtitle: string;
+    ctaLabel?: string;
+  },
 ): Promise<DashboardCarouselRow> {
+  const localeContent = buildCarouselLocaleMapFromSource(input.sourceLocale, {
+    title: input.title.trim(),
+    subtitle: input.subtitle.trim(),
+    ctaLabel: input.ctaLabel?.trim() ?? "",
+  });
+  const en = localeContent.en;
   const created = await prisma.dashboardCarousel.create({
     data: {
-      title: input.title.trim(),
-      subtitle: input.subtitle.trim(),
+      title: en.title || localeContent.ko.title || localeContent.bn.title,
+      subtitle: en.subtitle || localeContent.ko.subtitle || localeContent.bn.subtitle,
       imageUrl: input.imageUrl,
-      ctaLabel: input.ctaLabel?.trim() || null,
+      ctaLabel: en.ctaLabel || localeContent.ko.ctaLabel || localeContent.bn.ctaLabel || null,
       ctaHref: input.ctaHref?.trim() || null,
       isActive: input.isActive,
       sortOrder: input.sortOrder,
+      localeContent: localeContent as unknown as Prisma.InputJsonValue,
     },
   });
-  return {
-    id: created.id,
-    title: created.title,
-    subtitle: created.subtitle,
-    imageUrl: created.imageUrl,
-    ctaLabel: created.ctaLabel ?? undefined,
-    ctaHref: created.ctaHref ?? undefined,
-    isActive: created.isActive,
-    sortOrder: created.sortOrder,
-    createdAt: created.createdAt.toISOString(),
-  };
+  return mapCarouselRow(created as DbCarouselRow);
 }
 
 export async function updateDashboardCarousel(
   id: string,
   input: Partial<
-    Pick<
-      DashboardCarouselRow,
-      "title" | "subtitle" | "imageUrl" | "ctaLabel" | "ctaHref" | "isActive" | "sortOrder"
-    >
+    Pick<DashboardCarouselRow, "imageUrl" | "ctaHref" | "isActive" | "sortOrder"> & {
+      localeContent?: CarouselLocaleMap;
+      title?: string;
+      subtitle?: string;
+      ctaLabel?: string;
+    }
   >,
 ): Promise<DashboardCarouselRow | null> {
   const existing = await prisma.dashboardCarousel.findUnique({ where: { id } });
   if (!existing) return null;
+  let localeContent = resolveCarouselMap(existing as DbCarouselRow);
+
+  if (input.localeContent) {
+    localeContent = input.localeContent;
+  } else if (input.title !== undefined || input.subtitle !== undefined || input.ctaLabel !== undefined) {
+    const en = { ...localeContent.en };
+    if (input.title !== undefined) en.title = input.title.trim() ?? "";
+    if (input.subtitle !== undefined) en.subtitle = input.subtitle.trim() ?? "";
+    if (input.ctaLabel !== undefined) en.ctaLabel = input.ctaLabel.trim() ?? "";
+    localeContent = { ...localeContent, en };
+  }
+
+  const en = localeContent.en;
   const updated = await prisma.dashboardCarousel.update({
     where: { id },
     data: {
-      title: input.title?.trim(),
-      subtitle: input.subtitle?.trim(),
+      title: en.title || localeContent.ko.title || localeContent.bn.title,
+      subtitle: en.subtitle || localeContent.ko.subtitle || localeContent.bn.subtitle,
       imageUrl: input.imageUrl,
-      ctaLabel: input.ctaLabel?.trim(),
+      ctaLabel:
+        input.ctaLabel !== undefined
+          ? input.ctaLabel.trim() || null
+          : en.ctaLabel || localeContent.ko.ctaLabel || localeContent.bn.ctaLabel || null,
       ctaHref: input.ctaHref?.trim(),
       isActive: input.isActive,
       sortOrder: input.sortOrder,
+      localeContent: localeContent as unknown as Prisma.InputJsonValue,
     },
   });
-  return {
-    id: updated.id,
-    title: updated.title,
-    subtitle: updated.subtitle,
-    imageUrl: updated.imageUrl,
-    ctaLabel: updated.ctaLabel ?? undefined,
-    ctaHref: updated.ctaHref ?? undefined,
-    isActive: updated.isActive,
-    sortOrder: updated.sortOrder,
-    createdAt: updated.createdAt.toISOString(),
-  };
+  return mapCarouselRow(updated as DbCarouselRow);
 }
 
 export async function deleteDashboardCarousel(id: string): Promise<boolean> {

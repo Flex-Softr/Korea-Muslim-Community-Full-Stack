@@ -52,35 +52,30 @@ export function memberDetailHref(memberId: string): string {
   return `/member/${memberId}`;
 }
 
-export const MEMBER_SECTION_COPY: Record<
+/** i18n dot-keys under `members.section.*` in locale JSON. */
+export const MEMBER_SECTION_I18N_KEYS: Record<
   MemberSlug,
   { title: string; subtitle: string; emptyMessage: string }
 > = {
   executive: {
-    title: "Executive members",
-    subtitle:
-      "Leadership and office holders who coordinate programmes and represent the community.",
-    emptyMessage:
-      "Executive listings will appear here once profiles are published.",
+    title: "members.section.executive.title",
+    subtitle: "members.section.executive.subtitle",
+    emptyMessage: "members.section.executive.emptyMessage",
   },
   "advisor-body": {
-    title: "Advisor body",
-    subtitle:
-      "Scholars and senior advisors who guide the organisation on faith, ethics, and strategy.",
-    emptyMessage:
-      "Advisor profiles will appear here once they are published.",
+    title: "members.section.advisorBody.title",
+    subtitle: "members.section.advisorBody.subtitle",
+    emptyMessage: "members.section.advisorBody.emptyMessage",
   },
   general: {
-    title: "General members",
-    subtitle:
-      "Volunteers, coordinators, and active members helping run events and services.",
-    emptyMessage:
-      "General member highlights will appear here when available.",
+    title: "members.section.general.title",
+    subtitle: "members.section.general.subtitle",
+    emptyMessage: "members.section.general.emptyMessage",
   },
 };
 
-export const MEMBER_NAV_LABELS: Record<MemberSlug, string> = {
-  executive: "Executive Member",
-  "advisor-body": "Advisor Body",
-  general: "General Member",
+export const MEMBER_NAV_LABEL_KEYS: Record<MemberSlug, string> = {
+  executive: "members.nav.executive",
+  "advisor-body": "members.nav.advisorBody",
+  general: "members.nav.general",
 };

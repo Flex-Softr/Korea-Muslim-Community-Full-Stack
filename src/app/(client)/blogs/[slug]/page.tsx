@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
 import { auth } from "@/auth";
-import { PublicBlogComments } from "@/components/blog/public-blog-comments";
-import { PageBanner } from "@/components/layout/page-banner";
-import { Badge } from "@/components/ui/badge";
+import { PublicBlogArticleDetail } from "@/components/cms/public-blog-article-detail";
 import { getPublicBlogBySlug } from "@/lib/public-blog";
+import { toCmsTextDetailSource } from "@/lib/cms/cms-detail-locale-source";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { serverT } from "@/lib/i18n/server-translate";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +23,10 @@ function formatDate(dateIso: string): string {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPublicBlogBySlug(slug);
-  if (!post) return { title: "Blog" };
+  if (!post) {
+    const lang = await getRequestLang();
+    return { title: serverT(lang, "common.blog") };
+  }
   return {
     title: post.title,
     description: `${post.category} article by ${post.author.name}`,
@@ -35,49 +39,27 @@ export default async function PublicBlogArticlePage({ params }: PageProps) {
   const post = await getPublicBlogBySlug(slug);
   if (!post) notFound();
 
+  const source = toCmsTextDetailSource({
+    id: post.slug,
+    slug: post.slug,
+    imageSrc: post.thumbnail ?? "/brand/logo.png",
+    dateIso: post.dateIso,
+    date: formatDate(post.dateIso),
+    title: post.title,
+    category: post.category,
+    body: post.contentHtml,
+    localeContent: post.localeContent ?? null,
+  });
+
   return (
-    <>
-      <PageBanner
-        title={post.title}
-        subtitle={`${post.category} · ${formatDate(post.dateIso)}`}
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Blogs", href: "/blog" },
-          { label: post.title },
-        ]}
-      />
-      <article className="border-b border-border/40 bg-muted/15 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <Link
-            href="/blog"
-            className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
-          >
-            <ArrowLeft className="size-4" aria-hidden />
-            Back to blog archive
-          </Link>
-
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <time dateTime={post.dateIso}>{formatDate(post.dateIso)}</time>
-            <span aria-hidden className="text-border">·</span>
-            <Badge variant="secondary" className="font-normal">{post.category}</Badge>
-            <span aria-hidden className="text-border">·</span>
-            <span>By {post.author.name}</span>
-          </div>
-
-          {post.thumbnail ? (
-            <div className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-xl border border-border/80 bg-muted shadow-sm ring-1 ring-black/[0.04] dark:ring-white/5">
-              <Image src={post.thumbnail} alt="" fill className="object-cover" sizes="100vw" priority />
-            </div>
-          ) : null}
-
-          <div
-            className="prose prose-sm mt-8 max-w-none dark:prose-invert sm:prose-base"
-            dangerouslySetInnerHTML={{ __html: post.contentHtml }}
-          />
-
-          <PublicBlogComments slug={slug} canComment={!!session?.user?.id} />
-        </div>
-      </article>
-    </>
+    <PublicBlogArticleDetail
+      key={slug}
+      source={source}
+      dateLabel={formatDate(post.dateIso)}
+      showHeroImage={!!post.thumbnail}
+      authorName={post.author.name}
+      slug={slug}
+      canComment={!!session?.user?.id}
+    />
   );
 }

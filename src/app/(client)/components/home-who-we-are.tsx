@@ -1,31 +1,42 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import { ArrowUpRight, BookOpen, Globe2, HeartHandshake, Users } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
 
-const highlights = [
-  {
-    icon: Users,
-    title: "Nationwide community",
-    text: "Muslims living, studying, and working across Korea — connected in dignity and mutual support.",
-  },
-  {
-    icon: BookOpen,
-    title: "Learning & faith",
-    text: "Study circles, programmes, and spiritual gatherings rooted in Islamic values and Korean context.",
-  },
-  {
-    icon: Globe2,
-    title: "Open & respectful",
-    text: "We cooperate where goals align and welcome neighbours who share our values of service and unity.",
-  },
-  {
-    icon: HeartHandshake,
-    title: "Service & relief",
-    text: "Outreach, seasonal aid, and spaces where families and newcomers can find practical help.",
-  },
+const HIGHLIGHT_ICONS = [
+  Users,
+  BookOpen,
+  Globe2,
+  HeartHandshake,
+] satisfies readonly LucideIcon[];
+
+const HIGHLIGHT_TITLE_KEYS = [
+  "homeWhoWeAre.highlightNationwideTitle",
+  "homeWhoWeAre.highlightLearningTitle",
+  "homeWhoWeAre.highlightOpenTitle",
+  "homeWhoWeAre.highlightServiceTitle",
+] as const;
+
+const HIGHLIGHT_TEXT_KEYS = [
+  "homeWhoWeAre.highlightNationwideText",
+  "homeWhoWeAre.highlightLearningText",
+  "homeWhoWeAre.highlightOpenText",
+  "homeWhoWeAre.highlightServiceText",
 ] as const;
 
 export function HomeWhoWeAre() {
+  const { t } = useLanguage();
+
+  const highlights = HIGHLIGHT_TITLE_KEYS.map((titleKey, i) => ({
+    icon: HIGHLIGHT_ICONS[i]!,
+    title: t(titleKey),
+    text: t(HIGHLIGHT_TEXT_KEYS[i]!),
+    key: titleKey,
+  }));
+
   return (
     <section
       className="relative overflow-hidden border-b border-border/40 bg-background"
@@ -50,42 +61,39 @@ export function HomeWhoWeAre() {
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#2c7bb6] dark:text-sky-400">
-              Who we are
+              {t("homeWhoWeAre.eyebrow")}
             </p>
             <h2
               id="home-who-we-are-heading"
               className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.35rem] lg:leading-[1.15]"
             >
-              Korea Muslim Community
+              {t("footer.brandTitle")}
             </h2>
             <p className="mt-2 text-lg font-medium text-muted-foreground sm:text-xl">
-              한국 무슬림 커뮤니티
+              {t("homeWhoWeAre.subtitle")}
             </p>
             <p className="mt-6 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
               <strong className="font-semibold text-foreground">
-                Korea Muslim Community
+                {t("footer.brandTitle")}
               </strong>{" "}
-              is a voluntary organisation for Muslims across the Republic of Korea.
-              We host programmes, spiritual activities, and outreach that reflect our
-              faith while respecting Korean society and the law.
+              {t("homeWhoWeAre.bodyAfterOrgName")}
             </p>
             <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Whether you are new to Korea or have been here for years, you are welcome
-              to connect, learn, and grow with us.
+              {t("homeWhoWeAre.bodyInvite")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/about"
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#2c7bb6] px-5 text-sm font-semibold text-white shadow-md shadow-[#2c7bb6]/20 transition hover:bg-[#256fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-2 dark:shadow-sky-500/10"
               >
-                About us
+                {t("homeWhoWeAre.ctaAbout")}
                 <ArrowUpRight className="size-4" aria-hidden />
               </Link>
               <Link
                 href="/contact"
                 className="text-sm font-semibold text-foreground underline-offset-4 transition hover:text-[#2c7bb6] hover:underline dark:hover:text-sky-400"
               >
-                Get in touch
+                {t("homeWhoWeAre.ctaContact")}
               </Link>
             </div>
           </div>
@@ -95,7 +103,7 @@ export function HomeWhoWeAre() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border/60 bg-muted shadow-xl ring-1 ring-black/[0.04] dark:ring-white/10 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[min(100%,28rem)]">
                 <Image
                   src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1400&q=80"
-                  alt=""
+                  alt={t("homeWhoWeAre.imageAlt")}
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 58vw"
@@ -106,16 +114,15 @@ export function HomeWhoWeAre() {
                 />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                   <p className="max-w-md text-sm font-medium leading-relaxed text-white/95 sm:text-base">
-                    Connecting Muslims through education, gatherings, and service —
-                    open to everyone who shares our values.
+                    {t("homeWhoWeAre.imageCaption")}
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {highlights.map(({ icon: Icon, title, text }) => (
+                {highlights.map(({ icon: Icon, title, text, key }) => (
                   <div
-                    key={title}
+                    key={key}
                     className="flex gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm ring-1 ring-black/[0.03] transition hover:border-[#2c7bb6]/25 hover:shadow-md dark:bg-card/60 dark:ring-white/5"
                   >
                     <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#2c7bb6]/10 text-[#2c7bb6] dark:bg-sky-400/15 dark:text-sky-400">

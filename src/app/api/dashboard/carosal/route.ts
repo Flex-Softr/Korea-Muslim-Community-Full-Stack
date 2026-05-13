@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import {
-  createDashboardCarousel,
-  listDashboardCarousel,
-} from "@/lib/dashboard/store";
+import { createDashboardCarousel, listDashboardCarousel } from "@/lib/dashboard/store";
+import { normalizeContentLocale } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
 
 export async function GET() {
@@ -20,6 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const body = (await request.json()) as {
+    sourceLocale?: string;
     title?: string;
     subtitle?: string;
     imageUrl?: string;
@@ -33,7 +32,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Title, subtitle and image are required." }, { status: 400 });
   }
 
+  const sourceLocale = normalizeContentLocale(body.sourceLocale);
+
   const created = await createDashboardCarousel({
+    sourceLocale,
     title: body.title,
     subtitle: body.subtitle,
     imageUrl: body.imageUrl,

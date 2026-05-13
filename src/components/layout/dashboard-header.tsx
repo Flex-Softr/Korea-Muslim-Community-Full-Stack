@@ -24,7 +24,7 @@ const LANG_OPTIONS: Array<{
 }> = [
   { value: "bn", labelKey: "common.bengali" },
   { value: "en", labelKey: "common.english" },
-  { value: "kr", labelKey: "common.korean" },
+  { value: "ko", labelKey: "common.korean" },
 ];
 
 function initials(name: string | null | undefined, email: string) {
@@ -90,7 +90,7 @@ export function DashboardHeader({
               "h-9 px-2.5 text-sm font-semibold",
             )}
           >
-            <span>Lan:</span>
+            <span>{t("dashboard.headerLanguageShort")}:</span>
             <span className="pl-1 font-bold">{getLangTriggerShortLabel(lang)}</span>
             <ChevronDown className="ml-1 size-4 opacity-80" aria-hidden />
           </DropdownMenuTrigger>
@@ -100,8 +100,10 @@ export function DashboardHeader({
                 key={option.value}
                 className="cursor-pointer"
                 onClick={() => {
-                  setLang(option.value);
-                  setLangOpen(false);
+                  void (async () => {
+                    await setLang(option.value);
+                    setLangOpen(false);
+                  })();
                 }}
               >
                 {t(option.labelKey)}

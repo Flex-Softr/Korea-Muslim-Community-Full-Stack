@@ -5,18 +5,26 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { PageBanner } from "@/components/layout/page-banner";
 import { Badge } from "@/components/ui/badge";
-import { listDashboardContentByCreator } from "@/lib/dashboard/store";
+import { listDashboardBlogsByCreator } from "@/lib/dashboard/store";
 import { getMemberById } from "@/lib/members/queries";
 import { prisma } from "@/lib/prisma";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-function roleLabel(category: string): "Advisor" | "Executive" | "General" {
-  if (category === "ADVISOR_BODY") return "Advisor";
-  if (category === "EXECUTIVE") return "Executive";
-  return "General";
+function memberCategoryNavKey(category: string): string {
+  if (category === "ADVISOR_BODY") return "members.nav.advisorBody";
+  if (category === "EXECUTIVE") return "members.nav.executive";
+  return "members.nav.general";
+}
+
+function bannerFallbackSubtitle(st: (key: string) => string, category: string): string {
+  if (category === "ADVISOR_BODY") return st("members.publicProfile.bannerSubtitleAdvisor");
+  if (category === "EXECUTIVE") return st("members.publicProfile.bannerSubtitleExecutive");
+  return st("members.publicProfile.bannerSubtitleGeneral");
 }
 
 function blogSlug(title: string): string {
@@ -37,9 +45,10 @@ function formatDate(dateIso: string): string {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const member = await getMemberById(id);
-  if (!member) return { title: "Member" };
+  const lang = await getRequestLang();
+  if (!member) return { title: serverT(lang, "breadcrumbs.memberProfile") };
   return {
-    title: `${member.name} · Member profile`,
+    title: `${member.name} · ${serverT(lang, "members.publicProfile.metaTitleSuffix")}`,
     description:
       member.aboutSummary ??
       member.bio ??
@@ -50,6 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function MembersProfilePage({ params }: PageProps) {
+  const st = await getServerT();
   const { id } = await params;
   const member = await getMemberById(id);
   if (!member) notFound();
@@ -61,7 +71,7 @@ export default async function MembersProfilePage({ params }: PageProps) {
       select: { id: true },
     });
     if (user) {
-      blogs = (await listDashboardContentByCreator("blog", user.id))
+      blogs = (await listDashboardBlogsByCreator(user.id))
         .filter((blog) => blog.status === "published")
         .map((blog) => ({
           id: blog.id,
@@ -77,10 +87,10 @@ export default async function MembersProfilePage({ params }: PageProps) {
     <>
       <PageBanner
         title={member.name}
-        subtitle={member.designation ?? `${roleLabel(member.category)} member`}
+        subtitle={member.designation ?? bannerFallbackSubtitle(st, member.category)}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Members", href: "/member" },
+          { label: st("nav.home"), href: "/" },
+          { label: st("nav.members"), href: "/member" },
           { label: member.name },
         ]}
       />
@@ -109,7 +119,7 @@ export default async function MembersProfilePage({ params }: PageProps) {
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-semibold tracking-tight">{member.name}</h1>
-                  <Badge variant="secondary">{roleLabel(member.category)}</Badge>
+                  <Badge variant="secondary">{st(memberCategoryNavKey(member.category))}</Badge>
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {member.bio || member.aboutSummary || "No bio available."}

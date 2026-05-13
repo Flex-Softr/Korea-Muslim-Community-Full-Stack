@@ -1,6 +1,8 @@
+import type { LocaleContentMap } from "@/lib/i18n/content-locale";
+
 export type ActivityNewsItem = {
   id: string;
-  locale?: "en" | "bn" | "kr";
+  locale?: "en" | "bn" | "ko";
   /** URL segment for `/activity/[slug]` — not shared with blog routes. */
   slug: string;
   /** ISO date for `<time datetime>` when available. */
@@ -12,6 +14,8 @@ export type ActivityNewsItem = {
   imageSrc: string;
   /** Body copy for the activity detail page (paragraphs separated by `\n\n`). */
   content: string;
+  /** Present for dashboard-backed items — used client-side when switching UI language. */
+  localeContent?: LocaleContentMap | null;
 };
 
 /** Featured story on the home / “our activity” section (also has its own detail URL). */

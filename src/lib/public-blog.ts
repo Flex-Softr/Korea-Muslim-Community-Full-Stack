@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getPublishedDashboardBlogBySlug } from "@/lib/dashboard/store";
 import { getBlogPostBySlug } from "@/data/student-news";
+import { pickLocalizedFields, type LocaleContentMap } from "@/lib/i18n/content-locale";
 import { getRequestLang } from "@/lib/i18n/server-language";
-import { translateText } from "@/lib/translate";
 
 export type PublicBlogPost = {
   slug: string;
@@ -16,6 +16,8 @@ export type PublicBlogPost = {
     name: string;
     email: string | null;
   };
+  /** Dashboard-backed posts only — enables live language switching on the article page. */
+  localeContent?: LocaleContentMap | null;
 };
 
 function escapeHtml(input: string): string {
@@ -34,11 +36,18 @@ function paragraphsToHtml(content: string): string {
 }
 
 function sanitizeHtml(input: string): string {
-  // Prevent client-side React warning and unsafe execution from injected scripts.
   return input
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
     .replace(/<script[\s\S]*?\/>/gi, "")
     .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, "");
+}
+
+function sanitizeLocaleDescriptions(map: LocaleContentMap): LocaleContentMap {
+  return {
+    en: { ...map.en, description: sanitizeHtml(map.en.description) },
+    ko: { ...map.ko, description: sanitizeHtml(map.ko.description) },
+    bn: { ...map.bn, description: sanitizeHtml(map.bn.description) },
+  };
 }
 
 export async function getPublicBlogBySlug(slug: string): Promise<PublicBlogPost | null> {
@@ -55,39 +64,31 @@ export async function getPublicBlogBySlug(slug: string): Promise<PublicBlogPost 
       authorName = author?.name?.trim() || author?.email || authorName;
       authorEmail = author?.email || null;
     }
-    const [title, category, contentHtml] = await Promise.all([
-      translateText(dashboardPost.title, requestLang, "en"),
-      translateText(dashboardPost.category, requestLang, "en"),
-      translateText(dashboardPost.description || "<p></p>", requestLang, "en"),
-    ]);
+    const loc = pickLocalizedFields(dashboardPost.localeContent, requestLang);
     return {
-      slug,
-      title,
+      slug: dashboardPost.slug,
+      title: loc.title,
       dateIso: dashboardPost.dateIso,
-      category,
-      contentHtml: sanitizeHtml(contentHtml),
+      category: loc.category,
+      contentHtml: sanitizeHtml(loc.description || "<p></p>"),
       thumbnail: dashboardPost.coverImage || null,
       author: {
         id: dashboardPost.createdById ?? null,
         name: authorName,
         email: authorEmail,
       },
+      localeContent: sanitizeLocaleDescriptions(dashboardPost.localeContent),
     };
   }
 
   const staticPost = getBlogPostBySlug(slug);
   if (!staticPost) return null;
-  const [title, category, content] = await Promise.all([
-    translateText(staticPost.title, requestLang, staticPost.locale ?? "en"),
-    translateText(staticPost.category, requestLang, staticPost.locale ?? "en"),
-    translateText(staticPost.content, requestLang, staticPost.locale ?? "en"),
-  ]);
   return {
     slug,
-    title,
+    title: staticPost.title,
     dateIso: staticPost.dateIso,
-    category,
-    contentHtml: paragraphsToHtml(content),
+    category: staticPost.category,
+    contentHtml: paragraphsToHtml(staticPost.content),
     thumbnail: staticPost.coverImage || null,
     author: {
       id: null,

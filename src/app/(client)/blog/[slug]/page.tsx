@@ -1,32 +1,28 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { BlogLatestSidebar } from "@/components/blog/blog-latest-sidebar";
-import { PageBanner } from "@/components/layout/page-banner";
-import { Badge } from "@/components/ui/badge";
-import { getBlogPost } from "@/lib/content/repository";
+
+export const dynamic = "force-dynamic";
+
+import { StudentBlogArticleDetail } from "@/components/cms/student-blog-article-detail";
+import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
+import {
+  getBlogPost,
+  listBlogPosts,
+} from "@/lib/content/repository";
+import { toCmsTextDetailSource } from "@/lib/cms/cms-detail-locale-source";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { serverT } from "@/lib/i18n/server-translate";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-function richTextToPlainText(value: string): string {
-  return value
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPost(slug);
   if (!post) {
-    return { title: "Blog" };
+    const lang = await getRequestLang();
+    return { title: serverT(lang, "common.blog") };
   }
   return {
     title: post.title,
@@ -36,90 +32,48 @@ export async function generateMetadata({
 
 export default async function BlogArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const requestLang = await getRequestLang();
+  const [post, listResult] = await Promise.all([
+    getBlogPost(slug, requestLang),
+    listBlogPosts(
+      { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
+      requestLang,
+      { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
+    ),
+  ]);
   if (!post) {
     notFound();
   }
+  const sidebarItems = listResult.items.filter((p) => p.slug !== slug).slice(0, 5);
 
-  const plainContent = richTextToPlainText(post.content);
-  const paragraphs = plainContent
-    .split(/(?:\r?\n){2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const source = toCmsTextDetailSource({
+    id: post.id,
+    slug: post.slug,
+    imageSrc: post.coverImage,
+    dateIso: post.dateIso,
+    date: post.date,
+    title: post.title,
+    category: post.category,
+    body: post.content,
+    localeContent: post.localeContent ?? null,
+    resolvedForLang: requestLang,
+  });
+
+  const sidebarCards = sidebarItems.map((p) =>
+    toCmsTextDetailSource({
+      id: p.id,
+      slug: p.slug,
+      imageSrc: p.coverImage,
+      dateIso: p.dateIso,
+      date: p.date,
+      title: p.title,
+      category: p.category,
+      body: p.content,
+      localeContent: p.localeContent ?? null,
+    }),
+  );
 
   return (
-    <>
-      <PageBanner
-        title={post.title}
-        subtitle={`${post.category} · ${post.date}`}
-        breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Blog", href: "/blog" },
-          { label: post.title },
-        ]}
-      />
-      <article className="border-b border-border/40 bg-muted/15 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-            <div className="min-w-0 lg:col-span-7 xl:col-span-8">
-              <Link
-                href="/blog"
-                className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
-              >
-                <ArrowLeft className="size-4" aria-hidden />
-                Blog archive
-              </Link>
-
-              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <time dateTime={post.dateIso}>{post.date}</time>
-                <span aria-hidden className="text-border">
-                  ·
-                </span>
-                <Badge variant="secondary" className="font-normal">
-                  {post.category}
-                </Badge>
-              </div>
-
-              <div className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-xl border border-border/80 bg-muted shadow-sm ring-1 ring-black/[0.04] dark:ring-white/5">
-                <Image
-                  src={post.coverImage}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, min(896px, 58vw)"
-                  priority
-                />
-              </div>
-
-              <p className="mt-8 text-lg leading-relaxed text-muted-foreground">
-                {post.excerpt}
-              </p>
-
-              <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
-                {paragraphs.length > 0 ? (
-                  paragraphs.map((p, i) => <p key={i}>{p}</p>)
-                ) : (
-                  <p>{plainContent}</p>
-                )}
-              </div>
-
-              <p className="mt-10 text-sm text-muted-foreground">
-                <Link
-                  href="/blog"
-                  className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
-                >
-                  Browse the full blog archive
-                </Link>
-                .
-              </p>
-            </div>
-
-            <div className="lg:col-span-5 xl:col-span-4">
-              <BlogLatestSidebar excludeSlug={slug} limit={5} />
-            </div>
-          </div>
-        </div>
-      </article>
-    </>
+    <StudentBlogArticleDetail key={slug} source={source} sidebarCards={sidebarCards} />
   );
 }

@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
 import { listBlogPosts } from "@/lib/content/repository";
 import { BlogListing } from "./blog-listing";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description:
-    "Articles, announcements, and student news from Korea Muslim Community.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getRequestLang();
+  return {
+    title: serverT(lang, "common.blog"),
+    description: serverT(lang, "pages.blog.subtitle"),
+  };
+}
 
 type BlogPageProps = {
   searchParams?: Promise<{
@@ -18,6 +22,7 @@ type BlogPageProps = {
 };
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const st = await getServerT();
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
   const yearParsed = params.year ? Number.parseInt(params.year, 10) : null;
@@ -25,15 +30,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const pageParsed = params.page ? Number.parseInt(params.page, 10) : 1;
   const page = Number.isFinite(pageParsed) ? pageParsed : 1;
 
-  const all = await listBlogPosts({ page: 1, pageSize: 200 });
-  console.log(all);
+  const all = await listBlogPosts(
+    { page: 1, pageSize: 200 },
+    undefined,
+    { maxRowsFromDb: 200 },
+  );
 
   return (
     <>
       <PageBanner
-        title="Blog"
-        subtitle="Articles, announcements, and student life updates in a news format."
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]}
+        title={st("common.blog")}
+        subtitle={st("pages.blog.subtitle")}
+        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("common.blog") }]}
       />
       <BlogListing
         posts={all.items}

@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { VIDEO_GALLERY_ITEMS, type VideoGalleryItem } from "@/data/gallery-media";
+import { useLanguage } from "@/components/providers/language-provider";
+import { pickLocalizedFields } from "@/lib/i18n/content-locale";
 import { cn } from "@/lib/utils";
 
 type VideoEntry = VideoGalleryItem;
@@ -136,6 +138,7 @@ export function VideoGallery({
   paginated?: boolean;
   sourceItems?: VideoEntry[];
 }) {
+  const { t, lang } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -143,10 +146,19 @@ export function VideoGallery({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [localCategory, setLocalCategory] = useState<string | null>(null);
   const [localYear, setLocalYear] = useState<number | null>(null);
-  const baseItems = useMemo(
-    () => sourceItems ?? VIDEO_GALLERY_ITEMS,
-    [sourceItems],
-  );
+  const baseItems = useMemo(() => {
+    const items = sourceItems ?? VIDEO_GALLERY_ITEMS;
+    return items.map((item) => {
+      if (!item.localeContent) return item;
+      const localized = pickLocalizedFields(item.localeContent, lang);
+      return {
+        ...item,
+        title: localized.title?.trim() || item.title,
+        category: localized.category?.trim() || item.category,
+        caption: localized.description?.trim() || item.caption,
+      };
+    });
+  }, [lang, sourceItems]);
 
   const parsedCategory = useMemo(() => {
     const category = searchParams.get("category");
@@ -322,7 +334,7 @@ export function VideoGallery({
           ? "pb-12 pt-6 sm:pb-16 sm:pt-8"
           : "border-t border-border/40",
       )}
-      aria-label={embedded ? "Video gallery" : undefined}
+      aria-label={embedded ? t("videoGallery.embeddedAria") : undefined}
       aria-labelledby={embedded ? undefined : "video-gallery-heading"}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -333,20 +345,19 @@ export function VideoGallery({
                 id="video-gallery-heading"
                 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
               >
-                Video Gallery
+                {t("common.videoGallery")}
               </h2>
               <Link
                 href="/video-gallery"
                 className="inline-flex w-fit items-center gap-2 rounded-md bg-[#2c7bb6] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#256fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-2"
               >
-                See more
+                {t("videoGallery.seeMore")}
                 <ArrowUpRight className="size-4 shrink-0" aria-hidden />
               </Link>
             </div>
 
             <p className="mb-6 text-sm text-muted-foreground">
-              Tap a thumbnail to play in a modal. Use on-screen arrows or
-              keyboard left/right to move between videos.
+              {t("pages.videos.subtitle")}
             </p>
           </>
         ) : null}
@@ -357,6 +368,10 @@ export function VideoGallery({
               categories={videoCategories}
               selectedCategory={selectedCategory}
               onSelectCategory={handleSelectCategory}
+              title={t("photoGallery.filterByCategory")}
+              allLabel={t("photoGallery.allCategories")}
+              clearLabel={t("photoGallery.clearCategory")}
+              ariaLabel={t("videoGallery.categoriesAria")}
               className="mb-4"
             />
             <ActivityCategoryFilter
@@ -365,10 +380,10 @@ export function VideoGallery({
                 selectedYear != null ? String(selectedYear) : null
               }
               onSelectCategory={handleSelectYear}
-              title="Filter by year"
-              allLabel="All years"
-              clearLabel="Clear year"
-              ariaLabel="Video years"
+              title={t("blog.filterByYear")}
+              allLabel={t("blog.allYears")}
+              clearLabel={t("blog.clearYear")}
+              ariaLabel={t("videoGallery.yearsAria")}
               className="mb-8 sm:mb-10"
             />
           </>
@@ -378,7 +393,7 @@ export function VideoGallery({
           <p className="mb-6 text-sm text-muted-foreground sm:mb-8">
             {fullList.length === 0 ? (
               <>
-                No videos match your filters. Try another filter or{" "}
+                {t("videoGallery.noMatchPrefix")}{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -387,27 +402,25 @@ export function VideoGallery({
                   }}
                   className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                 >
-                  show all
+                  {t("blog.showAll")}
                 </button>
                 .
               </>
             ) : (
               <>
-                Showing{" "}
-                <span className="font-medium text-foreground">
-                  {offset + 1}–{offset + videos.length}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-foreground">
-                  {fullList.length}
-                </span>{" "}
-                {fullList.length === 1 ? "video" : "videos"}
-                {selectedCategory != null || selectedYear != null ? (
-                  <>
-                    {" "}
-                    with filters
-                  </>
-                ) : null}
+                {t(
+                  fullList.length === 1
+                    ? "videoGallery.summaryVideo"
+                    : "videoGallery.summaryVideos",
+                  {
+                    start: offset + 1,
+                    end: offset + videos.length,
+                    total: fullList.length,
+                  },
+                )}
+                {selectedCategory != null || selectedYear != null
+                  ? ` ${t("videoGallery.withFilters")}`
+                  : null}
               </>
             )}
           </p>
@@ -431,7 +444,7 @@ export function VideoGallery({
             totalPages={totalPages}
             onPageChange={handlePageChange}
             className="mt-10"
-            ariaLabel="Video gallery pagination"
+            ariaLabel={t("videoGallery.paginationAria")}
             showSummary
             align="center"
           />
@@ -472,7 +485,7 @@ export function VideoGallery({
                 </DialogDescription>
               ) : (
                 <DialogDescription className="sr-only">
-                  Video player
+                  {t("videoGallery.playerSrOnly")}
                 </DialogDescription>
               )}
               <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
@@ -486,7 +499,7 @@ export function VideoGallery({
                 </span>
                 <LightboxArrowButton
                   direction="next"
-                  label="Next video"
+                  label={t("videoGallery.nextVideo")}
                   onClick={goNext}
                 />
               </div>

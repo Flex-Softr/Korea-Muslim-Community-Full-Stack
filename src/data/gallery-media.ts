@@ -1,3 +1,5 @@
+import type { LocaleContentMap } from "@/lib/i18n/content-locale";
+
 export type PhotoGalleryItem = {
   id: string;
   category: string;
@@ -7,6 +9,8 @@ export type PhotoGalleryItem = {
   gridClass: string;
   minHClass: string;
   dateIso: string;
+  /** Present for dashboard-backed items — used client-side when switching UI language. */
+  localeContent?: LocaleContentMap | null;
 };
 
 export type VideoGalleryItem = {
@@ -17,6 +21,8 @@ export type VideoGalleryItem = {
   embedUrl: string;
   caption?: string;
   dateIso: string;
+  /** Present for dashboard-backed items — used client-side when switching UI language. */
+  localeContent?: LocaleContentMap | null;
 };
 
 export const PHOTO_GALLERY_ITEMS: PhotoGalleryItem[] = [];

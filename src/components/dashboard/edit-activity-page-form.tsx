@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useToastSystem } from "@/components/ui/toast-system";
+import { DashboardContentLocaleTabBar } from "@/components/dashboard/dashboard-locale-controls";
+import type { ContentLocale, LocaleContentMap } from "@/lib/i18n/content-locale";
 
 type ActivityRow = {
   id: string;
-  title: string;
-  category: string;
-  description: string;
+  localeContent: LocaleContentMap;
   coverImage: string;
 };
 
@@ -22,15 +22,32 @@ function richTextToPlainText(value: string): string {
   return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim();
 }
 
+function cloneLocaleMap(map: LocaleContentMap): LocaleContentMap {
+  return JSON.parse(JSON.stringify(map)) as LocaleContentMap;
+}
+
 export function EditActivityPageForm({ id }: { id: string }) {
   const router = useRouter();
   const { notify } = useToastSystem();
   const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [editLocale, setEditLocale] = useState<ContentLocale>("en");
+  const [localeContent, setLocaleContent] = useState<LocaleContentMap | null>(null);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const patchLocale = useCallback(
+    (locale: ContentLocale, patch: Partial<LocaleContentMap[ContentLocale]>) => {
+      setLocaleContent((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          [locale]: { ...prev[locale], ...patch },
+        };
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +55,7 @@ export function EditActivityPageForm({ id }: { id: string }) {
       setLoading(true);
       try {
         const [itemRes, categoryRes] = await Promise.all([
-          fetch(`/api/dashboard/content/activity/${id}`, { cache: "no-store" }),
+          fetch(`/api/dashboard/activity/${id}`, { cache: "no-store" }),
           fetch("/api/dashboard/categories?type=activity", { cache: "no-store" }),
         ]);
         if (!itemRes.ok) {
@@ -51,9 +68,7 @@ export function EditActivityPageForm({ id }: { id: string }) {
           items?: Array<{ id: string; name: string }>;
         };
         if (cancelled) return;
-        setTitle(item.title);
-        setDescription(item.description ?? "");
-        setCategory(item.category);
+        setLocaleContent(cloneLocaleMap(item.localeContent));
         setCoverImage(item.coverImage ?? null);
         setCategories((categoryData.items ?? []).map((c) => c.name));
       } catch {
@@ -69,34 +84,44 @@ export function EditActivityPageForm({ id }: { id: string }) {
   }, [id, notify, router]);
 
   const onSave = () => {
-    const titleValue = title.trim();
-    const descriptionValue = description.trim();
+    if (isSubmitting) return;
+    if (!localeContent) return;
+    const block = localeContent[editLocale];
+    const titleValue = block.title.trim();
+    const descriptionValue = block.description.trim();
     const descriptionPlain = richTextToPlainText(descriptionValue);
-    const categoryValue = category.trim();
-    if (!titleValue) return notify("Title is required.", "warning");
-    if (!descriptionPlain) return notify("Description is required.", "warning");
-    if (!categoryValue) return notify("Category is required.", "warning");
+    const categoryValue = block.category.trim();
+    if (!titleValue) return notify("Title is required for the selected language.", "warning");
+    if (!descriptionPlain) return notify("Description is required for the selected language.", "warning");
+    if (!categoryValue) return notify("Category is required for the selected language.", "warning");
     if (!coverImage) return notify("Featured image is required.", "warning");
 
+    setIsSubmitting(true);
     void (async () => {
-      const res = await fetch(`/api/dashboard/content/activity/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: titleValue,
-          category: categoryValue,
-          description: descriptionValue,
-          coverImage,
-        }),
-      });
-      if (!res.ok) {
+      try {
+        const res = await fetch(`/api/dashboard/activity/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            localeContent,
+            coverImage,
+          }),
+        });
+        if (!res.ok) {
+          notify("Could not update activity.", "error");
+          return;
+        }
+        notify("Activity updated.", "success");
+        router.push("/dashboard/content/activity/activities");
+      } catch {
         notify("Could not update activity.", "error");
-        return;
+      } finally {
+        setIsSubmitting(false);
       }
-      notify("Activity updated.", "success");
-      router.push("/dashboard/content/activity/activities");
     })();
   };
+
+  const block = localeContent?.[editLocale];
 
   return (
     <section className="space-y-4">
@@ -104,7 +129,7 @@ export function EditActivityPageForm({ id }: { id: string }) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Edit Activity</h1>
           <p className="text-sm text-muted-foreground">
-            Update title, rich description, featured image, and category.
+            Edit each language using the tabs above. Save when you are done.
           </p>
         </div>
         <Link
@@ -116,25 +141,27 @@ export function EditActivityPageForm({ id }: { id: string }) {
       </div>
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
-        {loading ? (
+        {loading || !localeContent || !block ? (
           <p className="text-sm text-muted-foreground">Loading activity...</p>
         ) : (
           <div className="space-y-4">
+            <DashboardContentLocaleTabBar value={editLocale} onChange={setEditLocale} />
+
             <div className="space-y-2">
-              <Label htmlFor="edit-activity-title">Title</Label>
+              <Label htmlFor="edit-activity-title">Title ({editLocale})</Label>
               <Input
                 id="edit-activity-title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={block.title}
+                onChange={(e) => patchLocale(editLocale, { title: e.target.value })}
                 maxLength={180}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Description</Label>
+              <Label>Description ({editLocale})</Label>
               <RichTextEditor
-                value={description}
-                onChange={setDescription}
+                value={block.description}
+                onChange={(v) => patchLocale(editLocale, { description: v })}
                 placeholder="Write a detailed activity description with formatting, alignment, table, and images..."
               />
             </div>
@@ -150,12 +177,12 @@ export function EditActivityPageForm({ id }: { id: string }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-activity-category">Category</Label>
+              <Label htmlFor="edit-activity-category">Category ({editLocale})</Label>
               <select
                 id="edit-activity-category"
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={block.category}
+                onChange={(e) => patchLocale(editLocale, { category: e.target.value })}
               >
                 <option value="">Select category</option>
                 {categories.map((item) => (
@@ -166,16 +193,18 @@ export function EditActivityPageForm({ id }: { id: string }) {
               </select>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Link
-                href="/dashboard/content/activity/activities"
-                className={buttonVariants({ variant: "outline", size: "default" })}
-              >
-                Cancel
-              </Link>
-              <Button type="button" onClick={onSave}>
-                Save
-              </Button>
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-4">
+              <div className="flex gap-2">
+                <Link
+                  href="/dashboard/content/activity/activities"
+                  className={buttonVariants({ variant: "outline", size: "default" })}
+                >
+                  Cancel
+                </Link>
+                <Button type="button" onClick={onSave} isLoading={isSubmitting} loadingText="Saving...">
+                  Save
+                </Button>
+              </div>
             </div>
           </div>
         )}

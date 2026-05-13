@@ -1,14 +1,15 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageContent } from "../../components/page-content";
 import { PageSidebar } from "../../components/page-sidebar";
+import { getServerT } from "@/lib/i18n/server-translate";
 
-export default function DownloadBookPage() {
+export default async function DownloadBookPage() {
+  const st = await getServerT();
     return (
       <>
         <PageBanner
-          title="Download Book"
-          //subtitle="Download Book"
-          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Download Book" }]}
+          title={st("breadcrumbs.downloadBook")}
+          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.downloadBook") }]}
         />
           <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
           <div className="sm:w-1/3 w-full">

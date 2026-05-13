@@ -11,6 +11,7 @@ import { DashboardNavLinks } from "@/components/layout/dashboard-nav-links";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import type { UserRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function DashboardShell({
   role,
@@ -26,6 +27,7 @@ export function DashboardShell({
   children: React.ReactNode;
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div className="dashboard-theme flex h-[100dvh] min-h-0 w-full flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] lg:flex-row">
@@ -51,10 +53,10 @@ export function DashboardShell({
             "translate-x-0 translate-y-0",
           )}
         >
-          <DialogTitle className="sr-only">Dashboard navigation</DialogTitle>
+          <DialogTitle className="sr-only">{t("dashboard.navAria")}</DialogTitle>
           <div className="flex h-16 shrink-0 items-center border-b border-white/15 px-5">
             <span className="text-base font-semibold tracking-tight text-white">
-              Dashboard
+              {t("dashboard.sidebarTitle")}
             </span>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">

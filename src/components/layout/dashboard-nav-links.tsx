@@ -24,89 +24,89 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { CountBadge } from "@/components/ui/count-badge";
 import { onPendingUsersChanged } from "@/lib/dashboard-events";
+import { useLanguage } from "@/components/providers/language-provider";
 
 const navItems: Array<
   | {
       type: "link";
       href: string;
-      label: string;
+      labelKey: string;
       icon?: typeof LayoutDashboard;
       adminOnly?: boolean;
     }
   | {
       type: "group";
-      label: string;
+      labelKey: string;
       icon: typeof LayoutDashboard;
       adminOnly?: boolean;
       children: Array<{
         href: string;
-        label: string;
+        labelKey: string;
         icon: typeof LayoutDashboard;
         adminOnly?: boolean;
       }>;
     }
 > = [
-  
   {
     type: "group",
-    label: "Blogs",
+    labelKey: "dashboard.nav.blogs",
     icon: FileText,
     children: [
-      { href: "/dashboard/content/blog/blogs", label: "All Blogs", icon: FileText },
+      { href: "/dashboard/content/blog/blogs", labelKey: "dashboard.nav.allBlogs", icon: FileText },
       {
         href: "/dashboard/content/blog/categories",
-        label: "Categories",
+        labelKey: "dashboard.nav.categories",
         icon: FolderKanban,
         adminOnly: true,
       },
-      { href: "/dashboard/blogs/pending", label: "Pending Blogs", icon: Clock3, adminOnly: true },
+      { href: "/dashboard/blogs/pending", labelKey: "dashboard.nav.pendingBlogs", icon: Clock3, adminOnly: true },
     ],
   },
   {
     type: "group",
-    label: "Activity",
+    labelKey: "dashboard.nav.activity",
     icon: Activity,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/activity/activities", label: "All Activities", icon: Activity },
-      { href: "/dashboard/content/activity/categories", label: "Categories", icon: FolderKanban }
+      { href: "/dashboard/content/activity/activities", labelKey: "dashboard.nav.allActivities", icon: Activity },
+      { href: "/dashboard/content/activity/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
     ],
   },
   {
     type: "group",
-    label: "Photo Gallery",
+    labelKey: "dashboard.nav.photoGallery",
     icon: ImageIcon,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/photo-gallery/photos", label: "All Photos", icon: ImageIcon },
-      { href: "/dashboard/content/photo-gallery/categories", label: "Categories", icon: FolderKanban },
+      { href: "/dashboard/content/photo-gallery/photos", labelKey: "dashboard.nav.allPhotos", icon: ImageIcon },
+      { href: "/dashboard/content/photo-gallery/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
     ],
   },
   {
     type: "group",
-    label: "Video Gallery",
+    labelKey: "dashboard.nav.videoGallery",
     icon: Video,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/video-gallery/videos", label: "All Videos", icon: Video },
-      { href: "/dashboard/content/video-gallery/categories", label: "Categories", icon: FolderKanban },
+      { href: "/dashboard/content/video-gallery/videos", labelKey: "dashboard.nav.allVideos", icon: Video },
+      { href: "/dashboard/content/video-gallery/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
     ],
   },
   {
     type: "group",
-    label: "Users",
+    labelKey: "dashboard.nav.users",
     icon: Users,
     adminOnly: true,
     children: [
-      { href: "/dashboard/users", label: "All Users", icon: Users, adminOnly: true },
-      { href: "/dashboard/users/pending", label: "Pending Users", icon: UserCheck, adminOnly: true },
-      { href: "/dashboard/members", label: "Members", icon: UsersRound, adminOnly: true },
+      { href: "/dashboard/users", labelKey: "dashboard.nav.allUsers", icon: Users, adminOnly: true },
+      { href: "/dashboard/users/pending", labelKey: "dashboard.nav.pendingUsers", icon: UserCheck, adminOnly: true },
+      { href: "/dashboard/members", labelKey: "dashboard.nav.members", icon: UsersRound, adminOnly: true },
     ],
   },
-  { type: "link", href: "/dashboard", label: "Profile", icon: User },
-  { type: "link", href: "/dashboard/carosal", label: "Carousel Slider", icon: Images, adminOnly: true },
+  { type: "link", href: "/dashboard", labelKey: "dashboard.nav.profile", icon: User },
+  { type: "link", href: "/dashboard/carosal", labelKey: "dashboard.nav.carouselSlider", icon: Images, adminOnly: true },
 
-  { type: "link", href: "/dashboard/settings", label: "Settings", icon: Settings }
+  { type: "link", href: "/dashboard/settings", labelKey: "common.settings", icon: Settings },
 ];
 
 export function DashboardNavLinks({
@@ -121,6 +121,9 @@ export function DashboardNavLinks({
   className?: string;
 }) {
   const pathname = usePathname();
+  const { t } = useLanguage();
+  /** Dynamic nav keys are plain strings; narrow `t` to avoid i18next deep generic instantiation. */
+  const tNav = t as (key: string) => string;
   const isAdmin = hasMinimumRole(role, "ADMIN");
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
   const [pendingUsersLoading, setPendingUsersLoading] = useState(isAdmin);
@@ -167,7 +170,7 @@ export function DashboardNavLinks({
     const initialState: Record<string, boolean> = {};
     visibleItems.forEach((item) => {
       if (item.type === "group") {
-        initialState[item.label] =
+        initialState[item.labelKey] =
           item.children.some((child) => pathname.startsWith(child.href));
       }
     });
@@ -182,8 +185,8 @@ export function DashboardNavLinks({
   };
 
   return (
-    <nav className={cn("flex flex-col gap-1.5 p-2.5 sm:p-3", className)} aria-label="Dashboard">
-      {visibleItems.map((item, idx) => {
+    <nav className={cn("flex flex-col gap-1.5 p-2.5 sm:p-3", className)} aria-label={t("dashboard.navAria")}>
+      {visibleItems.map((item) => {
         if (item.type === "link") {
           const isActive =
             item.href === "/dashboard"
@@ -192,9 +195,9 @@ export function DashboardNavLinks({
           const Icon = item.icon;
           return (
             <Link
-              key={`${item.href}-${item.label}`}
+              key={`${item.href}-${item.labelKey}`}
               href={item.href}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? tNav(item.labelKey) : undefined}
               onClick={() => onNavigate?.()}
               className={cn(
                 "relative flex min-h-11 items-center rounded-xl text-sm font-medium transition-all duration-200 ease-out sm:min-h-0 sm:py-2",
@@ -206,22 +209,22 @@ export function DashboardNavLinks({
             >
               {isActive ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" /> : null}
               {Icon ? <Icon className={cn("size-4 shrink-0", isActive ? "opacity-100" : "opacity-80")} aria-hidden /> : null}
-              {!collapsed ? <span className="min-w-0 truncate">{item.label}</span> : null}
+              {!collapsed ? <span className="min-w-0 truncate">{tNav(item.labelKey)}</span> : null}
             </Link>
           );
         }
         // type === "group"
-        const isOpen = !!openGroups[item.label];
+        const isOpen = !!openGroups[item.labelKey];
         const GroupIcon = item.icon;
         // If any child is active, treat group as open for the chevron
         const isAnyChildActive = item.children.some((child) =>
           pathname.startsWith(child.href)
         );
         return (
-          <div key={item.label} className="space-y-0.5">
+          <div key={item.labelKey} className="space-y-0.5">
             <button
               type="button"
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? tNav(item.labelKey) : undefined}
               className={cn(
                 "flex w-full rounded-xl text-sm font-semibold text-white/85 select-none transition-all duration-200 ease-out hover:bg-white/8 hover:text-white",
                 collapsed ? "items-center justify-center px-0 py-2.5" : "items-center gap-2 px-3 py-2.5",
@@ -230,12 +233,12 @@ export function DashboardNavLinks({
                   : ""
               )}
               aria-expanded={isOpen}
-              onClick={() => handleToggleGroup(item.label)}
+              onClick={() => handleToggleGroup(item.labelKey)}
             >
               <GroupIcon className="size-4 shrink-0 opacity-85" aria-hidden />
               {!collapsed ? (
                 <>
-                  <span className="min-w-0 flex-1 text-left truncate">{item.label}</span>
+                  <span className="min-w-0 flex-1 text-left truncate">{tNav(item.labelKey)}</span>
                   <span>
                     {isOpen ? (
                       <ChevronDown className="size-4 opacity-80" aria-hidden />
@@ -253,7 +256,7 @@ export function DashboardNavLinks({
                   const ChildIcon = child.icon;
                   return (
                     <Link
-                      key={`${item.label}-${child.href}-${child.label}`}
+                      key={`${item.labelKey}-${child.href}-${child.labelKey}`}
                       href={child.href}
                       onClick={() => onNavigate?.()}
                       className={cn(
@@ -266,7 +269,7 @@ export function DashboardNavLinks({
                       {isActive ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" /> : null}
                       <span className="flex min-w-0 items-center gap-2.5">
                         <ChildIcon className={cn("size-4 shrink-0", isActive ? "opacity-100" : "opacity-80")} />
-                        <span className="truncate">{child.label}</span>
+                        <span className="truncate">{tNav(child.labelKey)}</span>
                         {child.href === "/dashboard/users/pending" ? (
                           <CountBadge count={pendingUsersCount} loading={pendingUsersLoading} />
                         ) : null}

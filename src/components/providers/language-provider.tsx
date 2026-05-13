@@ -1,5 +1,4 @@
 export {
-  DICT,
   LanguageProvider,
   useI18n,
   useLanguage,

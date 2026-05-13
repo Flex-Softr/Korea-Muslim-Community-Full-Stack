@@ -7,22 +7,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PageBanner } from "@/components/layout/page-banner";
+import { getRequestLang } from "@/lib/i18n/server-language";
+import { getServerT, serverT } from "@/lib/i18n/server-translate";
 
-export const metadata: Metadata = {
-  title: "About us",
-  description:
-    "Korea Muslim Community — who we are, what we do, and how we support Muslims across the Republic of Korea.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getRequestLang();
+  return {
+    title: serverT(lang, "breadcrumbs.aboutUs"),
+    description: serverT(lang, "pages.about.metaDescription"),
+  };
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const st = await getServerT();
+  const a = (key: string) => st(`pages.about.${key}`);
+
   return (
     <>
       <PageBanner
-        title="About us"
-        subtitle="Who we are, what we stand for, and how we serve Muslims and friends of the community in Korea."
+        title={st("breadcrumbs.aboutUs")}
+        subtitle={st("pages.about.subtitle")}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "About us" },
+          { label: st("nav.home"), href: "/" },
+          { label: st("breadcrumbs.aboutUs") },
         ]}
       />
 
@@ -38,59 +45,41 @@ export default function AboutPage() {
                 id="who-we-are-heading"
                 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
               >
-                Who we are
+                {a("whoHeading")}
               </h2>
               <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
                 <p>
                   <strong className="font-semibold text-foreground">
-                    Korea Muslim Community
+                    {st("footer.brandTitle")}
                   </strong>{" "}
-                  (한국 무슬림 커뮤니티) is a community organisation for Muslims
-                  living, studying, and working across the Republic of Korea.
-                  We welcome families, students, professionals, and new arrivals
-                  who want to connect, learn, and support one another.
+                  {a("bodyAfterOrgName")}
                 </p>
-                <p>
-                  We host gatherings, educational programs, spiritual activities,
-                  and outreach that reflect Islamic values while respecting
-                  Korean law and the diverse society we share. Our work is
-                  voluntary, transparent, and open to cooperation with other
-                  groups where goals align.
-                </p>
-                <p>
-                  This website shares public updates, resources, and ways to get
-                  involved. For membership services and internal tools, signed-in
-                  members can use the dashboard.
-                </p>
+                <p>{a("bodyP2")}</p>
+                <p>{a("bodyP3")}</p>
               </div>
             </div>
             <aside className="lg:col-span-5">
               <div className="rounded-2xl border border-border/80 bg-muted/30 p-6 shadow-sm ring-1 ring-black/[0.04] dark:bg-muted/15 dark:ring-white/5 sm:p-8">
                 <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  At a glance
+                  {a("glanceHeading")}
                 </h3>
                 <dl className="mt-4 space-y-4 text-sm">
                   <div>
-                    <dt className="font-medium text-foreground">Organisation</dt>
-                    <dd className="mt-1 text-muted-foreground">
-                      Korea Muslim Community — nationwide, member-driven
-                    </dd>
+                    <dt className="font-medium text-foreground">{a("glanceOrgDt")}</dt>
+                    <dd className="mt-1 text-muted-foreground">{a("glanceOrgDd")}</dd>
                   </div>
                   <div>
-                    <dt className="font-medium text-foreground">Focus</dt>
-                    <dd className="mt-1 text-muted-foreground">
-                      Faith, education, mutual aid, civic participation, and
-                      welcoming new Muslims and residents.
-                    </dd>
+                    <dt className="font-medium text-foreground">{a("glanceFocusDt")}</dt>
+                    <dd className="mt-1 text-muted-foreground">{a("glanceFocusDd")}</dd>
                   </div>
                   <div>
-                    <dt className="font-medium text-foreground">Contact</dt>
+                    <dt className="font-medium text-foreground">{a("glanceContactDt")}</dt>
                     <dd className="mt-1 text-muted-foreground">
                       <Link
                         href="/contact"
                         className="text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                       >
-                        Reach our team
+                        {a("glanceContactLink")}
                       </Link>
                     </dd>
                   </div>
@@ -107,37 +96,33 @@ export default function AboutPage() {
               id="mission-heading"
               className="text-center text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
             >
-              Mission &amp; approach
+              {a("missionHeading")}
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">
-              We help Muslims in Korea thrive in faith and daily life — through
-              reliable information, community programmes, and practical support.
+              {a("missionLead")}
             </p>
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <Card className="border-border/80 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg">Education &amp; guidance</CardTitle>
+                  <CardTitle className="text-lg">{a("missionCard1Title")}</CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    Talks, study circles, and resources in Korean and English so
-                    members can grow in knowledge and confidence.
+                    {a("missionCard1Desc")}
                   </CardDescription>
                 </CardHeader>
               </Card>
               <Card className="border-border/80 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg">Service &amp; solidarity</CardTitle>
+                  <CardTitle className="text-lg">{a("missionCard2Title")}</CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    Relief drives, newcomer support, and partnerships that turn
-                    compassion into action in our cities.
+                    {a("missionCard2Desc")}
                   </CardDescription>
                 </CardHeader>
               </Card>
               <Card className="border-border/80 shadow-sm sm:col-span-2 lg:col-span-1">
                 <CardHeader>
-                  <CardTitle className="text-lg">Open dialogue</CardTitle>
+                  <CardTitle className="text-lg">{a("missionCard3Title")}</CardTitle>
                   <CardDescription className="text-base leading-relaxed">
-                    We engage neighbours, institutions, and fellow citizens
-                    with clarity, respect, and a spirit of shared humanity.
+                    {a("missionCard3Desc")}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -145,14 +130,12 @@ export default function AboutPage() {
           </section>
 
           <section className="mt-16 text-center sm:mt-20">
-            <p className="text-muted-foreground">
-              Want to collaborate, volunteer, or learn more?
-            </p>
+            <p className="text-muted-foreground">{a("ctaLead")}</p>
             <Link
               href="/contact"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
             >
-              Contact us
+              {a("ctaButton")}
             </Link>
           </section>
         </div>

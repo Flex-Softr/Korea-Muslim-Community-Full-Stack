@@ -143,7 +143,7 @@ export function PendingBlogsModule() {
         onConfirm={() => {
           if (!approveTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/content/blog/${approveTarget.id}`, {
+            const res = await fetch(`/api/dashboard/blog/${approveTarget.id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ status: "published" }),
@@ -167,7 +167,7 @@ export function PendingBlogsModule() {
         onConfirm={() => {
           if (!deleteTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/content/blog/${deleteTarget.id}`, {
+            const res = await fetch(`/api/dashboard/blog/${deleteTarget.id}`, {
               method: "DELETE",
             });
             if (!res.ok) return notify("Could not delete blog.", "error");

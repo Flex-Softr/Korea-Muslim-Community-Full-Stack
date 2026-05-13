@@ -10,6 +10,7 @@ import {
   type ActivityNewsItem,
 } from "@/data/activity-news";
 import { useTranslatedFields } from "@/hooks/use-translated-fields";
+import { stripHtmlTags } from "@/lib/utils";
 
 type ActivityNewsCardProps = {
   item: ActivityNewsItem;
@@ -25,7 +26,9 @@ export function ActivityNewsCard({
   const translated = useTranslatedFields({
     locale: item.locale,
     title: item.title,
+    category: item.category,
     excerpt: item.excerpt,
+    localeContent: item.localeContent,
   });
 
   return (
@@ -51,14 +54,14 @@ export function ActivityNewsCard({
               ·
             </span>
             <Badge variant="secondary" className="rounded-full px-2 py-0 text-[11px] font-medium">
-              {item.category}
+              {translated.category}
             </Badge>
           </div>
           <h3 className="mt-2.5 line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-lg">
             {translated.title}
           </h3>
           <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
-            {translated.excerpt}
+            {stripHtmlTags(translated.excerpt)}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400">
             {t("common.readMore")}

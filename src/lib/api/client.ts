@@ -5,10 +5,10 @@ function readLangFromDocumentCookie(): string | null {
   return decodeURIComponent(match[1]);
 }
 
-function normalizeLang(raw: string | null | undefined): "bn" | "en" | "kr" {
-  const value = raw?.trim().toLowerCase();
+function normalizeLang(raw: string | null | undefined): "bn" | "en" | "ko" {
+  const value = raw?.trim().toLowerCase().split("-")[0];
   if (value === "en") return "en";
-  if (value === "kr" || value === "kor" || value === "ko") return "kr";
+  if (value === "kr" || value === "kor" || value === "ko") return "ko";
   return "bn";
 }
 

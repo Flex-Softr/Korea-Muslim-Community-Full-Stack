@@ -20,6 +20,11 @@ type MediaRow = {
 
 const PAGE_SIZE = 10;
 
+const MEDIA_COLLECTION_API = {
+  photo: "/api/dashboard/photo",
+  video: "/api/dashboard/video",
+} as const;
+
 function formatDate(dateIso: string): string {
   const d = new Date(dateIso);
   if (Number.isNaN(d.getTime())) return dateIso;
@@ -90,7 +95,7 @@ function MediaRowsModule({
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/dashboard/content/${contentType}`, {
+        const res = await fetch(MEDIA_COLLECTION_API[contentType], {
           cache: "no-store",
         });
         const data = (await res.json()) as { items?: MediaRow[] };
@@ -290,7 +295,7 @@ function MediaRowsModule({
         onConfirm={() => {
           if (!deleteTarget) return;
           void (async () => {
-            const res = await fetch(`/api/dashboard/content/${contentType}/${deleteTarget.id}`, {
+            const res = await fetch(`${MEDIA_COLLECTION_API[contentType]}/${deleteTarget.id}`, {
               method: "DELETE",
             });
             if (!res.ok) {

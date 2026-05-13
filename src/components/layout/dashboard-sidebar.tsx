@@ -4,14 +4,22 @@ import { PanelLeftClose } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { UserRole } from "@/lib/roles";
 import { DashboardNavLinks } from "@/components/layout/dashboard-nav-links";
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 export function DashboardSidebar({ role }: { role: UserRole }) {
+  const { t } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("dashboard-sidebar-collapsed");
-    if (saved === "1") setCollapsed(true);
+    if (saved === "1") {
+      const id = requestAnimationFrame(() => {
+        setCollapsed(true);
+      });
+      return () => cancelAnimationFrame(id);
+    }
+    return undefined;
   }, []);
 
   const toggleCollapsed = () => {
@@ -39,7 +47,9 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
               <span className="rounded-[2px] bg-current" />
             </span>
           </span>
-          {!collapsed ? <span className="text-base font-semibold tracking-tight text-white">Dashboard</span> : null}
+          {!collapsed ? (
+            <span className="text-base font-semibold tracking-tight text-white">{t("dashboard.sidebarTitle")}</span>
+          ) : null}
         </span>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -48,7 +58,7 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
       <div className={cn("space-y-2 border-t border-white/10 py-3", collapsed ? "px-2" : "px-3")}>
         <button
           type="button"
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? t("dashboard.expandSidebar") : t("dashboard.collapseSidebar")}
           onClick={toggleCollapsed}
           className={cn(
             "flex h-10 w-full rounded-xl bg-white/6 text-sm font-medium text-white/90 transition-all duration-200 hover:bg-white/10",
@@ -58,7 +68,7 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
           <span className="inline-flex size-5 items-center justify-center rounded-full bg-white/12">
             <PanelLeftClose className={cn("size-3.5 transition-transform duration-200", collapsed && "rotate-180")} aria-hidden />
           </span>
-          {!collapsed ? "Collapse" : null}
+          {!collapsed ? t("dashboard.collapse") : null}
         </button>
       </div>
     </aside>

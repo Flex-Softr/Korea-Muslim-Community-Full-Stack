@@ -1,9 +1,9 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { loginWithCredentials } from "@/app/(auth)/login/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,19 +33,23 @@ export function LoginForm() {
     const email = String(form.get("email") || "");
     const password = String(form.get("password") || "");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    setPending(false);
-    if (result?.error) {
-      setError("Invalid email or password.");
-      return;
+    try {
+      const result = await loginWithCredentials(
+        email,
+        password,
+        searchParams.get("callbackUrl"),
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.push(callbackUrl);
+      router.refresh();
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setPending(false);
     }
-    router.push(callbackUrl);
-    router.refresh();
   }
 
   return (

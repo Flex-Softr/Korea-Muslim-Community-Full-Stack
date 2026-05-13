@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { auth } from "@/auth";
 import { AppProviders } from "@/components/providers/app-providers";
+import { getRequestLang } from "@/lib/i18n/server-language";
 import "./globals.css";
 
 const solaimanLipi = localFont({
@@ -21,11 +22,12 @@ export const metadata: Metadata = {
   description:
     "Community site for Muslims in Korea — events, resources, and member access.",
   icons: {
-    icon: [{ url: "/logo.png", sizes: "512x512" }],
-    shortcut: ["/logo.png"],
-    apple: [
-      { url: "/logo.png", sizes: "180x180", type: "image/png" },
-    ],
+    icon: [{ url: "/fav.jpg", type: "image/jpeg" }],
+    apple: [{ url: "/fav.jpg", type: "image/jpeg" }],
+  },
+  // Discourage Chrome / Google Translate from showing the translate bar on this site.
+  other: {
+    google: "notranslate",
   },
 };
 
@@ -35,16 +37,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const initialLang = await getRequestLang();
 
   return (
     <html
-      lang="bn"
+      lang={initialLang}
       dir="ltr"
+      translate="no"
       suppressHydrationWarning
       className={`${solaimanLipi.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground font-bangla">
-        <AppProviders session={session}>
+      <body className="min-h-full bg-background text-foreground font-bangla" translate="no">
+        <AppProviders session={session} initialLang={initialLang}>
           {children}
         </AppProviders>
       </body>
