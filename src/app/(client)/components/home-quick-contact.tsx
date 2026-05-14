@@ -8,41 +8,66 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/components/providers/language-provider";
+import { useToastSystem } from "@/components/ui/toast-system";
+import {
+  CONTACT_OCCUPATION_VALUES,
+  type ContactOccupationValue,
+} from "@/lib/contact/occupations";
+import { submitContactForm } from "@/lib/services/contact-form";
 import { cn } from "@/lib/utils";
+
+const OCCUPATION_LABEL_KEY: Record<
+  ContactOccupationValue,
+  | "homeQuickContact.occupationOptionStudent"
+  | "homeQuickContact.occupationOptionJobHolder"
+  | "homeQuickContact.occupationOptionEps"
+> = {
+  student: "homeQuickContact.occupationOptionStudent",
+  job_holder: "homeQuickContact.occupationOptionJobHolder",
+  eps: "homeQuickContact.occupationOptionEps",
+};
+
+const fieldClass =
+  "h-11 w-full rounded-xl border border-border/80 bg-background/80 px-3 text-base shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-[#2c7bb6]/25 md:text-sm dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20";
 
 export function HomeQuickContact() {
   const { t } = useLanguage();
-  const [sent, setSent] = useState(false);
+  const { notify } = useToastSystem();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formEl = e.currentTarget;
     setError(null);
     setPending(true);
-    const form = new FormData(e.currentTarget);
-    const payload = {
-      name: String(form.get("name") || ""),
-      email: String(form.get("email") || ""),
-      message: String(form.get("message") || ""),
-    };
+    try {
+      const form = new FormData(formEl);
+      const payload = {
+        name: String(form.get("name") || ""),
+        mobileNumber: String(form.get("mobileNumber") || ""),
+        occupation: String(form.get("occupation") || ""),
+        address: String(form.get("address") || ""),
+        visaType: String(form.get("visaType") || ""),
+        message: String(form.get("message") || ""),
+      };
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = (await res.json().catch(() => ({}))) as {
-      error?: string;
-    };
+      const res = await submitContactForm(payload);
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
 
-    setPending(false);
-    if (!res.ok) {
-      setError(data.error || t("homeQuickContact.errorGeneric"));
-      return;
+      if (!res.ok) {
+        setError(data.error || t("homeQuickContact.errorGeneric"));
+        return;
+      }
+      formEl.reset();
+      notify(t("homeQuickContact.toastSuccess"), "success");
+    } catch {
+      setError(t("homeQuickContact.errorGeneric"));
+    } finally {
+      setPending(false);
     }
-    setSent(true);
-    e.currentTarget.reset();
   }
 
   return (
@@ -143,21 +168,85 @@ export function HomeQuickContact() {
                       autoComplete="name"
                       required
                       placeholder={t("homeQuickContact.placeholderName")}
-                      className="h-11 rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
+                      className={fieldClass}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="home-quick-email" className="text-foreground">
-                      {t("homeQuickContact.labelEmail")}
+                    <Label
+                      htmlFor="home-quick-mobile"
+                      className="text-foreground"
+                    >
+                      {t("homeQuickContact.labelMobile")}
                     </Label>
                     <Input
-                      id="home-quick-email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
+                      id="home-quick-mobile"
+                      name="mobileNumber"
+                      type="tel"
+                      autoComplete="tel"
+                      inputMode="tel"
                       required
-                      placeholder={t("homeQuickContact.placeholderEmail")}
-                      className="h-11 rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
+                      placeholder={t("homeQuickContact.placeholderMobile")}
+                      className={fieldClass}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="home-quick-occupation"
+                    className="text-foreground"
+                  >
+                    {t("homeQuickContact.labelOccupation")}
+                  </Label>
+                  <select
+                    id="home-quick-occupation"
+                    name="occupation"
+                    required
+                    defaultValue=""
+                    className={cn(fieldClass, "appearance-none bg-[length:1rem] bg-[position:right_0.75rem_center] bg-no-repeat pe-9")}
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                    }}
+                  >
+                    <option value="" disabled>
+                      {t("homeQuickContact.occupationPlaceholder")}
+                    </option>
+                    {CONTACT_OCCUPATION_VALUES.map((value) => (
+                      <option key={value} value={value}>
+                        {t(OCCUPATION_LABEL_KEY[value])}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="home-quick-address"
+                      className="text-foreground"
+                    >
+                      {t("homeQuickContact.labelAddress")}
+                    </Label>
+                    <Input
+                      id="home-quick-address"
+                      name="address"
+                      autoComplete="street-address"
+                      required
+                      placeholder={t("homeQuickContact.placeholderAddress")}
+                      className={fieldClass}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="home-quick-visa"
+                      className="text-foreground"
+                    >
+                      {t("homeQuickContact.labelVisaType")}
+                    </Label>
+                    <Input
+                      id="home-quick-visa"
+                      name="visaType"
+                      required
+                      placeholder={t("homeQuickContact.placeholderVisaType")}
+                      className={fieldClass}
                     />
                   </div>
                 </div>
@@ -171,7 +260,7 @@ export function HomeQuickContact() {
                     required
                     rows={4}
                     placeholder={t("homeQuickContact.placeholderMessage")}
-                    className="min-h-[7.5rem] resize-y rounded-xl border-border/80 bg-background/80 shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:ring-[#2c7bb6]/25 dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
+                    className="min-h-[7.5rem] resize-y rounded-xl border border-border/80 bg-background/80 px-3 py-2 text-base shadow-sm transition-[box-shadow] focus-visible:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-[#2c7bb6]/25 md:text-sm dark:focus-visible:border-sky-500/40 dark:focus-visible:ring-sky-500/20"
                   />
                 </div>
 
@@ -184,12 +273,10 @@ export function HomeQuickContact() {
                 <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
                   <Button
                     type="submit"
-                    disabled={sent || pending}
+                    disabled={pending}
                     className="h-11 rounded-xl bg-[#2c7bb6] px-6 text-sm font-semibold shadow-md shadow-[#2c7bb6]/20 hover:bg-[#256fa3] dark:shadow-sky-500/10"
                   >
-                    {sent ? (
-                      t("homeQuickContact.sentButton")
-                    ) : pending ? (
+                    {pending ? (
                       t("homeQuickContact.sendingButton")
                     ) : (
                       <>
@@ -198,15 +285,9 @@ export function HomeQuickContact() {
                       </>
                     )}
                   </Button>
-                  {sent ? (
-                    <p className="text-sm text-muted-foreground" role="status">
-                      {t("homeQuickContact.thanksStatus")}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground sm:text-end sm:max-w-[14rem]">
-                      {t("homeQuickContact.privacyNote")}
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground sm:text-end sm:max-w-[14rem]">
+                    {t("homeQuickContact.privacyNote")}
+                  </p>
                 </div>
               </form>
             </div>

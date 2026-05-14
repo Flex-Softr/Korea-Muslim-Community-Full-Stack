@@ -107,7 +107,8 @@ APP_NAME="Korea Muslim Community"
 ## API routes (reference)
 
 - `GET /api/health` — readiness check (503 if the database is down).
-- `POST /api/contact` — contact form JSON `{ name, email, message }` (rate limited, sends email).
+- `POST /api/contact` — contact form JSON `{ name, mobileNumber, occupation, address, visaType, message }` (`occupation`: `student` | `job_holder` | `eps`; rate limited; **stored in DB**, email sending disabled).
+- `GET /api/dashboard/contact-submissions` — admin-only, paginated list (`page`, `pageSize` query params).
 - Auth: register, NextAuth, forgot/reset password, email verification, change password, profile — see `src/app/api/`.
 
 ## CI

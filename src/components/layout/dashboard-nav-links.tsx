@@ -18,6 +18,7 @@ import {
   Users,
   UserCheck,
   UsersRound,
+  Inbox,
 } from "lucide-react";
 import { hasMinimumRole, type UserRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -105,6 +106,13 @@ const navItems: Array<
   },
   { type: "link", href: "/dashboard", labelKey: "dashboard.nav.profile", icon: User },
   { type: "link", href: "/dashboard/carosal", labelKey: "dashboard.nav.carouselSlider", icon: Images, adminOnly: true },
+  {
+    type: "link",
+    href: "/dashboard/contact-submissions",
+    labelKey: "dashboard.nav.contactSubmissions",
+    icon: Inbox,
+    adminOnly: true,
+  },
 
   { type: "link", href: "/dashboard/settings", labelKey: "common.settings", icon: Settings },
 ];

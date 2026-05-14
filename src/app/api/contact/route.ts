@@ -1,34 +1,34 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { env } from "@/config/env";
-import { sendMail } from "@/lib/email/send-mail";
-import { buildContactSubmissionEmail } from "@/lib/email/templates/contact-submission";
+import { CONTACT_OCCUPATION_VALUES } from "@/lib/contact/occupations";
+import {
+  CONTACT_FORM_PRISMA_SETUP_MESSAGE,
+  contactFormSubmissionDelegate,
+} from "@/lib/prisma-contact-form-submission";
 import {
   clientIpFromRequest,
   rateLimit,
   rateLimitHeaders,
 } from "@/lib/rate-limit";
 
+const mobileSchema = z
+  .string()
+  .trim()
+  .min(8, "Mobile number is too short.")
+  .max(40, "Mobile number is too long.")
+  .regex(/^[\d+\s().-]+$/, "Mobile number contains invalid characters.");
+
 const bodySchema = z.object({
   name: z.string().trim().min(1).max(120),
-  email: z.string().trim().email().max(254),
+  mobileNumber: mobileSchema,
+  occupation: z.enum(CONTACT_OCCUPATION_VALUES),
+  address: z.string().trim().min(1).max(500),
+  visaType: z.string().trim().min(1).max(200),
   message: z.string().trim().min(1).max(5000),
 });
 
 const WINDOW_MS = 15 * 60 * 1000;
 const CONTACT_LIMIT = 5;
-
-function contactRecipient(): string | null {
-  const direct = env.CONTACT_TO_EMAIL?.trim();
-  if (direct) return direct;
-  const from = env.EMAIL_FROM?.trim();
-  if (from) return from;
-  return null;
-}
-
-function appName(): string {
-  return env.APP_NAME?.trim() || "App";
-}
 
 export async function POST(request: Request) {
   const ip = clientIpFromRequest(request);
@@ -49,43 +49,45 @@ export async function POST(request: Request) {
 
   const parsed = bodySchema.safeParse(json);
   if (!parsed.success) {
+    const issue = parsed.error.issues[0];
     return NextResponse.json(
-      { error: "Name, valid email, and message (max 5000 chars) required." },
+      { error: issue?.message ?? "Invalid request. Check all fields." },
       { status: 400 },
     );
   }
 
-  const to = contactRecipient();
-  if (!to) {
+  const { name, mobileNumber, occupation, address, visaType, message } =
+    parsed.data;
+
+  const contactDelegate = contactFormSubmissionDelegate();
+
+  if (!contactDelegate?.create) {
+    console.error(
+      `[contact] prisma.contactFormSubmission is missing — ${CONTACT_FORM_PRISMA_SETUP_MESSAGE}`,
+    );
     return NextResponse.json(
       {
-        error:
-          "Contact form is not configured. Set CONTACT_TO_EMAIL or EMAIL_FROM.",
+        error: `Contact form storage is not ready. ${CONTACT_FORM_PRISMA_SETUP_MESSAGE}`,
       },
       { status: 503 },
     );
   }
 
-  const { name, email, message } = parsed.data;
-  const { subject, html, text } = buildContactSubmissionEmail({
-    appName: appName(),
-    fromName: name,
-    fromEmail: email,
-    message,
-  });
-
   try {
-    await sendMail({
-      to,
-      subject,
-      html,
-      text,
-      replyTo: email,
+    await contactDelegate.create({
+      data: {
+        name,
+        mobileNumber,
+        occupation,
+        address,
+        visaType,
+        message,
+      },
     });
   } catch (err) {
     console.error("[contact]", err);
     return NextResponse.json(
-      { error: "Could not send message. Try again later." },
+      { error: "Could not save your message. Try again later." },
       { status: 502 },
     );
   }
