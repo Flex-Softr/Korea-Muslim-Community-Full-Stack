@@ -5,6 +5,11 @@ import { Mail, MapPin, MessageCircle } from "lucide-react";
 import { FooterScrollTop } from "@/components/layout/footer-scroll-top";
 import { SiteLogoMark } from "@/components/layout/site-logo-mark";
 import { useLanguage } from "@/components/providers/language-provider";
+import {
+  MEMBER_NAV_LABEL_KEYS,
+  MEMBER_SLUGS,
+  memberListingHref,
+} from "@/lib/members/config";
 import { cn } from "@/lib/utils";
 
 function SocialLink({
@@ -34,74 +39,98 @@ function SocialLink({
   );
 }
 
+
 const INTRO_LINKS: { href: string; labelKey: string }[] = [
-  { href: "https://shibir.org.bd/en/at-a-glance", labelKey: "footer.introAtAGlance" },
-  { href: "https://shibir.org.bd/history", labelKey: "footer.introHistory" },
-  { href: "https://shibir.org.bd/sangeet", labelKey: "footer.introShibirSong" },
-  { href: "https://shibir.org.bd/celebrations", labelKey: "footer.introCelebrations" },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/brief-introduction`,
+    labelKey: "footer.linkIntroBriefIntroduction",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/constitution`,
+    labelKey: "footer.linkIntroConstitution",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/organizational-method`,
+    labelKey: "footer.linkIntroOrganizationalMethod",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/policies`,
+    labelKey: "footer.linkIntroPolicies",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/introductory-registration`,
+    labelKey: "footer.linkIntroIntroductoryRegistration",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/history-and-tradition`,
+    labelKey: "footer.linkIntroHistoryAndTradition",
+  },
+];
+
+const CENTRAL_ORG_LINKS: { href: string; labelKey: string }[] = [
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-working-procedure`,
+    labelKey: "footer.linkCentralWorkingProcedure",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-shura-council`,
+    labelKey: "footer.linkCentralShuraCouncil",
+  },
+  {
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/other-leadership`,
+    labelKey: "footer.linkOtherLeadership",
+  },
 ];
 
 const ORG_LINKS: { href: string; labelKey: string }[] = [
-  { href: "https://shibir.org.bd/constitution", labelKey: "footer.orgConstitution" },
-  { href: "https://shibir.org.bd/strategy", labelKey: "footer.orgStrategy" },
   {
-    href: "https://shibir.org.bd/central-committee",
-    labelKey: "footer.orgExecutiveCouncil",
-  },
-  { href: "https://shibir.org.bd/branches", labelKey: "footer.orgBranches" },
-  { href: "https://shibir.org.bd/departments", labelKey: "footer.orgDepartments" },
-];
-
-const HIST_LINKS: { href: string; labelKey: string }[] = [
-  {
-    href: "https://shibir.org.bd/chronicles/sultanate-e-bangalah",
-    labelKey: "footer.histSultanateBangalah",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/women-s-division`,
+    labelKey: "footer.linkProcedureWomenDivision",
   },
   {
-    href: "https://shibir.org.bd/chronicles/baro-bhuyans",
-    labelKey: "footer.histBaroBhuiyan",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-division`,
+    labelKey: "footer.linkProcedureStudentDivision",
   },
   {
-    href: "https://shibir.org.bd/chronicles/subah-bangalah",
-    labelKey: "footer.histSubahBangalah",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/professional-division`,
+    labelKey: "footer.linkProcedureProfessionalDivision",
   },
   {
-    href: "https://shibir.org.bd/chronicles/azadi-movement",
-    labelKey: "footer.histAzadiMovement",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/national-and-international`,
+    labelKey: "footer.linkProcedureNationalAndInternational",
   },
   {
-    href: "https://shibir.org.bd/chronicles/pakistan-movement",
-    labelKey: "footer.histPakistanMovement",
-  },
-  {
-    href: "https://shibir.org.bd/chronicles/seventy-one",
-    labelKey: "footer.histSeventyOne",
-  },
-  {
-    href: "https://shibir.org.bd/chronicles/july-revolution",
-    labelKey: "footer.histJulyRevolution",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-s-division`,
+    labelKey: "footer.linkProcedureStudentsDivision",
   },
 ];
 
-const UPDATE_LINKS: { href: string; labelKey: string }[] = [
-  { href: "https://shibir.org.bd/press-release", labelKey: "footer.updPressRelease" },
-  { href: "https://shibir.org.bd/news", labelKey: "footer.updNews" },
-  { href: "https://shibir.org.bd/events", labelKey: "footer.updEvents" },
+
+const MEMBER_FOOTER_LINKS: { href: string; labelKey: string }[] =
+  MEMBER_SLUGS.map((slug) => ({
+    href: memberListingHref(slug),
+    labelKey: MEMBER_NAV_LABEL_KEYS[slug],
+  }));
+
+const MEDIA_FOOTER_LINKS: { href: string; labelKey: string }[] = [
+  { href: "/blog", labelKey: "common.blog" },
+  { href: "/activity", labelKey: "common.activity" },
+  { href: "/photo-gallery", labelKey: "common.photoGallery" },
+  { href: "/video-gallery", labelKey: "common.videoGallery" },
 ];
 
-const ACTIVITY_LINKS: { href: string; labelKey: string }[] = [
-  { href: "https://jamaat-e-islami.org/category.php?cid=77", labelKey: "footer.actDawah" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=78", labelKey: "footer.actSocialWelfare" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=79", labelKey: "footer.actTarbiyah" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=80", labelKey: "footer.actPolitical" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=81", labelKey: "footer.actEducation" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=82", labelKey: "footer.actHealth" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=83", labelKey: "footer.actLabour" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=84", labelKey: "footer.actCultural" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=85", labelKey: "footer.actAgriculture" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=86", labelKey: "footer.actYouthSports" },
-  { href: "https://jamaat-e-islami.org/category.php?cid=91", labelKey: "footer.actInternational" },
+/** In-app routes not covered by external org links or the media / member columns. */
+const OTHER_FOOTER_LINKS: { href: string; labelKey: string }[] = [
+  { href: "/", labelKey: "common.home" },
+  { href: "/about", labelKey: "breadcrumbs.aboutUs" },
+  { href: "/contact", labelKey: "breadcrumbs.contact" },
+  { href: "/donation", labelKey: "common.donation" },
+  { href: "/students", labelKey: "nav.students" },
+  { href: "/education", labelKey: "nav.education" },
+  { href: "/mosque", labelKey: "nav.mosque" },
 ];
+
+
 
 /** Dynamic keys from `.map()` widen to `string`; narrow `t` to satisfy react-i18next + JSX typing (TS2322 / TS2589). */
 function footerLinkLabel(
@@ -109,6 +138,33 @@ function footerLinkLabel(
   key: string,
 ): string {
   return (t as (k: string) => string)(key);
+}
+
+function FooterNavColumn({
+  titleKey,
+  links,
+  t,
+}: {
+  titleKey: string;
+  links: readonly { href: string; labelKey: string }[];
+  t: ReturnType<typeof useLanguage>["t"];
+}) {
+  return (
+    <div>
+      <h4 className="text-lg font-semibold text-sky-400">
+        {footerLinkLabel(t, titleKey)}
+      </h4>
+      <ul className="mt-3 space-y-1.5 text-md text-white/70">
+        {links.map(({ href, labelKey }) => (
+          <li key={href}>
+            <Link href={href} className="hover:text-white">
+              {footerLinkLabel(t, labelKey)}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export function ClientFooter() {
@@ -217,96 +273,40 @@ export function ClientFooter() {
 
           {/* RIGHT SIDE (LINK GROUPS) */}
           <div className="grid grid-cols-2 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 md:gap-x-20">
-            <div>
-              <h4 className="text-lg font-semibold text-sky-400">
-                {t("footer.secIntroduction")}
-              </h4>
-              <ul className="mt-3 space-y-1.5 text-md text-white/70">
-                {INTRO_LINKS.map(({ href, labelKey }) => (
-                  <li key={href}>
-                    <Link href={href} className="hover:text-white">
-                      {footerLinkLabel(t, labelKey)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <FooterNavColumn
+              titleKey="footer.secIntroduction"
+              links={INTRO_LINKS}
+              t={t}
+            />
+            <FooterNavColumn
+              titleKey="footer.secOrganization"
+              links={ORG_LINKS}
+              t={t}
+            />
 
-              <div className="mt-10">
-                <h4 className="text-lg font-semibold text-sky-400">
-                  {t("footer.secOrganization")}
-                </h4>
-                <ul className="mt-3 space-y-1.5 text-md text-white/70">
-                  {ORG_LINKS.map(({ href, labelKey }) => (
-                    <li key={href}>
-                      <Link href={href} className="hover:text-white">
-                        {footerLinkLabel(t, labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+           <FooterNavColumn
+              titleKey="footer.secOther"
+              links={OTHER_FOOTER_LINKS}
+              t={t}
+            />
 
-              <div className="mt-8">
-                <h4 className="text-lg font-semibold text-sky-400">
-                  {t("footer.secLeadership")}
-                </h4>
-                <ul className="mt-3 space-y-1.5 text-md text-white/70">
-                  <li>
-                    <Link
-                      href="https://jamaat-e-islami.org/leadership.php?leader=1"
-                      className="hover:text-white"
-                    >
-                      {t("footer.leadAmirJamaat")}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <FooterNavColumn
+              titleKey="footer.secCentralOrganization"
+              links={CENTRAL_ORG_LINKS}
+              t={t}
+            />
+            <FooterNavColumn
+              titleKey="nav.members"
+              links={MEMBER_FOOTER_LINKS}
+              t={t}
+            />
+            <FooterNavColumn
+              titleKey="nav.media"
+              links={MEDIA_FOOTER_LINKS}
+              t={t}
+            />
+           
 
-            <div>
-              <h4 className="text-lg font-semibold text-sky-400">
-                {t("footer.secHistoricMoments")}
-              </h4>
-              <ul className="mt-3 space-y-1.5 text-md text-white/70">
-                {HIST_LINKS.map(({ href, labelKey }) => (
-                  <li key={href}>
-                    <Link href={href} className="hover:text-white">
-                      {footerLinkLabel(t, labelKey)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-10">
-                <h4 className="text-lg font-semibold text-sky-400">
-                  {t("footer.secUpdates")}
-                </h4>
-                <ul className="mt-3 space-y-1.5 text-md text-white/70">
-                  {UPDATE_LINKS.map(({ href, labelKey }) => (
-                    <li key={href}>
-                      <Link href={href} className="hover:text-white">
-                        {footerLinkLabel(t, labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-lg font-semibold text-sky-400">
-                {t("footer.secActivities")}
-              </h4>
-              <ul className="mt-3 space-y-1.5 text-md font-100 text-white/70">
-                {ACTIVITY_LINKS.map(({ href, labelKey }) => (
-                  <li key={href}>
-                    <Link href={href} className="hover:text-white">
-                      {footerLinkLabel(t, labelKey)}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
       </div>
