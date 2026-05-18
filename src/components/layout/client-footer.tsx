@@ -39,67 +39,68 @@ function SocialLink({
   );
 }
 
+
 const INTRO_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: "https://korea-muslim-community.org/introduction/brief-introduction",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/brief-introduction`,
     labelKey: "footer.linkIntroBriefIntroduction",
   },
   {
-    href: "https://korea-muslim-community.org/introduction/constitution",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/constitution`,
     labelKey: "footer.linkIntroConstitution",
   },
   {
-    href: "https://korea-muslim-community.org/introduction/organizational-method",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/organizational-method`,
     labelKey: "footer.linkIntroOrganizationalMethod",
   },
   {
-    href: "https://korea-muslim-community.org/introduction/policies",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/policies`,
     labelKey: "footer.linkIntroPolicies",
   },
   {
-    href: "https://korea-muslim-community.org/introduction/introductory-registration",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/introductory-registration`,
     labelKey: "footer.linkIntroIntroductoryRegistration",
   },
   {
-    href: "https://korea-muslim-community.org/introduction/history-and-tradition",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/history-and-tradition`,
     labelKey: "footer.linkIntroHistoryAndTradition",
   },
 ];
 
 const CENTRAL_ORG_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: "https://korean-muslim-community.vercel.app/organizational-structure/central-organization/central-working-procedure",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-working-procedure`,
     labelKey: "footer.linkCentralWorkingProcedure",
   },
   {
-    href: "https://korean-muslim-community.vercel.app/organizational-structure/central-organization/central-shura-council",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-shura-council`,
     labelKey: "footer.linkCentralShuraCouncil",
   },
   {
-    href: "https://korean-muslim-community.vercel.app/organizational-structure/central-organization/other-leadership",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/other-leadership`,
     labelKey: "footer.linkOtherLeadership",
   },
 ];
 
 const ORG_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: "https://korea-muslim-community.org/procedure/women-s-division",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/women-s-division`,
     labelKey: "footer.linkProcedureWomenDivision",
   },
   {
-    href: "https://korea-muslim-community.org/procedure/student-division",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-division`,
     labelKey: "footer.linkProcedureStudentDivision",
   },
   {
-    href: "https://korea-muslim-community.org/procedure/professional-division",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/professional-division`,
     labelKey: "footer.linkProcedureProfessionalDivision",
   },
   {
-    href: "https://korea-muslim-community.org/procedure/national-and-international",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/national-and-international`,
     labelKey: "footer.linkProcedureNationalAndInternational",
   },
   {
-    href: "https://korea-muslim-community.org/procedure/student-s-division",
+    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-s-division`,
     labelKey: "footer.linkProcedureStudentsDivision",
   },
 ];
