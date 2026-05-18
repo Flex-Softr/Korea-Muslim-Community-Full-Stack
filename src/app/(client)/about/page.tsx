@@ -25,11 +25,11 @@ export default async function AboutPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.aboutUs")}
-        subtitle={st("pages.about.subtitle")}
+        titleKey="breadcrumbs.aboutUs"
+        subtitleKey="pages.about.subtitle"
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
-          { label: st("breadcrumbs.aboutUs") },
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "breadcrumbs.aboutUs" },
         ]}
       />
 

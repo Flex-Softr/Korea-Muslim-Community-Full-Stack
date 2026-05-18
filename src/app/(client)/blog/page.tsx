@@ -3,7 +3,7 @@ import { PageBanner } from "@/components/layout/page-banner";
 import { listBlogPosts } from "@/lib/content/repository";
 import { BlogListing } from "./blog-listing";
 import { getRequestLang } from "@/lib/i18n/server-language";
-import { getServerT, serverT } from "@/lib/i18n/server-translate";
+import { serverT } from "@/lib/i18n/server-translate";
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getRequestLang();
@@ -22,7 +22,6 @@ type BlogPageProps = {
 };
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const st = await getServerT();
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
   const yearParsed = params.year ? Number.parseInt(params.year, 10) : null;
@@ -39,9 +38,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <>
       <PageBanner
-        title={st("common.blog")}
-        subtitle={st("pages.blog.subtitle")}
-        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("common.blog") }]}
+        titleKey="common.blog"
+        subtitleKey="pages.blog.subtitle"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "common.blog" }]}
       />
       <BlogListing
         posts={all.items}

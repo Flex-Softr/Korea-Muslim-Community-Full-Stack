@@ -92,7 +92,7 @@ export default async function MemberDetailPage({ params }: PageProps) {
         }
         subtitle={bannerSubtitle}
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
+          { labelKey: "nav.home", href: "/" },
           { label: sectionTitle, href: listingHref },
           { label: member.name },
         ]}

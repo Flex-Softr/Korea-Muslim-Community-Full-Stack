@@ -3,7 +3,7 @@ import { PageBanner } from "@/components/layout/page-banner";
 import { listActivityItems } from "@/lib/content/repository";
 import { ActivityListing } from "./activity-listing";
 import { getRequestLang } from "@/lib/i18n/server-language";
-import { getServerT, serverT } from "@/lib/i18n/server-translate";
+import { serverT } from "@/lib/i18n/server-translate";
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getRequestLang();
@@ -22,7 +22,6 @@ type ActivityPageProps = {
 };
 
 export default async function ActivityPage({ searchParams }: ActivityPageProps) {
-  const st = await getServerT();
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
   const yearParsed = params.year ? Number.parseInt(params.year, 10) : null;
@@ -38,9 +37,9 @@ export default async function ActivityPage({ searchParams }: ActivityPageProps) 
   return (
     <>
       <PageBanner
-        title={st("common.activity")}
-        subtitle={st("pages.activity.subtitle")}
-        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.activity") }]}
+        titleKey="common.activity"
+        subtitleKey="pages.activity.subtitle"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.activity" }]}
       />
       <ActivityListing
         items={all.items}

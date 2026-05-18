@@ -29,9 +29,9 @@ export default async function DonationPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.donate")}
-        subtitle={st("pages.donate.subtitle")}
-        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.donate") }]}
+        titleKey="breadcrumbs.donate"
+        subtitleKey="pages.donate.subtitle"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.donate" }]}
       />
 
       <div className="mx-auto max-w-3xl space-y-12 px-4 py-12 sm:px-6 sm:py-16">

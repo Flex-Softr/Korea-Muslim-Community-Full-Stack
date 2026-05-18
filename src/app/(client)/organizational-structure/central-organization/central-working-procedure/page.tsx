@@ -1,15 +1,13 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageSidebar } from "../../../components/page-sidebar";
 import { PageContent } from "../../../components/page-content";
-import { getServerT } from "@/lib/i18n/server-translate";
 
 export default async function CentralWorkingProcedurePage() {
-  const st = await getServerT();
-    return (
+  return (
       <>
         <PageBanner
-          title={st("nav.centralWorkingProcedure")}
-          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("nav.centralWorkingProcedure") }]}
+          titleKey="nav.centralWorkingProcedure"
+          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "nav.centralWorkingProcedure" }]}
         />
           <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
           <div className="sm:w-1/3 w-full">

@@ -24,9 +24,9 @@ export default async function ContactPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.contact")}
-        subtitle={st("pages.contact.subtitle")}
-        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.contact") }]}
+        titleKey="breadcrumbs.contact"
+        subtitleKey="pages.contact.subtitle"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.contact" }]}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         <Card className="shadow-md ring-1 ring-border/60">

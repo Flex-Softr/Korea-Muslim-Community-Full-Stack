@@ -17,11 +17,11 @@ export default async function TermsPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.termsOfService")}
-        subtitle={st("pages.terms.subtitle")}
+        titleKey="breadcrumbs.termsOfService"
+        subtitleKey="pages.terms.subtitle"
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
-          { label: st("breadcrumbs.termsOfService") },
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "breadcrumbs.termsOfService" },
         ]}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">

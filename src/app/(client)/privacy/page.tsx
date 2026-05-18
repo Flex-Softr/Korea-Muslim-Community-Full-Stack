@@ -17,11 +17,11 @@ export default async function PrivacyPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.privacyPolicy")}
-        subtitle={st("pages.privacy.subtitle")}
+        titleKey="breadcrumbs.privacyPolicy"
+        subtitleKey="pages.privacy.subtitle"
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
-          { label: st("breadcrumbs.privacyPolicy") },
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "breadcrumbs.privacyPolicy" },
         ]}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">

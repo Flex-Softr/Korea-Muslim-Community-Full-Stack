@@ -6,8 +6,8 @@ export default async function EPSLinkPage() {
     return (
       <>
         <PageBanner
-          title={st("breadcrumbs.epsLink")}
-          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.epsLink") }]}
+          titleKey="breadcrumbs.epsLink"
+          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.epsLink" }]}
         />
         <div>
           <h1>{st("breadcrumbs.epsLink")}</h1>
