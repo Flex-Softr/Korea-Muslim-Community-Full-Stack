@@ -16,9 +16,9 @@ export default async function TeamPage() {
   return (
     <>
       <PageBanner
-        title={st("breadcrumbs.team")}
-        subtitle={st("pages.team.subtitle")}
-        breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.team") }]}
+        titleKey="breadcrumbs.team"
+        subtitleKey="pages.team.subtitle"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.team" }]}
       />
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-muted-foreground">{st("pages.team.body")}</p>

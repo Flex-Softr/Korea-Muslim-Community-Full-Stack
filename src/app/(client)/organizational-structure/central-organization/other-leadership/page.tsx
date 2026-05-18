@@ -1,15 +1,13 @@
 import { PageBanner } from "@/components/layout/page-banner"
 import { PageContent } from "../../../components/page-content"
 import { PageSidebar } from "../../../components/page-sidebar"
-import { getServerT } from "@/lib/i18n/server-translate"
 
 export default async function OtherLeadershipPage() {
-  const st = await getServerT()
     return (
       <>
         <PageBanner
-          title={st("nav.otherLeadership")}
-          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("nav.otherLeadership") }]}
+          titleKey="nav.otherLeadership"
+          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "nav.otherLeadership" }]}
         />
          <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
           <div className="sm:w-1/3 w-full">

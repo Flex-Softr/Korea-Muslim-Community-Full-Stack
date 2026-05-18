@@ -89,8 +89,8 @@ export default async function MembersProfilePage({ params }: PageProps) {
         title={member.name}
         subtitle={member.designation ?? bannerFallbackSubtitle(st, member.category)}
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
-          { label: st("nav.members"), href: "/member" },
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "nav.members", href: "/member" },
           { label: member.name },
         ]}
       />

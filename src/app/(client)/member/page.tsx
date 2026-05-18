@@ -59,11 +59,11 @@ export default async function MemberDirectoryPage({ searchParams }: PageProps) {
   return (
     <>
       <PageBanner
-        title={st(keys.title)}
-        subtitle={st(keys.subtitle)}
+        titleKey={keys.title}
+        subtitleKey={keys.subtitle}
         breadcrumbs={[
-          { label: st("nav.home"), href: "/" },
-          { label: st(keys.title) },
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: keys.title },
         ]}
       />
 

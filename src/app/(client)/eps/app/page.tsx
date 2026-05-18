@@ -6,8 +6,8 @@ export default async function EPSAppPage() {
     return (
       <>
         <PageBanner
-          title={st("breadcrumbs.epsApp")}
-          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.epsApp") }]}
+          titleKey="breadcrumbs.epsApp"
+          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.epsApp" }]}
         />
         <div>
           <h1>{st("breadcrumbs.epsApp")}</h1>

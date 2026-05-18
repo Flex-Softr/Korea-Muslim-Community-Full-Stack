@@ -6,8 +6,8 @@ export default async function EPSFormPage() {
     return (
       <>
         <PageBanner
-          title={st("breadcrumbs.epsForm")}
-          breadcrumbs={[{ label: st("nav.home"), href: "/" }, { label: st("breadcrumbs.epsForm") }]}
+          titleKey="breadcrumbs.epsForm"
+          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.epsForm" }]}
         />
         <div>
         <h1>{st("breadcrumbs.epsForm")}</h1>
