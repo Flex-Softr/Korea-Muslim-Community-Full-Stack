@@ -62,7 +62,9 @@ export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
 /** Use from Prisma seed, scripts, and tests (no `server-only`). For the app, prefer `@/config/env`. */
 export function loadServerEnv(): ServerEnv {
-  return serverEnvSchema.parse({
+  const isBuild = process.env.SKIP_ENV_VALIDATION === "1";
+
+  const envData = {
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_URL: process.env.DATABASE_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
@@ -78,5 +80,11 @@ export function loadServerEnv(): ServerEnv {
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PASSWORD: process.env.SMTP_PASSWORD,
     CONTACT_TO_EMAIL: process.env.CONTACT_TO_EMAIL,
-  });
+  };
+
+  if (isBuild) {
+    return envData as ServerEnv;
+  }
+
+  return serverEnvSchema.parse(envData);
 }
