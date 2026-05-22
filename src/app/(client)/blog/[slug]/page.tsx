@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
 import { StudentBlogArticleDetail } from "@/components/cms/student-blog-article-detail";
 import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
 import {
   getBlogPost,
-  listBlogPosts,
+  listCachedBlogPosts,
 } from "@/lib/content/repository";
 import { toCmsTextDetailSource } from "@/lib/cms/cms-detail-locale-source";
 import { getRequestLang } from "@/lib/i18n/server-language";
@@ -35,10 +33,10 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const requestLang = await getRequestLang();
   const [post, listResult] = await Promise.all([
     getBlogPost(slug, requestLang),
-    listBlogPosts(
+    listCachedBlogPosts(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
       requestLang,
-      { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
+      { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP, withFacets: false },
     ),
   ]);
   if (!post) {

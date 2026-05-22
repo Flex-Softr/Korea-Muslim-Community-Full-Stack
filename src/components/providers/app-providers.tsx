@@ -1,7 +1,6 @@
 "use client";
 
-import type { Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+import { Suspense } from "react";
 import {
   LanguageProvider,
   type Lang,
@@ -11,11 +10,9 @@ import { ToastProvider } from "@/components/ui/toast-system";
 
 export function AppProviders({
   children,
-  session,
   initialLang,
 }: {
   children: React.ReactNode;
-  session: Session | null;
   initialLang: Lang;
 }) {
   return (
@@ -25,11 +22,11 @@ export function AppProviders({
       enableSystem
       disableTransitionOnChange
     >
-      <SessionProvider session={session} refetchOnWindowFocus={false} refetchWhenOffline={false}>
-        <ToastProvider>
-          <LanguageProvider initialLang={initialLang}>{children}</LanguageProvider>
-        </ToastProvider>
-      </SessionProvider>
+      <ToastProvider>
+        <LanguageProvider initialLang={initialLang}>
+          <Suspense fallback={null}>{children}</Suspense>
+        </LanguageProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

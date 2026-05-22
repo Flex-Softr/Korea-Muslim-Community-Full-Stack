@@ -1,6 +1,7 @@
 import { ACTIVITY_NEWS, type ActivityNewsItem, getActivityBySlug } from "@/data/activity-news";
 import { PHOTO_GALLERY_ITEMS, type PhotoGalleryItem, VIDEO_GALLERY_ITEMS, type VideoGalleryItem } from "@/data/gallery-media";
 import { STUDENT_NEWS_POSTS, type StudentNewsPost, getBlogPostBySlug } from "@/data/student-news";
+import { cacheLife, cacheTag } from "next/cache";
 import {
   getPublishedDashboardActivityBySlug,
   getPublishedDashboardBlogBySlug,
@@ -351,6 +352,8 @@ function paginate<T>(items: T[], query: ContentListQuery): {
 export type ListContentRepositoryOpts = {
   /** When set, caps how many newest published rows participate in totals and pagination (previews / home). */
   maxRowsFromDb?: number;
+  /** Listing facets are expensive and unnecessary for small preview sections. */
+  withFacets?: boolean;
 };
 
 /** Optional hint for callers that only need the first page without filters (same as passing `maxRowsFromDb: pageSize`). */
@@ -519,14 +522,17 @@ async function listBlogPostsFromDb(
 ): Promise<PaginatedResponse<StudentNewsPost>> {
   const where = buildCategoryYearWhereBlog(query);
   const maxCap = opts?.maxRowsFromDb;
+  const withFacets = opts?.withFacets ?? true;
   const totalDb = await dashboardPrisma.dashboardBlog.count({ where });
   const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
     totalDb,
     query,
     maxCap,
   );
-  const [{ categories, years }, rawRows] = await Promise.all([
-    facetCategoriesAndYearsBlog(),
+  const [facets, rawRows] = await Promise.all([
+    withFacets
+      ? facetCategoriesAndYearsBlog()
+      : Promise.resolve({ categories: [] as CategoryOption[], years: [] as YearOption[] }),
     take === 0
       ? Promise.resolve([])
       : dashboardPrisma.dashboardBlog.findMany({
@@ -541,8 +547,8 @@ async function listBlogPostsFromDb(
   const items = rows.map((row) => mapDbBlogPost(row, requestLang));
   return {
     items,
-    categories,
-    years,
+    categories: facets.categories,
+    years: facets.years,
     pagination: {
       page,
       pageSize,
@@ -624,14 +630,17 @@ async function listActivityItemsFromDb(
 ): Promise<PaginatedResponse<ActivityNewsItem>> {
   const where = buildCategoryYearWhereActivity(query);
   const maxCap = opts?.maxRowsFromDb;
+  const withFacets = opts?.withFacets ?? true;
   const totalDb = await dashboardPrisma.dashboardActivity.count({ where });
   const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
     totalDb,
     query,
     maxCap,
   );
-  const [{ categories, years }, rawRows] = await Promise.all([
-    facetCategoriesAndYearsActivity(),
+  const [facets, rawRows] = await Promise.all([
+    withFacets
+      ? facetCategoriesAndYearsActivity()
+      : Promise.resolve({ categories: [] as CategoryOption[], years: [] as YearOption[] }),
     take === 0
       ? Promise.resolve([])
       : dashboardPrisma.dashboardActivity.findMany({
@@ -646,8 +655,8 @@ async function listActivityItemsFromDb(
   const items = rows.map((row) => mapDbActivityItem(row, requestLang));
   return {
     items,
-    categories,
-    years,
+    categories: facets.categories,
+    years: facets.years,
     pagination: {
       page,
       pageSize,
@@ -728,14 +737,17 @@ async function listPhotoItemsFromDb(
 ): Promise<PaginatedResponse<PhotoGalleryItem>> {
   const where = buildCategoryYearWherePhoto(query);
   const maxCap = opts?.maxRowsFromDb;
+  const withFacets = opts?.withFacets ?? true;
   const totalDb = await dashboardPrisma.dashboardPhoto.count({ where });
   const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
     totalDb,
     query,
     maxCap,
   );
-  const [{ categories, years }, rawRows] = await Promise.all([
-    facetCategoriesAndYearsPhoto(),
+  const [facets, rawRows] = await Promise.all([
+    withFacets
+      ? facetCategoriesAndYearsPhoto()
+      : Promise.resolve({ categories: [] as CategoryOption[], years: [] as YearOption[] }),
     take === 0
       ? Promise.resolve([])
       : dashboardPrisma.dashboardPhoto.findMany({
@@ -750,8 +762,8 @@ async function listPhotoItemsFromDb(
   const items = rows.map((row) => mapDbPhotoItem(row, requestLang));
   return {
     items,
-    categories,
-    years,
+    categories: facets.categories,
+    years: facets.years,
     pagination: {
       page,
       pageSize,
@@ -808,14 +820,17 @@ async function listVideoItemsFromDb(
 ): Promise<PaginatedResponse<VideoGalleryItem>> {
   const where = buildVideoListWhere(query);
   const maxCap = opts?.maxRowsFromDb;
+  const withFacets = opts?.withFacets ?? true;
   const totalDb = await dashboardPrisma.dashboardVideo.count({ where });
   const { effectiveTotal, totalPages, page, skip, take, pageSize } = listPaginationPlan(
     totalDb,
     query,
     maxCap,
   );
-  const [{ categories, years }, rawRows] = await Promise.all([
-    facetCategoriesAndYearsVideo(),
+  const [facets, rawRows] = await Promise.all([
+    withFacets
+      ? facetCategoriesAndYearsVideo()
+      : Promise.resolve({ categories: [] as CategoryOption[], years: [] as YearOption[] }),
     take === 0
       ? Promise.resolve([])
       : dashboardPrisma.dashboardVideo.findMany({
@@ -832,8 +847,8 @@ async function listVideoItemsFromDb(
     .map((row) => mapDbVideoItem(row, requestLang));
   return {
     items,
-    categories,
-    years,
+    categories: facets.categories,
+    years: facets.years,
     pagination: {
       page,
       pageSize,
@@ -841,6 +856,50 @@ async function listVideoItemsFromDb(
       totalPages,
     },
   };
+}
+
+export async function listCachedBlogPosts(
+  query: ContentListQuery,
+  lang: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<StudentNewsPost>> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("cms:blog", "cms:home");
+  return listBlogPosts(query, lang, opts);
+}
+
+export async function listCachedActivityItems(
+  query: ContentListQuery,
+  lang: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<ActivityNewsItem>> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("cms:activity", "cms:home");
+  return listActivityItems(query, lang, opts);
+}
+
+export async function listCachedPhotoItems(
+  query: ContentListQuery,
+  lang: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<PhotoGalleryItem>> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("cms:photo", "cms:home");
+  return listPhotoItems(query, lang, opts);
+}
+
+export async function listCachedVideoItems(
+  query: ContentListQuery,
+  lang: Lang,
+  opts?: ListContentRepositoryOpts,
+): Promise<PaginatedResponse<VideoGalleryItem>> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("cms:video", "cms:home");
+  return listVideoItems(query, lang, opts);
 }
 
 export async function listVideoItems(

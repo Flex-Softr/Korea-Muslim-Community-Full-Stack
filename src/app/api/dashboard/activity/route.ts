@@ -7,6 +7,7 @@ import {
 } from "@/lib/dashboard/store";
 import { normalizeContentLocale } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
+import { revalidateCmsContent } from "@/lib/cms/cache-invalidation";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -58,5 +59,6 @@ export async function POST(request: Request) {
     videoUrl: body.videoUrl,
     createdById: session?.user?.id ?? undefined,
   });
+  revalidateCmsContent("activity");
   return NextResponse.json(created, { status: 201 });
 }

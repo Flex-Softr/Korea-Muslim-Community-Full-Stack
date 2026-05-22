@@ -144,6 +144,9 @@ model DashboardBlog {
   @@index([createdById])
   @@index([status])
   @@index([slug])
+  @@index([status, createdAt])
+  @@index([createdById, createdAt])
+  @@index([status, category, createdAt])
 }
 
 /// CMS activity articles.
@@ -166,6 +169,9 @@ model DashboardActivity {
   @@index([createdById])
   @@index([status])
   @@index([slug])
+  @@index([status, createdAt])
+  @@index([createdById, createdAt])
+  @@index([status, category, createdAt])
 }
 
 /// Photo gallery CMS items.
@@ -188,6 +194,9 @@ model DashboardPhoto {
   @@index([createdById])
   @@index([status])
   @@index([slug])
+  @@index([status, createdAt])
+  @@index([createdById, createdAt])
+  @@index([status, category, createdAt])
 }
 
 /// Video gallery CMS items.
@@ -210,6 +219,9 @@ model DashboardVideo {
   @@index([createdById])
   @@index([status])
   @@index([slug])
+  @@index([status, createdAt])
+  @@index([createdById, createdAt])
+  @@index([status, category, createdAt])
 }
 
 model DashboardCategory {

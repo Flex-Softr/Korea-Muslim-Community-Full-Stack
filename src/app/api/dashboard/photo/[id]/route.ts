@@ -7,6 +7,7 @@ import {
 } from "@/lib/dashboard/store";
 import type { LocaleContentMap } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
+import { revalidateCmsContent } from "@/lib/cms/cache-invalidation";
 
 export async function PATCH(
   request: Request,
@@ -50,6 +51,7 @@ export async function PATCH(
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  revalidateCmsContent("photo");
   return NextResponse.json(updated);
 }
 
@@ -94,5 +96,6 @@ export async function DELETE(
   if (!removed) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  revalidateCmsContent("photo");
   return NextResponse.json({ ok: true });
 }

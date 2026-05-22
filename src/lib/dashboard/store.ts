@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { buildCarouselLocaleMapFromSource } from "@/lib/i18n/build-carousel-locale";
 import { buildLocaleContentMapFromSource } from "@/lib/i18n/build-locale-content";
@@ -172,7 +173,7 @@ function mapCarouselRow(row: DbCarouselRow): DashboardCarouselRow {
 }
 
 async function allocateUniqueContentSlug(type: DashboardContentType, base: string): Promise<string> {
-  let s = (base || "item").slice(0, 120);
+  const s = (base || "item").slice(0, 120);
   const table = prismaContentTable(type);
   for (let i = 0; i < 80; i += 1) {
     const candidate = i === 0 ? s : `${base}-${i + 1}`.slice(0, 120);
@@ -188,6 +189,26 @@ async function allocateUniqueContentSlug(type: DashboardContentType, base: strin
 export async function listDashboardContent(type: DashboardContentType): Promise<DashboardContentRow[]> {
   const rows = await prismaContentTable(type).findMany({
     orderBy: { createdAt: "desc" },
+  });
+  return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
+}
+
+export async function listDashboardContentSummary(type: DashboardContentType): Promise<DashboardContentRow[]> {
+  const rows = await prismaContentTable(type).findMany({
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      createdAt: true,
+      description: true,
+      coverImage: true,
+      videoUrl: true,
+      createdById: true,
+      status: true,
+      slug: true,
+      localeContent: true,
+    },
   });
   return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
@@ -251,6 +272,19 @@ export async function listDashboardContentByCreator(
   const rows = await prismaContentTable(type).findMany({
     where: { createdById: creatorId },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      createdAt: true,
+      description: true,
+      coverImage: true,
+      videoUrl: true,
+      createdById: true,
+      status: true,
+      slug: true,
+      localeContent: true,
+    },
   });
   return rows.map((row: unknown) => mapContentRow(row as DbContentRow));
 }
@@ -378,7 +412,7 @@ type UpdateDashboardContentPayload = Parameters<typeof updateDashboardContent>[2
 
 /** Blog CMS — mirrors `listDashboardCarousel` / dedicated collection `DashboardBlog`. */
 export async function listDashboardBlogs() {
-  return listDashboardContent("blog");
+  return listDashboardContentSummary("blog");
 }
 export async function listDashboardBlogsByCreator(creatorId: string) {
   return listDashboardContentByCreator("blog", creatorId);
@@ -398,7 +432,7 @@ export async function deleteDashboardBlog(id: string) {
 
 /** Activity CMS — collection `DashboardActivity`. */
 export async function listDashboardActivities() {
-  return listDashboardContent("activity");
+  return listDashboardContentSummary("activity");
 }
 export async function listDashboardActivitiesByCreator(creatorId: string) {
   return listDashboardContentByCreator("activity", creatorId);
@@ -418,7 +452,7 @@ export async function deleteDashboardActivity(id: string) {
 
 /** Photo gallery CMS — collection `DashboardPhoto`. */
 export async function listDashboardPhotos() {
-  return listDashboardContent("photo");
+  return listDashboardContentSummary("photo");
 }
 export async function listDashboardPhotosByCreator(creatorId: string) {
   return listDashboardContentByCreator("photo", creatorId);
@@ -438,7 +472,7 @@ export async function deleteDashboardPhoto(id: string) {
 
 /** Video gallery CMS — collection `DashboardVideo`. */
 export async function listDashboardVideos() {
-  return listDashboardContent("video");
+  return listDashboardContentSummary("video");
 }
 export async function listDashboardVideosByCreator(creatorId: string) {
   return listDashboardContentByCreator("video", creatorId);
@@ -559,6 +593,17 @@ export async function deleteDashboardCategory(type: DashboardCategoryType, id: s
 
 export async function listDashboardCarousel(): Promise<DashboardCarouselRow[]> {
   const rows = await prisma.dashboardCarousel.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+  return rows.map((row) => mapCarouselRow(row as DbCarouselRow));
+}
+
+export async function listPublicDashboardCarousel(): Promise<DashboardCarouselRow[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("cms:carousel", "cms:home");
+  const rows = await prisma.dashboardCarousel.findMany({
+    where: { isActive: true },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });
   return rows.map((row) => mapCarouselRow(row as DbCarouselRow));

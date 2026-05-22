@@ -6,7 +6,7 @@ import { parseUserRole, type UserRole } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
 
 /** Re-sync role/verification/name from DB periodically for JWT sessions. */
-const SESSION_SYNC_MS = 2 * 60 * 1000;
+const SESSION_SYNC_MS = 15 * 60 * 1000;
 
 async function resolveProfileImage(email: string | null | undefined) {
   const normalizedEmail = email?.trim().toLowerCase();

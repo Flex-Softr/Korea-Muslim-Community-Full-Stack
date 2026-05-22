@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { auth } from "@/auth";
 import { AppProviders } from "@/components/providers/app-providers";
-import { getRequestLang } from "@/lib/i18n/server-language";
 import "./globals.css";
 
 const solaimanLipi = localFont({
@@ -36,8 +34,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  const initialLang = await getRequestLang();
+  const initialLang = "bn";
 
   return (
     <html
@@ -48,7 +45,7 @@ export default async function RootLayout({
       className={`${solaimanLipi.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground font-bangla" translate="no">
-        <AppProviders session={session} initialLang={initialLang}>
+        <AppProviders initialLang={initialLang}>
           {children}
         </AppProviders>
       </body>

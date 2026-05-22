@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
-import { listBlogPosts } from "@/lib/content/repository";
+import { listCachedBlogPosts } from "@/lib/content/repository";
 import { BlogListing } from "./blog-listing";
 import { getRequestLang } from "@/lib/i18n/server-language";
 import { serverT } from "@/lib/i18n/server-translate";
@@ -21,6 +21,15 @@ type BlogPageProps = {
   }>;
 };
 
+export const unstable_instant = {
+  prefetch: "runtime",
+  samples: [
+    { cookies: [{ name: "lang", value: "bn" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "en" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "ko" }], searchParams: { category: null, year: null, page: null } },
+  ],
+};
+
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
@@ -29,9 +38,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const pageParsed = params.page ? Number.parseInt(params.page, 10) : 1;
   const page = Number.isFinite(pageParsed) ? pageParsed : 1;
 
-  const all = await listBlogPosts(
+  const lang = await getRequestLang();
+  const all = await listCachedBlogPosts(
     { page: 1, pageSize: 200 },
-    undefined,
+    lang,
     { maxRowsFromDb: 200 },
   );
 
