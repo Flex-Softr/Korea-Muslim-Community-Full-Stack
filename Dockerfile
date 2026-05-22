@@ -18,6 +18,9 @@ RUN apk add --no-cache openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 ENV SKIP_ENV_VALIDATION=1
 
 RUN npm run build
