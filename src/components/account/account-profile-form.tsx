@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import { getAccountProfile, updateAccountProfile } from "@/lib/api/account-profile";
 import type { AccountProfileUpdatePayload } from "@/lib/account/profile-types";
@@ -37,7 +36,6 @@ function formatUserDate(iso: string | undefined): string {
 
 export function AccountProfileForm({ readOnlyEmail, isEmailVerified, onNotify }: Props) {
   const router = useRouter();
-  const { update } = useSession();
 
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
@@ -166,7 +164,6 @@ export function AccountProfileForm({ readOnlyEmail, isEmailVerified, onNotify }:
       setPending(true);
       await updateAccountProfile(payload);
       onNotify("Profile saved.", "success");
-      await update?.();
       router.refresh();
       await load();
     } catch (e) {

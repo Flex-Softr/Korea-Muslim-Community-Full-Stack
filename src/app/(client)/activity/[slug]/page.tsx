@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-/** Cookie-driven UI language must not be statically cached without `lang`. */
-export const dynamic = "force-dynamic";
-
 import { ActivityArticleDetail } from "@/components/cms/activity-article-detail";
 import { CMS_LIST_QUICK_PREVIEW_CAP } from "@/lib/content/constants";
 import {
   getActivityItem,
-  listActivityItems,
+  listCachedActivityItems,
 } from "@/lib/content/repository";
 import { toCmsTextDetailSource } from "@/lib/cms/cms-detail-locale-source";
 import { getRequestLang } from "@/lib/i18n/server-language";
@@ -36,27 +33,26 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   const requestLang = await getRequestLang();
   const [item, listResult] = await Promise.all([
     getActivityItem(slug, requestLang),
-    listActivityItems(
+    listCachedActivityItems(
       { page: 1, pageSize: CMS_LIST_QUICK_PREVIEW_CAP },
       requestLang,
-      { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP },
+      { maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP, withFacets: false },
     ),
   ]);
   if (!item) {
     notFound();
   }
   const sidebarItems = listResult.items.filter((entry) => entry.slug !== slug).slice(0, 5);
-  const activity = listResult.items.filter((entry) => entry.slug == slug);
   const source = toCmsTextDetailSource({
-    id: activity[0].id,
-    slug: activity[0].slug,
-    imageSrc: activity[0].imageSrc,
-    dateIso: activity[0].dateIso,
-    date: activity[0].date,
-    title: activity[0].title,
-    category: activity[0].category,
-    body: activity[0].content,
-    localeContent: activity[0].localeContent ?? null,
+    id: item.id,
+    slug: item.slug,
+    imageSrc: item.imageSrc,
+    dateIso: item.dateIso,
+    date: item.date,
+    title: item.title,
+    category: item.category,
+    body: item.content,
+    localeContent: item.localeContent ?? null,
     resolvedForLang: requestLang,
   });
 

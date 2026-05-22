@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
-import { listPhotoItems } from "@/lib/content/repository";
+import { listCachedPhotoItems } from "@/lib/content/repository";
 import { PhotoGallery } from "../components/photo-gallery";
 import { getRequestLang } from "@/lib/i18n/server-language";
 import { serverT } from "@/lib/i18n/server-translate";
@@ -13,11 +13,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export const unstable_instant = {
+  prefetch: "runtime",
+  samples: [
+    { cookies: [{ name: "lang", value: "bn" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "en" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "ko" }], searchParams: { category: null, year: null, page: null } },
+  ],
+};
+
 export default async function GalleryPage() {
-  const data = await listPhotoItems(
-    { page: 1, pageSize: 200 },
-    undefined,
-    { maxRowsFromDb: 200 },
+  const lang = await getRequestLang();
+  const data = await listCachedPhotoItems(
+    { page: 1, pageSize: 36 },
+    lang,
+    { maxRowsFromDb: 36 },
   );
   return (
     <>

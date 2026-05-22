@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getAccountProfile } from "@/lib/api/account-profile";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToastSystem } from "@/components/ui/toast-system";
 import { useLanguage } from "@/components/providers/language-provider";
 import type { Lang } from "@/lib/i18n/lang";
 
@@ -16,6 +13,13 @@ type BlogItem = {
   category: string;
   dateIso: string;
   status?: "pending" | "published";
+};
+
+export type UserDashboardHomeProfile = {
+  name: string;
+  email: string;
+  memberCode: string | null;
+  city: string | null;
 };
 
 function localeTagForLang(lang: Lang): string {
@@ -30,44 +34,14 @@ function formatDate(dateIso: string, lang: Lang): string {
   return d.toLocaleDateString(localeTagForLang(lang), { year: "numeric", month: "short", day: "numeric" });
 }
 
-export function UserDashboardHome() {
-  const { notify } = useToastSystem();
+export function UserDashboardHome({
+  profile,
+  blogs,
+}: {
+  profile: UserDashboardHomeProfile;
+  blogs: BlogItem[];
+}) {
   const { t, lang } = useLanguage();
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [memberCode, setMemberCode] = useState<string | null>(null);
-  const [city, setCity] = useState<string | null>(null);
-  const [blogs, setBlogs] = useState<BlogItem[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const [profile, blogRes] = await Promise.all([
-          getAccountProfile(),
-          fetch("/api/dashboard/blog?mine=true", { cache: "no-store" }),
-        ]);
-        if (!blogRes.ok) throw new Error("Failed blogs");
-        const blogData = (await blogRes.json()) as { items?: BlogItem[] };
-        if (cancelled) return;
-        setName(profile.user.name ?? "");
-        setEmail(profile.user.email);
-        setMemberCode(profile.member?.memberCode ?? null);
-        setCity(profile.member?.cityKorea ?? null);
-        setBlogs(blogData.items ?? []);
-      } catch {
-        if (!cancelled) notify(t("dashboard.home.loadError"), "error");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [notify, t]);
 
   return (
     <div className="space-y-6">
@@ -91,40 +65,36 @@ export function UserDashboardHome() {
           </Link>
         </div>
 
-        {loading ? (
-          <p className="text-sm text-muted-foreground">{t("dashboard.home.loadingProfile")}</p>
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t("dashboard.home.email")}</Label>
-              <Input value={email} readOnly className="bg-muted" />
-            </div>
-            <div className="space-y-2">
-              <Label>{t("dashboard.home.name")}</Label>
-              <Input value={name} readOnly className="bg-muted" />
-            </div>
-            {memberCode ? (
-              <div className="space-y-2">
-                <Label>{t("dashboard.home.memberCode")}</Label>
-                <Input value={memberCode} readOnly className="bg-muted" />
-              </div>
-            ) : null}
-            {city ? (
-              <div className="space-y-2">
-                <Label>{t("dashboard.home.cityKorea")}</Label>
-                <Input value={city} readOnly className="bg-muted" />
-              </div>
-            ) : null}
-            <div className="pt-1">
-              <Link
-                href="/dashboard/settings#account-profile"
-                className={buttonVariants({ variant: "secondary" })}
-              >
-                {t("dashboard.home.editFullProfile")}
-              </Link>
-            </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t("dashboard.home.email")}</Label>
+            <Input value={profile.email} readOnly className="bg-muted" />
           </div>
-        )}
+          <div className="space-y-2">
+            <Label>{t("dashboard.home.name")}</Label>
+            <Input value={profile.name} readOnly className="bg-muted" />
+          </div>
+          {profile.memberCode ? (
+            <div className="space-y-2">
+              <Label>{t("dashboard.home.memberCode")}</Label>
+              <Input value={profile.memberCode} readOnly className="bg-muted" />
+            </div>
+          ) : null}
+          {profile.city ? (
+            <div className="space-y-2">
+              <Label>{t("dashboard.home.cityKorea")}</Label>
+              <Input value={profile.city} readOnly className="bg-muted" />
+            </div>
+          ) : null}
+          <div className="pt-1">
+            <Link
+              href="/dashboard/settings#account-profile"
+              className={buttonVariants({ variant: "secondary" })}
+            >
+              {t("dashboard.home.editFullProfile")}
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section id="my-blogs" className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">

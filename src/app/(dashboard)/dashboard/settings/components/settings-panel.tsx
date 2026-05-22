@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AccountProfileForm } from "@/components/account/account-profile-form";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,13 @@ type DonationBankDetails = {
   swift: string | null;
   branch: string | null;
   referenceNote: string | null;
+};
+
+export type SettingsPanelUser = {
+  id: string;
+  email: string;
+  role?: string | null;
+  isEmailVerified?: boolean;
 };
 
 function DonationBankSettingsCard({
@@ -241,8 +248,7 @@ function DonationBankSettingsCard({
   );
 }
 
-export function SettingsPanel() {
-  const { data: session } = useSession();
+export function SettingsPanel({ user }: { user: SettingsPanelUser }) {
   const { notify } = useToastSystem();
   const [pwMsg, setPwMsg] = useState<string | null>(null);
   const [pwErr, setPwErr] = useState<string | null>(null);
@@ -251,7 +257,7 @@ export function SettingsPanel() {
   const [createAdminErr, setCreateAdminErr] = useState<string | null>(null);
   const [createAdminPending, setCreateAdminPending] = useState(false);
 
-  const userId = session?.user?.id;
+  const userId = user.id;
 
   async function changePassword(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -325,7 +331,7 @@ export function SettingsPanel() {
     formElement.reset();
   }
 
-  if (!userId || !session?.user?.email) {
+  if (!userId || !user.email) {
     return (
       <div className="text-sm text-muted-foreground">Loading settings…</div>
     );
@@ -342,9 +348,9 @@ export function SettingsPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AccountProfileForm
-            readOnlyEmail={session.user.email}
-            isEmailVerified={Boolean(session.user.isEmailVerified)}
+            <AccountProfileForm
+            readOnlyEmail={user.email}
+            isEmailVerified={Boolean(user.isEmailVerified)}
             onNotify={notify}
           />
         </CardContent>
@@ -411,11 +417,11 @@ export function SettingsPanel() {
         </CardContent>
       </Card>
 
-      {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? (
+      {user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? (
         <DonationBankSettingsCard onNotify={notify} />
       ) : null}
 
-      {session.user.role === "ADMIN" || session.user.role === "SUPER_ADMIN" ? (
+      {user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? (
         <Card className="border-border/80 shadow-sm lg:col-span-1">
           <CardHeader>
             <CardTitle>Create Admin</CardTitle>

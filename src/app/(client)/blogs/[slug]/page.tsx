@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
 import { auth } from "@/auth";
 import { PublicBlogArticleDetail } from "@/components/cms/public-blog-article-detail";
 import { getPublicBlogBySlug } from "@/lib/public-blog";

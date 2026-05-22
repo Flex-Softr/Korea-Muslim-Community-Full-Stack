@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
-import { listActivityItems } from "@/lib/content/repository";
+import { listCachedActivityItems } from "@/lib/content/repository";
 import { ActivityListing } from "./activity-listing";
 import { getRequestLang } from "@/lib/i18n/server-language";
 import { serverT } from "@/lib/i18n/server-translate";
@@ -21,6 +21,15 @@ type ActivityPageProps = {
   }>;
 };
 
+export const unstable_instant = {
+  prefetch: "runtime",
+  samples: [
+    { cookies: [{ name: "lang", value: "bn" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "en" }], searchParams: { category: null, year: null, page: null } },
+    { cookies: [{ name: "lang", value: "ko" }], searchParams: { category: null, year: null, page: null } },
+  ],
+};
+
 export default async function ActivityPage({ searchParams }: ActivityPageProps) {
   const params = (await searchParams) ?? {};
   const category = params.category?.trim() || null;
@@ -28,9 +37,10 @@ export default async function ActivityPage({ searchParams }: ActivityPageProps) 
   const year = yearParsed != null && Number.isFinite(yearParsed) ? yearParsed : null;
   const pageParsed = params.page ? Number.parseInt(params.page, 10) : 1;
   const page = Number.isFinite(pageParsed) ? pageParsed : 1;
-  const all = await listActivityItems(
+  const lang = await getRequestLang();
+  const all = await listCachedActivityItems(
     { page: 1, pageSize: 200 },
-    undefined,
+    lang,
     { maxRowsFromDb: 200 },
   );
 

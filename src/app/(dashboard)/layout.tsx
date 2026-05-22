@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { isUserRole } from "@/lib/roles";
 
@@ -8,6 +9,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  await connection();
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");

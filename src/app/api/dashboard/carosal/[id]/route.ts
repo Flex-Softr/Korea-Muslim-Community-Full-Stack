@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { deleteDashboardCarousel, updateDashboardCarousel } from "@/lib/dashboard/store";
 import type { CarouselLocaleMap } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
+import { revalidateCmsCarousel } from "@/lib/cms/cache-invalidation";
 
 async function ensureAdmin() {
   const session = await auth();
@@ -42,6 +43,7 @@ export async function PATCH(
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  revalidateCmsCarousel();
   return NextResponse.json(updated);
 }
 
@@ -57,5 +59,6 @@ export async function DELETE(
   if (!removed) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  revalidateCmsCarousel();
   return NextResponse.json({ ok: true });
 }

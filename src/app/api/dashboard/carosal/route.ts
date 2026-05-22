@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { createDashboardCarousel, listDashboardCarousel } from "@/lib/dashboard/store";
 import { normalizeContentLocale } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
+import { revalidateCmsCarousel } from "@/lib/cms/cache-invalidation";
 
 export async function GET() {
   const session = await auth();
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
     isActive: body.isActive ?? true,
     sortOrder: Number.isFinite(body.sortOrder) ? Number(body.sortOrder) : 1,
   });
+  revalidateCmsCarousel();
 
   return NextResponse.json(created, { status: 201 });
 }
