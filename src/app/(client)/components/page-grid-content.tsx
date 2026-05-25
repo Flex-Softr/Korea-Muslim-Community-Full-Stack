@@ -1,55 +1,80 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import image from "../../../../public/hero/banner2.jpg";
-import { useLanguage } from "@/components/providers/language-provider";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-const CARDS = [
-  {
-    href: "/article/1",
-    imageSrc: image,
-    titleKey: "pageTeasers.article1Title" as const,
-    altKey: "pageTeasers.gridImageAlt" as const,
-  },
-  {
-    href: "/article/2",
-    imageSrc: "https://jamaat-e-islami.org/article_image/l/62_talk%20bji.jpg",
-    titleKey: "pageTeasers.article2Title" as const,
-    altKey: "pageTeasers.gridImageAlt" as const,
-  },
-  {
-    href: "/article/3",
-    imageSrc: "https://jamaat-e-islami.org/article_image/l/31_parliam.jpg",
-    titleKey: "pageTeasers.article3Title" as const,
-    altKey: "pageTeasers.gridImageAlt" as const,
-  },
-] as const;
+type DownloadItem = {
+  id: string;
+  image: string;
+  title: string;
+  category: string;
+  fileUrl: string;
+};
 
-export function PageGridContent() {
-  const { t } = useLanguage();
+function humanizePath(pathname: string): string {
+  const last = pathname.split("/").filter(Boolean).at(-1) ?? "";
+  return last
+    .split("-")
+    .filter(Boolean)
+    .map((part) => (part.length <= 3 ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join(" ");
+}
+
+export function PageGridContent({ category }: { category?: string }) {
+  const pathname = usePathname();
+  const pageCategory = useMemo(
+    () => category?.trim() || humanizePath(pathname),
+    [category, pathname],
+  );
+  const [items, setItems] = useState<DownloadItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({ category: pageCategory });
+        const res = await fetch(`/api/public/downloads?${params.toString()}`, { cache: "no-store" });
+        const data = (await res.json()) as { items?: DownloadItem[] };
+        if (!res.ok || cancelled) return;
+        setItems(data.items ?? []);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [pageCategory]);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      {CARDS.map((card) => (
+      {loading && items.length === 0 ? (
+        <p className="text-sm text-muted-foreground md:col-span-3">Loading...</p>
+      ) : null}
+      {!loading && items.length === 0 ? (
+        <p className="text-sm text-muted-foreground md:col-span-3">No downloads found.</p>
+      ) : null}
+      {items.map((card) => (
         <div
-          key={card.href}
+          key={card.id}
           className="flex flex-col gap-3 border-b-4 border-[#5bc0de] px-3 py-4 shadow-sm shadow-gray-400"
         >
-          <Link href={card.href}>
-            <div className="flex flex-col justify-between gap-3">
-              <div className="w-full">
-                <Image
-                  src={card.imageSrc}
-                  alt={t(card.altKey)}
-                  className="h-[200px] w-full object-cover"
-                  width={100}
-                  height={100}
-                />
-              </div>
-              <h1 className="cursor-pointer text-xl hover:underline">{t(card.titleKey)}</h1>
+          <a href={card.fileUrl} download className="flex flex-col justify-between gap-3">
+            <div className="w-full">
+              <Image
+                src={card.image}
+                alt={card.title}
+                className="h-[200px] w-full object-cover"
+                width={320}
+                height={200}
+              />
             </div>
-          </Link>
+            <h1 className="cursor-pointer text-xl hover:underline">{card.title}</h1>
+          </a>
         </div>
       ))}
     </div>

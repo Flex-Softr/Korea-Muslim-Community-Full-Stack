@@ -81,7 +81,7 @@ export function TopHeaderBar({
 
         <div className="flex items-center gap-3">
           <DropdownMenu open={langOpen} onOpenChange={setLangOpen}>
-            <DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 rounded-sm px-2 py-1.5 shadow-sm shadow-zinc-800/60 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 rounded-sm px-2 py-1.5 shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800">
               <span aria-hidden className="text-base leading-none">
                 {triggerFlag}
               </span>

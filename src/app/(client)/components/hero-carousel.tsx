@@ -95,13 +95,13 @@ export function HeroCarousel({ carouselSources }: { carouselSources: HeroCarouse
           sizes="100vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/55 to-black-50 md:bg-gradient-to-r md:from-black/55 md:via-black/25 md:to-transparent" />
 
         {current ? (
           <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-6 md:p-8">
             <div className="mx-auto max-w-7xl text-white">
-              <h2 className="text-lg font-bold sm:text-2xl">{current.title}</h2>
-              <p className="mt-1 max-w-2xl text-xs text-white/90 sm:text-sm">{current.subtitle}</p>
+              <h2 className="text-lg font-bold sm:text-2xl text-white dark:text-white">{current.title}</h2>
+              <p className="mt-1 max-w-2xl text-xs text-white dark:text-white sm:text-sm">{current.subtitle}</p>
               {current.ctaLabel && current.ctaHref ? (
                 <Link
                   href={current.ctaHref}

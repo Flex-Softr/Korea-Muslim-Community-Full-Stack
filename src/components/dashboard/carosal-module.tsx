@@ -252,6 +252,7 @@ export function CarosalModule() {
                     <ImageUploader
                       value={editImageUrl}
                       onChange={(next) => setEditImageUrl(next)}
+                      uploadType="carousel"
                       helperText="Upload hero slide image."
                     />
                   </div>
@@ -318,6 +319,7 @@ export function CarosalModule() {
                     <ImageUploader
                       value={createForm.imageUrl}
                       onChange={(next) => setCreateForm((p) => ({ ...p, imageUrl: next }))}
+                      uploadType="carousel"
                       helperText="Upload hero slide image."
                     />
                   </div>

@@ -9,6 +9,7 @@ import {
   ChevronRight,
   User,
   FileText,
+  Newspaper,
   Clock3,
   Activity,
   FolderKanban,
@@ -19,6 +20,7 @@ import {
   UserCheck,
   UsersRound,
   Inbox,
+  Download,
 } from "lucide-react";
 import { hasMinimumRole, type UserRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -71,6 +73,46 @@ const navItems: Array<
     children: [
       { href: "/dashboard/content/activity/activities", labelKey: "dashboard.nav.allActivities", icon: Activity },
       { href: "/dashboard/content/activity/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+    ],
+  },
+  {
+    type: "group",
+    labelKey: "dashboard.nav.articles",
+    icon: FileText,
+    adminOnly: true,
+    children: [
+      { href: "/dashboard/content/article/articles", labelKey: "dashboard.nav.allArticles", icon: FileText },
+      { href: "/dashboard/content/article/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+    ],
+  },
+  {
+    type: "group",
+    labelKey: "dashboard.nav.news",
+    icon: Newspaper,
+    adminOnly: true,
+    children: [
+      { href: "/dashboard/content/news/news", labelKey: "dashboard.nav.allNews", icon: Newspaper },
+      { href: "/dashboard/content/news/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+    ],
+  },
+  {
+    type: "group",
+    labelKey: "dashboard.nav.otherPagesData",
+    icon: FolderKanban,
+    adminOnly: true,
+    children: [
+      { href: "/dashboard/content/other-pages-data/items", labelKey: "dashboard.nav.allOtherPagesData", icon: FileText },
+      { href: "/dashboard/content/other-pages-data/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+    ],
+  },
+  {
+    type: "group",
+    labelKey: "dashboard.nav.downloads",
+    icon: Download,
+    adminOnly: true,
+    children: [
+      { href: "/dashboard/content/download/items", labelKey: "dashboard.nav.allDownloads", icon: Download },
+      { href: "/dashboard/content/download/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
     ],
   },
   {

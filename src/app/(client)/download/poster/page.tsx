@@ -1,6 +1,6 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageSidebar } from "../../components/page-sidebar";
-import { PageContent } from "../../components/page-content";
+import { PageGridContent } from "../../components/page-grid-content";
 
 export default async function DownloadPosterPage() {
   return (
@@ -14,7 +14,7 @@ export default async function DownloadPosterPage() {
             <PageSidebar />
           </div>
           <div className="sm:w-2/3 w-full">
-             <PageContent />
+             <PageGridContent />
           </div>
         </div>
       </>

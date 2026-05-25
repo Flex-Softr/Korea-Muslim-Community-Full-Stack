@@ -162,6 +162,7 @@ export function EditActivityPageForm({ id }: { id: string }) {
               <RichTextEditor
                 value={block.description}
                 onChange={(v) => patchLocale(editLocale, { description: v })}
+                uploadType="activity"
                 placeholder="Write a detailed activity description with formatting, alignment, table, and images..."
               />
             </div>
@@ -172,6 +173,7 @@ export function EditActivityPageForm({ id }: { id: string }) {
                 value={coverImage}
                 onChange={setCoverImage}
                 maxSizeMb={5}
+                uploadType="activity"
                 helperText="Upload featured image for the activity."
               />
             </div>

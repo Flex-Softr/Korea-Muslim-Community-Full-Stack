@@ -15,6 +15,8 @@ type ImageUploaderProps = {
   helperText?: string;
   error?: string | null;
   className?: string;
+  uploadType?: string;
+  uploadFolder?: string;
 };
 
 export function ImageUploader({
@@ -26,9 +28,12 @@ export function ImageUploader({
   helperText,
   error,
   className,
+  uploadType = "misc",
+  uploadFolder = "images",
 }: ImageUploaderProps) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [localError, setLocalError] = React.useState<string | null>(null);
+  const [uploading, setUploading] = React.useState(false);
 
   const pickFile = () => {
     if (disabled) return;
@@ -57,14 +62,26 @@ export function ImageUploader({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const next = typeof reader.result === "string" ? reader.result : null;
-      onChange(next);
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch(`/api/upload/${uploadType}?folder=${uploadFolder}`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        setLocalError(data.error ?? "Could not upload the image.");
+        return;
+      }
+      onChange(data.url);
       setLocalError(null);
-    };
-    reader.onerror = () => setLocalError("Could not read the image file.");
-    reader.readAsDataURL(file);
+    } catch {
+      setLocalError("Could not upload the image.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const message = error ?? localError ?? helperText ?? null;
@@ -97,8 +114,8 @@ export function ImageUploader({
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" onClick={pickFile} disabled={disabled}>
-            {value ? "Replace image" : "Upload image"}
+          <Button type="button" variant="outline" onClick={pickFile} disabled={disabled || uploading}>
+            {uploading ? "Uploading..." : value ? "Replace image" : "Upload image"}
           </Button>
           {value ? (
             <Button type="button" variant="ghost" onClick={clear} disabled={disabled}>

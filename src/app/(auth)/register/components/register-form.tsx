@@ -302,6 +302,7 @@ export function RegisterForm() {
               value={form.profilePhoto}
               onChange={(next) => update("profilePhoto", next)}
               maxSizeMb={5}
+              uploadType="profile"
               helperText="Required. Clear face photo is recommended."
               error={error?.toLowerCase().includes("profile photo") ? error : null}
             />
@@ -312,6 +313,8 @@ export function RegisterForm() {
               value={form.studentIdImage}
               onChange={(next) => update("studentIdImage", next)}
               maxSizeMb={5}
+              uploadType="profile"
+              uploadFolder="files"
               helperText="Optional verification document."
             />
           </div>

@@ -26,6 +26,8 @@ export function BlogArchiveCard({
     localeContent: post.localeContent,
   });
 
+   
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] transition-shadow hover:shadow-md dark:ring-white/5">
       <Link
@@ -55,7 +57,7 @@ export function BlogArchiveCard({
             {translated.title}
           </h3>
           <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-            {translated.excerpt}
+            {translated.excerpt.replace(/<[^>]*>/g, "")}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#2c7bb6] dark:text-sky-400">
             {t("common.readMore")}

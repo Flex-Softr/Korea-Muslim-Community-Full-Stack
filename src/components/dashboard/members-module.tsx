@@ -691,6 +691,7 @@ export function MembersModule() {
                 value={createForm.imageUrl || null}
                 onChange={(next) => setCreateForm((prev) => ({ ...prev, imageUrl: next ?? "" }))}
                 maxSizeMb={5}
+                uploadType="member"
                 helperText="Upload a member profile image."
               />
             </div>
@@ -1208,6 +1209,7 @@ export function MembersModule() {
                 value={editForm.imageUrl || null}
                 onChange={(next) => setEditForm((prev) => ({ ...prev, imageUrl: next ?? "" }))}
                 maxSizeMb={5}
+                uploadType="member"
                 helperText="Upload a member profile image."
               />
             </div>

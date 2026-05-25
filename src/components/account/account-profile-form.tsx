@@ -340,6 +340,7 @@ export function AccountProfileForm({ readOnlyEmail, isEmailVerified, onNotify }:
           value={profilePhoto}
           onChange={setProfilePhoto}
           maxSizeMb={5}
+          uploadType="profile"
           helperText="Required. Same as registration — a clear face photo is recommended."
         />
       </div>
@@ -349,6 +350,8 @@ export function AccountProfileForm({ readOnlyEmail, isEmailVerified, onNotify }:
           value={studentIdImage}
           onChange={setStudentIdImage}
           maxSizeMb={5}
+          uploadType="profile"
+          uploadFolder="files"
           helperText="Optional verification document."
         />
       </div>

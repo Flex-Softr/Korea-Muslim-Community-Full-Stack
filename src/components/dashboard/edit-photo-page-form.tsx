@@ -131,7 +131,7 @@ export function EditPhotoPageForm({ id }: { id: string }) {
         </div>
         <div className="space-y-2">
           <Label>Image</Label>
-          <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} />
+          <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType="photo" />
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-4">
           <div className="flex gap-2">

@@ -132,6 +132,7 @@ export function CreateMyBlogForm() {
             <RichTextEditor
               value={content}
               onChange={setContent}
+              uploadType="blog"
               placeholder="Write your blog content..."
             />
           </div>
@@ -142,6 +143,7 @@ export function CreateMyBlogForm() {
               value={thumbnail}
               onChange={setThumbnail}
               maxSizeMb={5}
+              uploadType="blog"
               helperText="Optional thumbnail image for your blog."
             />
           </div>
