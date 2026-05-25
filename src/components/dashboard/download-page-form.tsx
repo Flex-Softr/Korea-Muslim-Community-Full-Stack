@@ -97,7 +97,7 @@ export function DownloadPageForm({ id }: { id?: string }) {
         setCategory("");
         setCoverImage(null);
         setFileUrl(null);
-        setSourceLocale("en");
+       // setSourceLocale("en");
 
         router.push(LIST_HREF);
       } catch {
