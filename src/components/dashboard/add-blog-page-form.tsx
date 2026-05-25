@@ -143,6 +143,7 @@ export function AddBlogPageForm() {
             <RichTextEditor
               value={description}
               onChange={setDescription}
+              uploadType="blog"
               placeholder="Write a detailed description with formatting, alignment, table, and images..."
             />
           </div>
@@ -153,6 +154,7 @@ export function AddBlogPageForm() {
               value={coverImage}
               onChange={setCoverImage}
               maxSizeMb={5}
+              uploadType="blog"
               helperText="Upload featured image for the blog post."
             />
           </div>

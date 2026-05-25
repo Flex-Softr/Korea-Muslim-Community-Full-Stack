@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToastSystem } from "@/components/ui/toast-system";
 
-type CategoryType = "blog" | "activity" | "photo" | "video";
+type CategoryType = "blog" | "activity" | "article" | "news" | "other-page" | "download" | "photo" | "video";
 
 type CategoryRow = {
   id: string;

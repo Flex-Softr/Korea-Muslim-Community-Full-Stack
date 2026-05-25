@@ -25,7 +25,7 @@ const DOWNLOAD_ITEMS = [
 
 function downloadButtonClassName(lang: Lang) {
   return cn(
-    "flex items-center gap-2 rounded-sm bg-[#0a1628] px-5 py-2 font-medium text-white shadow-md shadow-zinc-800/60 transition hover:scale-[1.03] hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background lg:px-6 lg:py-2.5 dark:text-zinc-300 dark:hover:bg-zinc-800",
+    "flex items-center gap-2 rounded-sm bg-[#0a1628] px-5 py-2 font-medium text-white shadow-md shadow-zinc-800/60 transition hover:scale-[1.03] hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background lg:px-6 lg:py-2.5 dark:text-zinc-300 dark:hover:bg-zinc-800",
     headerNavTextSizeClass(lang),
   );
 }

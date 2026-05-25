@@ -91,7 +91,7 @@ export function AddPhotoPageForm() {
         </div>
         <div className="space-y-2">
           <Label>Image</Label>
-          <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} />
+          <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType="photo" />
         </div>
         <div className="flex justify-end gap-2">
           <Link href="/dashboard/content/photo-gallery/photos" className={buttonVariants({ variant: "outline" })}>Cancel</Link>

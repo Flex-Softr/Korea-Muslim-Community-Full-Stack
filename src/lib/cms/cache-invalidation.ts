@@ -6,6 +6,10 @@ import type { DashboardContentType } from "@/lib/dashboard/store";
 const CONTENT_TAGS: Record<DashboardContentType, string> = {
   blog: "cms:blog",
   activity: "cms:activity",
+  article: "cms:article",
+  news: "cms:news",
+  "other-page": "cms:other-page",
+  download: "cms:download",
   photo: "cms:photo",
   video: "cms:video",
 };

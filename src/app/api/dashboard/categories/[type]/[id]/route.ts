@@ -6,7 +6,16 @@ import {
 } from "@/lib/dashboard/store";
 
 function parseType(value: string): DashboardCategoryType | null {
-  if (value === "blog" || value === "activity" || value === "photo" || value === "video") {
+  if (
+    value === "blog" ||
+    value === "activity" ||
+    value === "article" ||
+    value === "news" ||
+    value === "other-page" ||
+    value === "download" ||
+    value === "photo" ||
+    value === "video"
+  ) {
     return value;
   }
   return null;

@@ -14,8 +14,8 @@ import {
   type LocaleContentMap,
 } from "@/lib/i18n/content-locale";
 
-export type DashboardContentType = "blog" | "activity" | "photo" | "video";
-export type DashboardCategoryType = "blog" | "activity" | "photo" | "video";
+export type DashboardContentType = "blog" | "activity" | "article" | "news" | "other-page" | "download" | "photo" | "video";
+export type DashboardCategoryType = DashboardContentType;
 
 type DashboardContentModelDelegate = {
   findFirst(args: unknown): Promise<unknown>;
@@ -28,6 +28,10 @@ type DashboardContentModelDelegate = {
 type DashboardPrismaClient = typeof prisma & {
   dashboardBlog: DashboardContentModelDelegate;
   dashboardActivity: DashboardContentModelDelegate;
+  dashboardArticle: DashboardContentModelDelegate;
+  dashboardNews: DashboardContentModelDelegate;
+  dashboardOtherPageData: DashboardContentModelDelegate;
+  dashboardDownload: DashboardContentModelDelegate;
   dashboardPhoto: DashboardContentModelDelegate;
   dashboardVideo: DashboardContentModelDelegate;
 };
@@ -40,6 +44,14 @@ function prismaContentTable(type: DashboardContentType): DashboardContentModelDe
       return dashboardPrisma.dashboardBlog;
     case "activity":
       return dashboardPrisma.dashboardActivity;
+    case "article":
+      return dashboardPrisma.dashboardArticle;
+    case "news":
+      return dashboardPrisma.dashboardNews;
+    case "other-page":
+      return dashboardPrisma.dashboardOtherPageData;
+    case "download":
+      return dashboardPrisma.dashboardDownload;
     case "photo":
       return dashboardPrisma.dashboardPhoto;
     case "video":
@@ -70,6 +82,7 @@ export type DashboardContentRow = {
   description?: string;
   coverImage?: string;
   videoUrl?: string;
+  fileUrl?: string;
   createdById?: string;
   status?: "pending" | "published";
 };
@@ -100,6 +113,7 @@ type DbContentRow = {
   description: string | null;
   coverImage: string | null;
   videoUrl: string | null;
+  fileUrl?: string | null;
   createdById: string | null;
   status: string | null;
   slug: string | null;
@@ -131,6 +145,7 @@ function mapContentRow(row: DbContentRow): DashboardContentRow {
     description: en.description || localeContent.ko.description || localeContent.bn.description,
     coverImage: row.coverImage ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
+    fileUrl: row.fileUrl ?? undefined,
     createdById: row.createdById ?? undefined,
     status: row.status === "pending" || row.status === "published" ? row.status : undefined,
   };
@@ -232,6 +247,7 @@ export async function createDashboardContent(
     description?: string;
     coverImage?: string;
     videoUrl?: string;
+    fileUrl?: string;
     createdById?: string;
     status?: "pending" | "published";
   },
@@ -255,6 +271,7 @@ export async function createDashboardContent(
       description: en.description || localeContent.ko.description || localeContent.bn.description,
       coverImage: input.coverImage?.trim() ?? "",
       videoUrl: input.videoUrl?.trim() || null,
+      ...(type === "download" ? { fileUrl: input.fileUrl?.trim() || null } : {}),
       createdById: input.createdById,
       status: resolvedStatus,
       publishedAt: resolvedStatus === "published" ? new Date() : null,
@@ -346,6 +363,7 @@ export async function updateDashboardContent(
     description: string;
     coverImage: string;
     videoUrl: string;
+    fileUrl: string;
     status: "pending" | "published";
   }>,
 ): Promise<DashboardContentRow | null> {
@@ -376,6 +394,7 @@ export async function updateDashboardContent(
     localeContent: localeContent as unknown as Prisma.InputJsonValue,
     ...(input.coverImage !== undefined ? { coverImage: input.coverImage.trim() } : {}),
     ...(input.videoUrl !== undefined ? { videoUrl: input.videoUrl.trim() || null } : {}),
+    ...(type === "download" && input.fileUrl !== undefined ? { fileUrl: input.fileUrl.trim() || null } : {}),
     ...(input.status !== undefined
       ? {
           status: input.status,
@@ -391,6 +410,18 @@ export async function updateDashboardContent(
       break;
     case "activity":
       updated = (await dashboardPrisma.dashboardActivity.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "article":
+      updated = (await dashboardPrisma.dashboardArticle.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "news":
+      updated = (await dashboardPrisma.dashboardNews.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "other-page":
+      updated = (await dashboardPrisma.dashboardOtherPageData.update({ where: { id }, data })) as DbContentRow;
+      break;
+    case "download":
+      updated = (await dashboardPrisma.dashboardDownload.update({ where: { id }, data })) as DbContentRow;
       break;
     case "photo":
       updated = (await dashboardPrisma.dashboardPhoto.update({ where: { id }, data })) as DbContentRow;
@@ -448,6 +479,86 @@ export async function updateDashboardActivity(id: string, input: UpdateDashboard
 }
 export async function deleteDashboardActivity(id: string) {
   return deleteDashboardContent("activity", id);
+}
+
+/** Article CMS. */
+export async function listDashboardArticles() {
+  return listDashboardContentSummary("article");
+}
+export async function listDashboardArticlesByCreator(creatorId: string) {
+  return listDashboardContentByCreator("article", creatorId);
+}
+export async function getDashboardArticleById(id: string) {
+  return getDashboardContentById("article", id);
+}
+export async function createDashboardArticle(input: CreateDashboardContentPayload) {
+  return createDashboardContent("article", input);
+}
+export async function updateDashboardArticle(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("article", id, input);
+}
+export async function deleteDashboardArticle(id: string) {
+  return deleteDashboardContent("article", id);
+}
+
+/** News CMS. */
+export async function listDashboardNewsItems() {
+  return listDashboardContentSummary("news");
+}
+export async function listDashboardNewsItemsByCreator(creatorId: string) {
+  return listDashboardContentByCreator("news", creatorId);
+}
+export async function getDashboardNewsById(id: string) {
+  return getDashboardContentById("news", id);
+}
+export async function createDashboardNews(input: CreateDashboardContentPayload) {
+  return createDashboardContent("news", input);
+}
+export async function updateDashboardNews(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("news", id, input);
+}
+export async function deleteDashboardNews(id: string) {
+  return deleteDashboardContent("news", id);
+}
+
+/** Other page data CMS. */
+export async function listDashboardOtherPageData() {
+  return listDashboardContentSummary("other-page");
+}
+export async function listDashboardOtherPageDataByCreator(creatorId: string) {
+  return listDashboardContentByCreator("other-page", creatorId);
+}
+export async function getDashboardOtherPageDataById(id: string) {
+  return getDashboardContentById("other-page", id);
+}
+export async function createDashboardOtherPageData(input: CreateDashboardContentPayload) {
+  return createDashboardContent("other-page", input);
+}
+export async function updateDashboardOtherPageData(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("other-page", id, input);
+}
+export async function deleteDashboardOtherPageData(id: string) {
+  return deleteDashboardContent("other-page", id);
+}
+
+/** Download CMS. */
+export async function listDashboardDownloads() {
+  return listDashboardContentSummary("download");
+}
+export async function listDashboardDownloadsByCreator(creatorId: string) {
+  return listDashboardContentByCreator("download", creatorId);
+}
+export async function getDashboardDownloadById(id: string) {
+  return getDashboardContentById("download", id);
+}
+export async function createDashboardDownload(input: CreateDashboardContentPayload) {
+  return createDashboardContent("download", input);
+}
+export async function updateDashboardDownload(id: string, input: UpdateDashboardContentPayload) {
+  return updateDashboardContent("download", id, input);
+}
+export async function deleteDashboardDownload(id: string) {
+  return deleteDashboardContent("download", id);
 }
 
 /** Photo gallery CMS — collection `DashboardPhoto`. */

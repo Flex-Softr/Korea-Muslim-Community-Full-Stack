@@ -316,7 +316,7 @@ function MobileNav({
         <div className="mb-10 flex shrink-0 items-center justify-between px-4 pt-4">
           <SiteLogoMark priority className="h-12 w-12 sm:h-12 sm:w-12" />
           <button type="button" onClick={close} className="text-white">
-            <X className="size-6 h-8 w-8 rounded-sm p-0 shadow-sm shadow-zinc-800/60 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
+            <X className="size-6 h-8 w-8 rounded-sm p-0 shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
           </button>
         </div>
 
@@ -379,7 +379,7 @@ function HeaderInner({ user }: { user: Session["user"] | null }) {
           {mobileOpen ? (
             <X />
           ) : (
-            <Menu className="size-6 h-10 w-10 rounded-sm p-1 shadow-sm shadow-zinc-800/60 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
+            <Menu className="size-6 h-10 w-10 rounded-sm p-1 shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
           )}
         </button>
       </div>

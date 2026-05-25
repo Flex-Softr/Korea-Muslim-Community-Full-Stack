@@ -1,5 +1,5 @@
 import { PageBanner } from "@/components/layout/page-banner";
-import { PageContent } from "../../components/page-content";
+import { PageGridContent } from "../../components/page-grid-content";
 import { PageSidebar } from "../../components/page-sidebar";
 
 export default async function DownloadSyllabusPage() {
@@ -14,7 +14,7 @@ export default async function DownloadSyllabusPage() {
             <PageSidebar />
           </div>
           <div className="sm:w-2/3 w-full">
-             <PageContent />
+             <PageGridContent />
           </div>
         </div>
     </>

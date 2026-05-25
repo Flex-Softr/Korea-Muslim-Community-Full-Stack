@@ -48,9 +48,9 @@ export function ClientUserMenu({
         aria-label={menuLabel}
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm" }),
-          "gap-2 px-1.5 py-4 sm:px-2 shadow-sm shadow-zinc-800/60 hover:bg-zinc-200 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
+          "gap-2 px-1.5 py-4 sm:px-2 text-black shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800",
           onBrand &&
-            "text-white hover:bg-white/15 hover:text-white focus-visible:ring-white/40",
+            "text-white hover:bg-zinc-800/15 hover:text-white focus-visible:ring-white/40",
         )}
       >
         <Avatar size="sm" className={onBrand ? "ring-2 ring-white/40" : undefined}>
@@ -61,9 +61,9 @@ export function ClientUserMenu({
             {label}
           </AvatarFallback>
         </Avatar>
-        <ChevronDown className="size-4 shrink-0 opacity-90" aria-hidden />
+        <ChevronDown className="size-4 shrink-0 opacity-90 text-white dark:text-white" aria-hidden />
         {!onBrand ? (
-          <span className="hidden max-w-[8rem] truncate text-xs text-muted-foreground sm:inline">
+          <span className="hidden max-w-[8rem] truncate text-xs text-white hover:text-dark dark:text-muted-foreground sm:inline">
             {email}
           </span>
         ) : null}

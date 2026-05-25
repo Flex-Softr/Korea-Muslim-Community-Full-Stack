@@ -33,10 +33,14 @@ function formatDate(dateIso: string): string {
 const CONTENT_COLLECTION_API = {
   blog: "/api/dashboard/blog",
   activity: "/api/dashboard/activity",
+  article: "/api/dashboard/article",
+  news: "/api/dashboard/news",
+  "other-page": "/api/dashboard/other-page-data",
+  download: "/api/dashboard/download",
 } as const;
 
 type ContentModuleProps = {
-  contentType: "blog" | "activity";
+  contentType: keyof typeof CONTENT_COLLECTION_API;
   title: string;
   subtitle: string;
   nounSingular: string;
@@ -59,7 +63,6 @@ function ContentRowsModule({
   editHrefBase,
 }: ContentModuleProps) {
   const [items, setItems] = useState<EditableRow[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [editTarget, setEditTarget] = useState<EditableRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EditableRow | null>(null);
@@ -87,9 +90,6 @@ function ContentRowsModule({
         setItems(rows);
         setCurrentUserId(data.currentUserId ?? null);
         setCanManageAll(data.canManageAll ?? false);
-        setCategories(
-          [...new Set(rows.map((row) => row.category))].sort((a, b) => a.localeCompare(b)),
-        );
       } catch {
         if (!cancelled) {
           notify(`Could not load ${nounPlural.toLowerCase()}.`, "error");
@@ -370,6 +370,70 @@ export function AllActivitiesModule() {
       enableCreate
       createHref="/dashboard/content/activity/activities/add"
       editHrefBase="/dashboard/content/activity/activities"
+    />
+  );
+}
+
+export function AllArticlesModule() {
+  return (
+    <ContentRowsModule
+      contentType="article"
+      title="All Articles"
+      subtitle="Manage article records from one place."
+      nounSingular="Article"
+      nounPlural="Articles"
+      paginationAriaLabel="All articles pagination"
+      enableCreate
+      createHref="/dashboard/content/article/articles/add"
+      editHrefBase="/dashboard/content/article/articles"
+    />
+  );
+}
+
+export function AllNewsModule() {
+  return (
+    <ContentRowsModule
+      contentType="news"
+      title="All News"
+      subtitle="Manage news records from one place."
+      nounSingular="News"
+      nounPlural="News"
+      paginationAriaLabel="All news pagination"
+      enableCreate
+      createHref="/dashboard/content/news/news/add"
+      editHrefBase="/dashboard/content/news/news"
+    />
+  );
+}
+
+export function AllOtherPageDataModule() {
+  return (
+    <ContentRowsModule
+      contentType="other-page"
+      title="Other Pages Data"
+      subtitle="Manage dynamic records for the static information pages."
+      nounSingular="Page Data"
+      nounPlural="Page Data"
+      paginationAriaLabel="Other pages data pagination"
+      enableCreate
+      createHref="/dashboard/content/other-pages-data/items/add"
+      editHrefBase="/dashboard/content/other-pages-data/items"
+    />
+  );
+}
+
+export function AllDownloadsModule() {
+  return (
+    <ContentRowsModule
+      contentType="download"
+      title="Downloads"
+      subtitle="Manage downloadable files by category."
+      nounSingular="Download"
+      nounPlural="Downloads"
+      paginationAriaLabel="Downloads pagination"
+      enableCreate
+      createHref="/dashboard/content/download/items/add"
+      editHrefBase="/dashboard/content/download/items"
     />
   );
 }

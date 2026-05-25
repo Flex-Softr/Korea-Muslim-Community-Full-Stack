@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import type Quill from "quill";
 import { cn } from "@/lib/utils";
 
 type RichTextEditorProps = {
@@ -8,6 +9,7 @@ type RichTextEditorProps = {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  uploadType?: string;
 };
 
 export function RichTextEditor({
@@ -15,9 +17,10 @@ export function RichTextEditor({
   onChange,
   placeholder = "Write content...",
   className,
+  uploadType = "misc",
 }: RichTextEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Quill | null>(null);
   const isSettingRef = useRef(false);
   const id = useId();
   const toolbarId = `quill-toolbar-${id.replace(/:/g, "")}`;
@@ -28,7 +31,7 @@ export function RichTextEditor({
 
     const setup = async () => {
       if (!containerRef.current) return;
-      const [{ default: Quill }, _themeCss] = await Promise.all([
+      const [{ default: Quill }] = await Promise.all([
         import("quill"),
         import("quill/dist/quill.snow.css"),
       ]);
@@ -51,19 +54,26 @@ export function RichTextEditor({
                 const input = document.createElement("input");
                 input.type = "file";
                 input.accept = "image/*";
-                input.onchange = () => {
+                input.onchange = async () => {
                   const file = input.files?.[0];
                   if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    const src = typeof reader.result === "string" ? reader.result : "";
-                    if (!src) return;
+                  const formData = new FormData();
+                  formData.append("file", file);
+                  try {
+                    const res = await fetch(`/api/upload/${uploadType}?folder=content`, {
+                      method: "POST",
+                      body: formData,
+                    });
+                    const data = (await res.json()) as { url?: string };
+                    const src = data.url ?? "";
+                    if (!res.ok || !src) return;
                     const range = quill.getSelection(true);
                     const index = range?.index ?? quill.getLength();
                     quill.insertEmbed(index, "image", src, "user");
                     quill.setSelection(index + 1, 0, "user");
-                  };
-                  reader.readAsDataURL(file);
+                  } catch {
+                    return;
+                  }
                 };
                 input.click();
               },
@@ -93,7 +103,7 @@ export function RichTextEditor({
         root.parentNode.removeChild(root);
       }
     };
-  }, [onChange, placeholder, toolbarId]);
+  }, [onChange, placeholder, toolbarId, uploadType]);
 
   useEffect(() => {
     const quill = editorRef.current;

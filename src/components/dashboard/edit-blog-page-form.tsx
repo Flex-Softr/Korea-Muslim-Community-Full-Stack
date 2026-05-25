@@ -164,6 +164,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
               <RichTextEditor
                 value={block.description}
                 onChange={(v) => patchLocale(editLocale, { description: v })}
+                uploadType="blog"
                 placeholder="Write a detailed description with formatting, alignment, table, and images..."
               />
             </div>
@@ -174,6 +175,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
                 value={coverImage}
                 onChange={setCoverImage}
                 maxSizeMb={5}
+                uploadType="blog"
                 helperText="Upload featured image for the blog post."
               />
             </div>

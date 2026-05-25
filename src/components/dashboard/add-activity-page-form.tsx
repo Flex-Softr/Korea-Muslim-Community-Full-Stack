@@ -143,6 +143,7 @@ export function AddActivityPageForm() {
             <RichTextEditor
               value={description}
               onChange={setDescription}
+              uploadType="activity"
               placeholder="Write a detailed activity description with formatting, alignment, table, and images..."
             />
           </div>
@@ -153,6 +154,7 @@ export function AddActivityPageForm() {
               value={coverImage}
               onChange={setCoverImage}
               maxSizeMb={5}
+              uploadType="activity"
               helperText="Upload featured image for the activity."
             />
           </div>

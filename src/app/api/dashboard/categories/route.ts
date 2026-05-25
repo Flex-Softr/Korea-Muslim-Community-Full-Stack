@@ -7,7 +7,16 @@ import {
 
 function parseType(value: string | null): DashboardCategoryType | null {
   if (!value) return null;
-  if (value === "blog" || value === "activity" || value === "photo" || value === "video") {
+  if (
+    value === "blog" ||
+    value === "activity" ||
+    value === "article" ||
+    value === "news" ||
+    value === "other-page" ||
+    value === "download" ||
+    value === "photo" ||
+    value === "video"
+  ) {
     return value;
   }
   return null;
