@@ -349,7 +349,8 @@ function MobileNav({
 }
 
 function HeaderInner({ user }: { user: Session["user"] | null }) {
-  const pathname = usePathname();
+  const pathnameRaw = usePathname();
+  const pathname = pathnameRaw ?? "";
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t, lang } = useLanguage();

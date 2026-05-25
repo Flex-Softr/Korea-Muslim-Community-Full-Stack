@@ -170,7 +170,8 @@ export function DashboardNavLinks({
   onNavigate?: () => void;
   className?: string;
 }) {
-  const pathname = usePathname();
+  const pathnameRaw = usePathname();
+  const pathname = pathnameRaw ?? "";
   const { t } = useLanguage();
   /** Dynamic nav keys are plain strings; narrow `t` to avoid i18next deep generic instantiation. */
   const tNav = t as (key: string) => string;

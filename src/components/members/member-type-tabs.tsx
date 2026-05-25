@@ -17,7 +17,7 @@ export function MemberTypeTabs({ className }: { className?: string }) {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
   const tt = t as LooseTranslate;
-  const current = slugFromSearchParam(searchParams.get("type"));
+  const current = slugFromSearchParam(searchParams?.get("type") ?? null);
 
   return (
     <nav
@@ -26,7 +26,7 @@ export function MemberTypeTabs({ className }: { className?: string }) {
     >
       {MEMBER_SLUGS.map((slug: MemberSlug) => {
         const isActive = slug === current;
-        const q = new URLSearchParams(searchParams.toString());
+        const q = new URLSearchParams(searchParams?.toString() ?? "");
         q.set("type", slug);
         const href = `/member?${q.toString()}`;
 
