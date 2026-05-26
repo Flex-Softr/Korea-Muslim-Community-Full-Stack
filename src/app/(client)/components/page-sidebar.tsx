@@ -220,7 +220,7 @@ export function PageSidebar() {
 
   return (
     <div className="border-1 p-2 shadow-sm shadow-gray-400">
-      <section>
+      {/* <section>
         <h2 className="bg-[#0a1628] p-3 text-lg text-white">
           {t("pageSidebar.pollTitle")}
         </h2>
@@ -263,9 +263,9 @@ export function PageSidebar() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <section className="mt-4 rounded-sm">
+      <section className=" rounded-sm">
         <h2 className="bg-[#0a1628] p-3 text-lg text-white">
           {t("pageSidebar.notableArticlesTitle")}
         </h2>

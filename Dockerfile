@@ -31,12 +31,13 @@ RUN apk add --no-cache openssl
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV UPLOAD_DIR=/app/uploads
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-RUN chown -R node:node /app
+RUN mkdir -p /app/uploads && chown -R node:node /app
 
 USER node
 

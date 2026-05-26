@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { PageBanner } from "@/components/layout/page-banner";
 import { SimpleDetailLayout } from "@/components/cms/simple-detail-layout";
 import { listDashboardNewsItems } from "@/lib/dashboard/store";
 
@@ -21,25 +20,24 @@ export default async function NewsDetailPage({
       title: item.title,
       image: item.coverImage || "/brand/logo.png",
       description: item.description,
+      localeContent: item.localeContent,
     }));
 
   return (
-    <>
-      <PageBanner
-        title={row.title}
-        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { label: "News", href: "/news" }, { label: row.title }]}
-      />
-      <SimpleDetailLayout
-        sidebarTitle="Latest News"
-        item={{
-          id: row.id,
-          href: `/news/${row.slug}`,
-          title: row.title,
-          image: row.coverImage || "/brand/logo.png",
-          description: row.description,
-        }}
-        sidebarItems={sidebarItems}
-      />
-    </>
+    <SimpleDetailLayout
+      sidebarTitle="Latest News"
+      sidebarTitleKey="breadcrumbs.news"
+      parentHref="/news"
+      parentLabelKey="breadcrumbs.news"
+      item={{
+        id: row.id,
+        href: `/news/${row.slug}`,
+        title: row.title,
+        image: row.coverImage || "/brand/logo.png",
+        description: row.description,
+        localeContent: row.localeContent,
+      }}
+      sidebarItems={sidebarItems}
+    />
   );
 }
