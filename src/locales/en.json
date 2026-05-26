@@ -228,7 +228,9 @@
     "aboutUs": "About us",
     "termsOfService": "Terms of service",
     "memberProfile": "Member",
-    "alumniProfile": "Alumni profile"
+    "alumniProfile": "Alumni profile",
+    "article": "Articles",
+    "news": "News"
   },
   "footer": {
     "brandTitle": "Korea Muslim Community",
@@ -429,10 +431,19 @@
       "colAddress": "Address",
       "colVisa": "Visa type",
       "colMessage": "Message",
+      "colActions": "Actions",
       "view": "View",
+      "delete": "Delete",
+      "cancel": "Cancel",
       "empty": "No contact messages yet.",
       "loadError": "Could not load contact messages.",
+      "deleteSuccess": "Contact message deleted.",
+      "deleteError": "Could not delete contact message.",
       "dialogTitle": "Full message",
+      "labelSubmissionId": "Submission ID",
+      "deleteTitle": "Delete contact message?",
+      "deleteDescription": "This will permanently delete the message from {{name}}.",
+      "thisSubmission": "this submission",
       "close": "Close",
       "summary": "Page {{page}} of {{totalPages}} · {{total}} message(s) total"
     },

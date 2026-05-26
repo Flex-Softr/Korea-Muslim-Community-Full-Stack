@@ -23,6 +23,17 @@ const nextConfig: NextConfig = {
 
   output: "standalone", 
   cacheComponents: true,
+
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/:type(account|activity|article|blog|carousel|download|member|misc|news|other-page|photo|profile|video)/:folder(images|files|content)/:path*",
+          destination: "/api/uploads/:type/:folder/:path*",
+        },
+      ],
+    };
+  },
   
   async redirects() {
     return [

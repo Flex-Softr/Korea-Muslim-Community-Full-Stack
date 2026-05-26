@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MessageSquareText } from "lucide-react";
+import { MessageSquareText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmActionModal } from "@/components/ui/confirm-action-modal";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import {
   Dialog,
@@ -14,7 +15,10 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ReusablePagination } from "@/components/ui/reusable-pagination";
 import { useLanguage } from "@/components/providers/language-provider";
 import { useToastSystem } from "@/components/ui/toast-system";
-import { fetchDashboardContactSubmissions } from "@/lib/services/dashboard-contact-submissions";
+import {
+  deleteDashboardContactSubmission,
+  fetchDashboardContactSubmissions,
+} from "@/lib/services/dashboard-contact-submissions";
 import { parseJson } from "@/lib/services/dashboard-users";
 import type { ContactOccupationValue } from "@/lib/contact/occupations";
 
@@ -74,6 +78,27 @@ function isOccupation(v: string): v is ContactOccupationValue {
   return v === "student" || v === "job_holder" || v === "eps";
 }
 
+function DetailField({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={`rounded-xl border border-border/70 bg-muted/30 p-3 ${className}`}>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 break-words text-sm font-medium leading-relaxed text-foreground">
+        {value || "N/A"}
+      </p>
+    </div>
+  );
+}
+
 export function ContactSubmissionsModule() {
   const { t } = useLanguage();
   const { notify } = useToastSystem();
@@ -85,6 +110,7 @@ export function ContactSubmissionsModule() {
   const [messageTarget, setMessageTarget] = useState<SubmissionRow | null>(
     null,
   );
+  const [deleteTarget, setDeleteTarget] = useState<SubmissionRow | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -179,8 +205,46 @@ export function ContactSubmissionsModule() {
           </div>
         ),
       },
+      {
+        key: "actions",
+        header: t("dashboard.contactSubmissions.colActions"),
+        headerClassName: "text-right",
+        cellClassName: "text-right",
+        render: (row) => (
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon-sm"
+            title={t("dashboard.contactSubmissions.delete")}
+            onClick={() => setDeleteTarget(row)}
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </Button>
+        ),
+      },
     ];
   }, [occupationLabel, t]);
+
+  const handleDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await deleteDashboardContactSubmission(deleteTarget.id);
+      if (!res.ok) {
+        const data = await parseJson<{ error?: string }>(res);
+        throw new Error(data.error ?? "Failed");
+      }
+      notify(t("dashboard.contactSubmissions.deleteSuccess"), "success");
+      setDeleteTarget(null);
+      if (messageTarget?.id === deleteTarget.id) setMessageTarget(null);
+      if (rows.length === 1 && page > 1) {
+        setPage((current) => Math.max(1, current - 1));
+        return;
+      }
+      void load();
+    } catch {
+      notify(t("dashboard.contactSubmissions.deleteError"), "error");
+    }
+  }, [deleteTarget, load, messageTarget?.id, notify, page, rows.length, t]);
 
   return (
     <section className="space-y-4">
@@ -225,7 +289,7 @@ export function ContactSubmissionsModule() {
           if (!open) setMessageTarget(null);
         }}
       >
-        <DialogContent showCloseButton className="max-w-lg">
+        <DialogContent showCloseButton className="max-w-3xl rounded-2xl p-5">
           <DialogTitle>
             {t("dashboard.contactSubmissions.dialogTitle")}
             {messageTarget ? (
@@ -235,19 +299,84 @@ export function ContactSubmissionsModule() {
             ) : null}
           </DialogTitle>
           {messageTarget ? (
-            <div className="max-h-[min(60vh,24rem)] overflow-y-auto pe-1">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                {messageTarget.message}
-              </p>
+            <div className="max-h-[min(68vh,34rem)] overflow-y-auto pe-1 pt-2">
+              <div className="grid gap-3 md:grid-cols-2">
+                <DetailField
+                  label={t("dashboard.contactSubmissions.labelSubmissionId")}
+                  value={messageTarget.id}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colDate")}
+                  value={formatDate(messageTarget.createdAt)}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colName")}
+                  value={messageTarget.name}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colMobile")}
+                  value={messageTarget.mobileNumber}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colOccupation")}
+                  value={occupationLabel(messageTarget.occupation)}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colVisa")}
+                  value={messageTarget.visaType}
+                />
+                <DetailField
+                  label={t("dashboard.contactSubmissions.colAddress")}
+                  value={messageTarget.address}
+                  className="md:col-span-2"
+                />
+                <div className="rounded-xl border border-border/70 bg-background p-4 md:col-span-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t("dashboard.contactSubmissions.colMessage")}
+                  </p>
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-foreground">
+                    {messageTarget.message || "N/A"}
+                  </p>
+                </div>
+              </div>
             </div>
           ) : null}
-          <div className="flex justify-end pt-2">
+          <div className="flex flex-col-reverse justify-between gap-2 border-t border-border/80 pt-4 sm:flex-row">
+            {messageTarget ? (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setDeleteTarget(messageTarget)}
+              >
+                <Trash2 className="me-1.5 size-4" aria-hidden />
+                {t("dashboard.contactSubmissions.delete")}
+              </Button>
+            ) : (
+              <span />
+            )}
             <Button type="button" variant="secondary" onClick={() => setMessageTarget(null)}>
               {t("dashboard.contactSubmissions.close")}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmActionModal
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        title={t("dashboard.contactSubmissions.deleteTitle")}
+        description={t("dashboard.contactSubmissions.deleteDescription", {
+          name: deleteTarget?.name ?? t("dashboard.contactSubmissions.thisSubmission"),
+        })}
+        confirmLabel={t("dashboard.contactSubmissions.delete")}
+        cancelLabel={t("dashboard.contactSubmissions.cancel")}
+        confirmVariant="destructive"
+        onConfirm={() => {
+          void handleDelete();
+        }}
+      />
     </section>
   );
 }

@@ -8,3 +8,9 @@ export async function fetchDashboardContactSubmissions(
     { cache: "no-store" },
   );
 }
+
+export async function deleteDashboardContactSubmission(submissionId: string) {
+  return apiFetch(`/api/dashboard/contact-submissions/${submissionId}`, {
+    method: "DELETE",
+  });
+}

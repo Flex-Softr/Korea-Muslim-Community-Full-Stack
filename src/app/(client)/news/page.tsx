@@ -17,8 +17,8 @@ export default async function NewsPage() {
   return (
     <>
       <PageBanner
-        title="News"
-        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { label: "News" }]}
+        titleKey="breadcrumbs.news"
+        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.news" }]}
       />
       <ArticleNewsListing
         basePath="/news"

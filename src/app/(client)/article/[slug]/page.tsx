@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { PageBanner } from "@/components/layout/page-banner";
 import { SimpleDetailLayout } from "@/components/cms/simple-detail-layout";
 import { listDashboardArticles } from "@/lib/dashboard/store";
 
@@ -21,25 +20,24 @@ export default async function ArticleDetailPage({
       title: item.title,
       image: item.coverImage || "/brand/logo.png",
       description: item.description,
+      localeContent: item.localeContent,
     }));
 
   return (
-    <>
-      <PageBanner
-        title={row.title}
-        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { label: "Articles", href: "/article" }, { label: row.title }]}
-      />
-      <SimpleDetailLayout
-        sidebarTitle="Latest Articles"
-        item={{
-          id: row.id,
-          href: `/article/${row.slug}`,
-          title: row.title,
-          image: row.coverImage || "/brand/logo.png",
-          description: row.description,
-        }}
-        sidebarItems={sidebarItems}
-      />
-    </>
+    <SimpleDetailLayout
+      sidebarTitle="Latest Articles"
+      sidebarTitleKey="breadcrumbs.article"
+      parentHref="/article"
+      parentLabelKey="breadcrumbs.article"
+      item={{
+        id: row.id,
+        href: `/article/${row.slug}`,
+        title: row.title,
+        image: row.coverImage || "/brand/logo.png",
+        description: row.description,
+        localeContent: row.localeContent,
+      }}
+      sidebarItems={sidebarItems}
+    />
   );
 }

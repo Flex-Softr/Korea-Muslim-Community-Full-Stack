@@ -1,7 +1,7 @@
-import fs from "node:fs";
 import path from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import multer from "multer";
+import { ensureUploadDirectory, resolveUploadParts, slugPart } from "@/lib/uploads";
 
 export const config = {
   api: {
@@ -9,59 +9,11 @@ export const config = {
   },
 };
 
-const ALLOWED_TYPES = new Set([
-  "account",
-  "activity",
-  "article",
-  "blog",
-  "carousel",
-  "download",
-  "member",
-  "misc",
-  "news",
-  "other-page",
-  "photo",
-  "profile",
-  "video",
-]);
-
-const ALLOWED_FOLDERS = new Set(["images", "files", "content"]);
-
-function slugPart(input: string): string {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9._-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function queryValue(value: unknown): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value) && typeof value[0] === "string") return value[0];
-  return undefined;
-}
-
-function resolveUploadParts(req: { query: Record<string, unknown> }) {
-  const rawType = queryValue(req.query.type);
-  const rawFolder = queryValue(req.query.folder);
-  const type = slugPart(rawType ?? "");
-  const folder = slugPart(rawFolder ?? "images");
-  if (!ALLOWED_TYPES.has(type)) {
-    throw new Error("Invalid upload type.");
-  }
-  if (!ALLOWED_FOLDERS.has(folder)) {
-    throw new Error("Invalid upload folder.");
-  }
-  return { type, folder };
-}
-
 const storage = multer.diskStorage({
   destination(req, _file, cb) {
     try {
-      const { type, folder } = resolveUploadParts(req);
-      const target = path.join(process.cwd(), "public", type, folder);
-      fs.mkdirSync(target, { recursive: true });
+      const { type, folder } = resolveUploadParts(req.query.type, req.query.folder);
+      const target = ensureUploadDirectory(type, folder);
       cb(null, target);
     } catch (error) {
       cb(error as Error, "");
@@ -91,8 +43,8 @@ function runMiddleware(
       req as unknown as Parameters<typeof middleware>[0],
       res as unknown as Parameters<typeof middleware>[1],
       (result) => {
-      if (result) reject(result);
-      else resolve();
+        if (result) reject(result);
+        else resolve();
       },
     );
   });
@@ -109,7 +61,7 @@ export default async function handler(req: UploadedRequest, res: NextApiResponse
   }
 
   try {
-    const { type, folder } = resolveUploadParts(req);
+    const { type, folder } = resolveUploadParts(req.query.type, req.query.folder);
     await runMiddleware(req, res);
     if (!req.file) {
       return res.status(400).json({ error: "Missing file" });

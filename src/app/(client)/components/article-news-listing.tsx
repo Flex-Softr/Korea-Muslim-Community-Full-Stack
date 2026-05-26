@@ -3,10 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { ActivityCategoryFilter } from "@/components/activity/activity-category-filter";
 import { useLanguage } from "@/components/providers/language-provider";
+import { Badge } from "@/components/ui/badge";
 import { DataPagination } from "@/components/ui/pagination";
 import type { ActivityNewsItem } from "@/data/activity-news";
+import { pickLocalizedFields } from "@/lib/i18n/content-locale";
+import { stripHtmlTags } from "@/lib/utils";
 
 const PAGE_SIZE = 8;
 
@@ -17,7 +21,7 @@ export function ArticleNewsListing({
   items: ActivityNewsItem[];
   basePath: "/article" | "/news";
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const categories = useMemo(
@@ -32,6 +36,22 @@ export function ArticleNewsListing({
   const safePage = Math.min(page, totalPages);
   const offset = (safePage - 1) * PAGE_SIZE;
   const pageItems = filtered.slice(offset, offset + PAGE_SIZE);
+  const localizedPageItems = useMemo(
+    () =>
+      pageItems.map((item) => {
+        const localized = item.localeContent
+          ? pickLocalizedFields(item.localeContent, lang)
+          : null;
+
+        return {
+          ...item,
+          title: localized?.title?.trim() || item.title,
+          category: localized?.category?.trim() || item.category,
+          excerpt: localized?.description?.trim() || item.excerpt,
+        };
+      }),
+    [pageItems, lang],
+  );
 
   return (
     <div className="border-b border-border/40 bg-muted/25 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
@@ -45,28 +65,42 @@ export function ArticleNewsListing({
           }}
           className="mb-8 sm:mb-10"
         />
-        {pageItems.length > 0 ? (
+        {localizedPageItems.length > 0 ? (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {pageItems.map((item) => (
+            {localizedPageItems.map((item) => (
               <li key={item.id}>
-                <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+                <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:ring-white/5">
                   <Link href={`${basePath}/${item.slug}`} className="flex h-full flex-col">
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                       <Image
                         src={item.imageSrc}
-                        alt=""
+                        alt={item.title}
                         fill
                         className="object-cover transition duration-500 group-hover:scale-[1.04]"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent opacity-80" />
                     </div>
                     <div className="flex flex-1 flex-col p-4 sm:p-5">
-                      <p className="text-xs text-muted-foreground">{item.category}</p>
-                      <h3 className="mt-2 line-clamp-2 text-lg font-semibold group-hover:text-[#2c7bb6]">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
+                        <time dateTime={item.dateIso ?? undefined}>{item.date}</time>
+                        <span aria-hidden className="text-border">
+                          ·
+                        </span>
+                        <Badge variant="secondary" className="rounded-full px-2 py-0 text-[11px] font-medium">
+                          {item.category}
+                        </Badge>
+                      </div>
+                      <h3 className="mt-2.5 line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight transition-colors group-hover:text-[#2c7bb6] sm:text-lg">
                         {item.title}
                       </h3>
-                      <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted-foreground">{item.excerpt}</p>
-                      <span className="mt-4 text-sm font-semibold text-[#2c7bb6]">{t("common.readMore")}</span>
+                      <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
+                        {stripHtmlTags(item.excerpt)}
+                      </p>
+                      <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400">
+                        {t("common.readMore")}
+                        <ArrowUpRight className="size-4" aria-hidden />
+                      </span>
                     </div>
                   </Link>
                 </article>

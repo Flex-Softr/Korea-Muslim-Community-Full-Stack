@@ -19,6 +19,7 @@ export function contactFormSubmissionDelegate() {
           };
         }) => Promise<unknown>;
         count: (args?: { where?: object }) => Promise<number>;
+        delete: (args: { where: { id: string } }) => Promise<unknown>;
         findMany: (args: {
           orderBy: object;
           skip: number;
