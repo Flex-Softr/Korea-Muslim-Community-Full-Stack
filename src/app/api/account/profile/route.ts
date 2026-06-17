@@ -216,7 +216,7 @@ export async function PATCH(request: Request) {
         data: {
           ...memberData,
           memberCode,
-          category: "GENERAL",
+          category: "EXECUTIVE",
           activityNotes: "Profile completed from account settings.",
         },
       });

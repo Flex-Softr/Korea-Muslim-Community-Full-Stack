@@ -1,26 +1,28 @@
 export const MEMBER_CATEGORY = {
   EXECUTIVE: "EXECUTIVE",
   ADVISOR_BODY: "ADVISOR_BODY",
-  GENERAL: "GENERAL",
 } as const;
 
 export type MemberCategory =
   (typeof MEMBER_CATEGORY)[keyof typeof MEMBER_CATEGORY];
 
-export const MEMBER_SLUGS = ["executive", "advisor-body", "general"] as const;
+export const MEMBER_CATEGORIES = [
+  MEMBER_CATEGORY.EXECUTIVE,
+  MEMBER_CATEGORY.ADVISOR_BODY,
+] as const;
+
+export const MEMBER_SLUGS = ["executive", "advisor-body"] as const;
 
 export type MemberSlug = (typeof MEMBER_SLUGS)[number];
 
 export const SLUG_TO_CATEGORY: Record<MemberSlug, MemberCategory> = {
   executive: MEMBER_CATEGORY.EXECUTIVE,
   "advisor-body": MEMBER_CATEGORY.ADVISOR_BODY,
-  general: MEMBER_CATEGORY.GENERAL,
 };
 
 export const CATEGORY_TO_SLUG: Record<MemberCategory, MemberSlug> = {
   [MEMBER_CATEGORY.EXECUTIVE]: "executive",
   [MEMBER_CATEGORY.ADVISOR_BODY]: "advisor-body",
-  [MEMBER_CATEGORY.GENERAL]: "general",
 };
 
 export const DEFAULT_MEMBER_SLUG: MemberSlug = "executive";
@@ -28,8 +30,7 @@ export const DEFAULT_MEMBER_SLUG: MemberSlug = "executive";
 export function isMemberCategory(v: string): v is MemberCategory {
   return (
     v === MEMBER_CATEGORY.EXECUTIVE ||
-    v === MEMBER_CATEGORY.ADVISOR_BODY ||
-    v === MEMBER_CATEGORY.GENERAL
+    v === MEMBER_CATEGORY.ADVISOR_BODY
   );
 }
 
@@ -67,15 +68,9 @@ export const MEMBER_SECTION_I18N_KEYS: Record<
     subtitle: "members.section.advisorBody.subtitle",
     emptyMessage: "members.section.advisorBody.emptyMessage",
   },
-  general: {
-    title: "members.section.general.title",
-    subtitle: "members.section.general.subtitle",
-    emptyMessage: "members.section.general.emptyMessage",
-  },
 };
 
 export const MEMBER_NAV_LABEL_KEYS: Record<MemberSlug, string> = {
   executive: "members.nav.executive",
   "advisor-body": "members.nav.advisorBody",
-  general: "members.nav.general",
 };

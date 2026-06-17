@@ -18,13 +18,13 @@ type PageProps = {
 function memberCategoryNavKey(category: string): string {
   if (category === "ADVISOR_BODY") return "members.nav.advisorBody";
   if (category === "EXECUTIVE") return "members.nav.executive";
-  return "members.nav.general";
+  return "members.publicProfile.bannerSubtitleMember";
 }
 
 function bannerFallbackSubtitle(st: (key: string) => string, category: string): string {
   if (category === "ADVISOR_BODY") return st("members.publicProfile.bannerSubtitleAdvisor");
   if (category === "EXECUTIVE") return st("members.publicProfile.bannerSubtitleExecutive");
-  return st("members.publicProfile.bannerSubtitleGeneral");
+  return st("members.publicProfile.bannerSubtitleMember");
 }
 
 function blogSlug(title: string): string {

@@ -62,7 +62,7 @@ type UsersResponse = {
   };
 };
 
-type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY" | "GENERAL";
+type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY";
 
 const PAGE_SIZE = 10;
 
@@ -118,7 +118,7 @@ export function UsersModule() {
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
   const [suspendTarget, setSuspendTarget] = useState<UserRow | null>(null);
   const [convertTarget, setConvertTarget] = useState<UserRow | null>(null);
-  const [convertRole, setConvertRole] = useState<MemberCategory>("GENERAL");
+  const [convertRole, setConvertRole] = useState<MemberCategory>("EXECUTIVE");
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
 
@@ -290,7 +290,7 @@ export function UsersModule() {
                 variant="outline"
                 onClick={() => {
                   setConvertTarget(row);
-                  setConvertRole("GENERAL");
+                  setConvertRole("EXECUTIVE");
                 }}
                 title="Convert to member"
                 className="hover:bg-muted hover:text-foreground"
@@ -445,7 +445,7 @@ export function UsersModule() {
         onOpenChange={(open) => {
           if (!open) {
             setConvertTarget(null);
-            setConvertRole("GENERAL");
+            setConvertRole("EXECUTIVE");
           }
         }}
         title="Convert user to member?"
@@ -457,7 +457,7 @@ export function UsersModule() {
           if (!convertTarget) return;
           void convertToMember(convertTarget, convertRole);
           setConvertTarget(null);
-          setConvertRole("GENERAL");
+          setConvertRole("EXECUTIVE");
         }}
       >
         <div className="space-y-2">
@@ -472,7 +472,6 @@ export function UsersModule() {
           >
             <option value="EXECUTIVE">Executive Member</option>
             <option value="ADVISOR_BODY">Advisor Body</option>
-            <option value="GENERAL">General Member</option>
           </select>
         </div>
       </ConfirmActionModal>

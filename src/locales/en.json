@@ -88,8 +88,7 @@
   "members": {
     "nav": {
       "executive": "Executive Member",
-      "advisorBody": "Advisor Body",
-      "general": "General Member"
+      "advisorBody": "Advisor Body"
     },
     "detail": {
       "backTo": "Back to"
@@ -97,7 +96,7 @@
     "publicProfile": {
       "bannerSubtitleAdvisor": "Advisor member",
       "bannerSubtitleExecutive": "Executive member",
-      "bannerSubtitleGeneral": "General member",
+      "bannerSubtitleMember": "Member",
       "metaTitleSuffix": "Member profile"
     },
     "section": {
@@ -110,11 +109,6 @@
         "title": "Advisor body",
         "subtitle": "Scholars and senior advisors who guide the organisation on faith, ethics, and strategy.",
         "emptyMessage": "Advisor profiles will appear here once they are published."
-      },
-      "general": {
-        "title": "General members",
-        "subtitle": "Volunteers, coordinators, and active members helping run events and services.",
-        "emptyMessage": "General member highlights will appear here when available."
       }
     }
   },
@@ -147,6 +141,33 @@
       "subtitle": "Send us a message — we read every submission and reply when a response is needed.",
       "formCardTitle": "Message",
       "formCardDescription": "Use the form below. For urgent matters, email us directly from the footer."
+    },
+    "eps": {
+      "subtitle": "EPS forms, useful links, and app information in one place.",
+      "sidebarTitle": "EPS media",
+      "sidebarSubtitle": "Photos published with the EPS category in the gallery.",
+      "sidebarEmpty": "No EPS category photos have been published yet.",
+      "formTitle": "EPS Form",
+      "formBody": "Find EPS application, preparation, and document form information here.",
+      "formPrimary": "Form download",
+      "formPrimaryBody": "Published EPS forms or documents can be accessed from this section.",
+      "formSecondary": "Document checklist",
+      "formSecondaryBody": "Review the required information and paperwork before applying.",
+      "linkTitle": "EPS Link",
+      "linkBody": "Important official and supporting EPS web links will be collected here.",
+      "linkPrimary": "Important links",
+      "linkPrimaryBody": "Find official sites, notices, and online resources quickly.",
+      "linkSecondary": "Supporting resources",
+      "linkSecondaryBody": "Helpful links for preparation, guidance, and updates.",
+      "appTitle": "EPS App",
+      "appBody": "Information about useful EPS preparation and service apps will appear here.",
+      "appPrimary": "App information",
+      "appPrimaryBody": "Learn about app usage, features, and updates.",
+      "appSecondary": "Download guidance",
+      "appSecondaryBody": "Download or installation instructions will be shown here when available.",
+      "ctaTitle": "Need help with EPS?",
+      "ctaBody": "Contact us with your questions or support needs.",
+      "ctaButton": "Contact us"
     },
     "team": {
       "subtitle": "Responsible members and coordinators — profiles and roles will be listed here.",
@@ -215,6 +236,7 @@
     "gallery": "Gallery",
     "videos": "Videos",
     "activity": "Activity",
+    "eps": "EPS",
     "downloadEbookLeaflet": "Download Ebook Leaflet",
     "downloadBook": "Download Book",
     "downloadForm": "Download Form",
