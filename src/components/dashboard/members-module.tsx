@@ -22,7 +22,7 @@ import {
   patchDashboardMember,
 } from "@/lib/services/dashboard-members";
 
-type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY" | "GENERAL";
+type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY";
 type ProfileVisibility = "PUBLIC" | "MEMBERS_ONLY";
 
 type MemberRow = {
@@ -99,7 +99,7 @@ type MembersResponse = {
 };
 
 const PAGE_SIZE = 10;
-const CATEGORY_OPTIONS: MemberCategory[] = ["EXECUTIVE", "ADVISOR_BODY", "GENERAL"];
+const CATEGORY_OPTIONS: MemberCategory[] = ["EXECUTIVE", "ADVISOR_BODY"];
 const VISIBILITY_OPTIONS: ProfileVisibility[] = ["PUBLIC", "MEMBERS_ONLY"];
 
 type BasicMemberForm = {
@@ -159,7 +159,7 @@ const EMPTY_FORM: BasicMemberForm = {
   designation: "",
   memberCode: "",
   title: "",
-  category: "GENERAL",
+  category: "EXECUTIVE",
   profileVisibility: "PUBLIC",
   contactEmail: "",
   sortOrder: "0",
@@ -268,8 +268,7 @@ function detailToForm(detail: MemberDetail): FullMemberForm {
 
 function categoryLabel(value: MemberCategory): string {
   if (value === "ADVISOR_BODY") return "Advisor Body";
-  if (value === "EXECUTIVE") return "Executive Member";
-  return "General Member";
+  return "Executive Member";
 }
 
 function visibilityLabel(value: ProfileVisibility): string {

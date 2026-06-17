@@ -148,7 +148,7 @@ export async function PATCH(
       return NextResponse.json({ error: "User is already a member." }, { status: 400 });
     }
 
-    const convertRole = (body.convertToMemberRole ?? "GENERAL").trim().toUpperCase();
+    const convertRole = (body.convertToMemberRole ?? "EXECUTIVE").trim().toUpperCase();
     if (!isMemberCategory(convertRole)) {
       return NextResponse.json({ error: "Invalid member role." }, { status: 400 });
     }

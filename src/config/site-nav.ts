@@ -150,16 +150,7 @@ export const SITE_NAV: SiteNavItem[] = [
     items: memberSubLinks,
   },
 
-  {
-    kind: "submenu",
-    id: "eps",
-    labelKey: "nav.eps",
-    items: [
-      { kind: "link", href: "/eps/form", labelKey: "nav.epsForm" },
-      { kind: "link", href: "/eps/link", labelKey: "nav.epsLink" },
-      { kind: "link", href: "/eps/app", labelKey: "nav.epsApp" },
-    ],
-  },
+  { kind: "link", href: "/eps", labelKey: "nav.eps" },
   // {
   //   kind: "submenu",
   //   id: "download",

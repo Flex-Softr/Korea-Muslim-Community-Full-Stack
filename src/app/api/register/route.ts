@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       memberCode,
       name: fullNameEn.trim(),
       nameBn: fullNameBn?.trim() || null,
-      category: "GENERAL",
+      category: "EXECUTIVE",
       contactEmail: normalized,
       phone: phone.trim(),
       imageUrl: profilePhoto,

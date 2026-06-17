@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hasMinimumRole } from "@/lib/roles";
-import { isMemberCategory } from "@/lib/members/config";
+import { MEMBER_CATEGORIES, isMemberCategory } from "@/lib/members/config";
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
           ],
         }
       : {}),
-    ...(isMemberCategory(category) ? { category } : {}),
+    category: isMemberCategory(category) ? category : { in: [...MEMBER_CATEGORIES] },
     ...(profileVisibility === "PUBLIC" || profileVisibility === "MEMBERS_ONLY"
       ? { profileVisibility }
       : {}),
