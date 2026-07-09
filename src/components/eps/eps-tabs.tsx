@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Download, ExternalLink, FileText, MessageCircle, Smartphone } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { cn } from "@/lib/utils";
+import { cn, cleanHtml } from "@/lib/utils";
 
 export type EpsPhotoItem = {
   id: string;
@@ -79,9 +79,9 @@ export function EpsTabs({ photos }: { photos: EpsPhotoItem[] }) {
           </nav>
 
           <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
-            {activeTab === "form" ? <EpsFormPanel /> : null}
-            {activeTab === "link" ? <EpsLinkPanel /> : null}
-            {activeTab === "app" ? <EpsAppPanel /> : null}
+            {activeTab === "form" ? <EpsFormPanel category={TAB_CATEGORIES.form} /> : null}
+            {activeTab === "link" ? <EpsLinkPanel category={TAB_CATEGORIES.link} /> : null}
+            {activeTab === "app" ? <EpsAppPanel category={TAB_CATEGORIES.app} /> : null}
           </section>
 
           <section className="mt-8 rounded-lg bg-[#0f766e] px-5 py-6 text-white sm:px-7">
@@ -214,59 +214,97 @@ function EpsMediaCarousel({
   );
 }
 
-function EpsFormPanel() {
-  const { t } = useLanguage();
-  const tt = t as unknown as (key: string) => string;
+const TAB_CATEGORIES: Record<EpsTabKey, string> = {
+  form: "EPS - Form",
+  link: "EPS - Link",
+  app: "EPS - App",
+};
+
+function DynamicTabContent({ category }: { category: string }) {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const data = await res.json();
+        if (!res.ok || !active) return;
+        setItems(data.items ?? []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [category]);
+
+  if (loading) {
+    return (
+      <div className="py-12 text-center text-muted-foreground animate-pulse">
+        Loading content...
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        No content found. Please publish content from the admin dashboard under this category.
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-5">
-      <PanelHeading
-        icon={FileText}
-        title={tt("pages.eps.formTitle")}
-        body={tt("pages.eps.formBody")}
-      />
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ActionRow icon={Download} title={tt("pages.eps.formPrimary")} body={tt("pages.eps.formPrimaryBody")} />
-        <ActionRow icon={FileText} title={tt("pages.eps.formSecondary")} body={tt("pages.eps.formSecondaryBody")} />
-      </div>
+    <div className="space-y-10">
+      {items.map((item) => (
+        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
+          {item.image && item.image !== "/brand/logo.png" && (
+            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div 
+            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
+            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
+          />
+        </article>
+      ))}
     </div>
   );
 }
 
-function EpsLinkPanel() {
-  const { t } = useLanguage();
-  const tt = t as unknown as (key: string) => string;
-
+function EpsFormPanel({ category }: { category: string }) {
   return (
-    <div className="space-y-5">
-      <PanelHeading
-        icon={ExternalLink}
-        title={tt("pages.eps.linkTitle")}
-        body={tt("pages.eps.linkBody")}
-      />
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ActionRow icon={ArrowUpRight} title={tt("pages.eps.linkPrimary")} body={tt("pages.eps.linkPrimaryBody")} />
-        <ActionRow icon={ExternalLink} title={tt("pages.eps.linkSecondary")} body={tt("pages.eps.linkSecondaryBody")} />
-      </div>
+    <div className="space-y-6">
+      <DynamicTabContent category={category} />
     </div>
   );
 }
 
-function EpsAppPanel() {
-  const { t } = useLanguage();
-  const tt = t as unknown as (key: string) => string;
-
+function EpsLinkPanel({ category }: { category: string }) {
   return (
-    <div className="space-y-5">
-      <PanelHeading
-        icon={Smartphone}
-        title={tt("pages.eps.appTitle")}
-        body={tt("pages.eps.appBody")}
-      />
-      <div className="grid gap-3 sm:grid-cols-2">
-        <ActionRow icon={Smartphone} title={tt("pages.eps.appPrimary")} body={tt("pages.eps.appPrimaryBody")} />
-        <ActionRow icon={Download} title={tt("pages.eps.appSecondary")} body={tt("pages.eps.appSecondaryBody")} />
-      </div>
+    <div className="space-y-6">
+      <DynamicTabContent category={category} />
+    </div>
+  );
+}
+
+function EpsAppPanel({ category }: { category: string }) {
+  return (
+    <div className="space-y-6">
+      <DynamicTabContent category={category} />
     </div>
   );
 }

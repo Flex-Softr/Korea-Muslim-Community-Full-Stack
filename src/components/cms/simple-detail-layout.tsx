@@ -11,6 +11,7 @@ import {
   pickLocalizedFields,
   type LocaleContentMap,
 } from "@/lib/i18n/content-locale";
+import { cleanHtml } from "@/lib/utils";
 
 export type SimpleDetailItem = {
   id: string;
@@ -121,8 +122,8 @@ export function SimpleDetailLayout({
           </div>
           <h1 className="text-3xl font-semibold">{resolvedItem.title}</h1>
           <div
-            className="prose prose-slate mt-4 max-w-none text-lg dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: resolvedItem.description || "" }}
+            className="prose prose-slate mt-4 max-w-none text-lg dark:prose-invert rich-content"
+            dangerouslySetInnerHTML={{ __html: cleanHtml(resolvedItem.description || "") }}
           />
         </article>
       </div>

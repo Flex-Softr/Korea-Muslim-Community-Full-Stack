@@ -55,6 +55,63 @@ function cloneLocaleMap(map: LocaleContentMap): LocaleContentMap {
   return JSON.parse(JSON.stringify(map)) as LocaleContentMap;
 }
 
+const MODULE_TAB_MAPPING = {
+  "Introduction": [
+    { label: "Brief Introduction", category: "Brief Introduction" },
+    { label: "Constitution", category: "Constitution" },
+    { label: "Organizational Method", category: "Organizational Method" },
+    { label: "Policies", category: "Policies" },
+    { label: "History and Tradition", category: "History and Tradition" },
+    { label: "Introductory Registration", category: "Introductory Registration" },
+  ],
+  "Organizational Structure": [
+    { label: "Central Working Procedure", category: "Central Working Procedure" },
+    { label: "Central Shura Council", category: "Central Shura Council" },
+    { label: "Other Leadership", category: "Other Leadership" },
+  ],
+  "Divisions / Procedure": [
+    { label: "Women's Division", category: "Women's Division" },
+    { label: "Student Division", category: "Student Division" },
+    { label: "Professional Division", category: "Professional Division" },
+    { label: "National & International", category: "National and International" },
+  ],
+  "Students": [
+    { label: "Overview", category: "Students - Overview" },
+    { label: "Admission", category: "Students - Admission" },
+    { label: "Classes", category: "Students - Classes" },
+    { label: "Events", category: "Students - Events" },
+    { label: "Support", category: "Students - Support" },
+    { label: "Resources", category: "Students - Resources" },
+  ],
+  "Education": [
+    { label: "Overview", category: "Education - Overview" },
+    { label: "Classes", category: "Education - Classes" },
+    { label: "Events", category: "Education - Events" },
+    { label: "Resources", category: "Education - Resources" },
+  ],
+  "EPS": [
+    { label: "Form", category: "EPS - Form" },
+    { label: "Link", category: "EPS - Link" },
+    { label: "App", category: "EPS - App" },
+  ],
+  "Mosque": [
+    { label: "Our Mosque", category: "Mosque - Our Mosque" },
+    { label: "Korea Mosques", category: "Mosque - Korea Mosques" },
+  ],
+} as const;
+
+type ModuleType = keyof typeof MODULE_TAB_MAPPING;
+
+function findModuleAndTabByCategory(categoryStr: string) {
+  for (const [moduleName, tabs] of Object.entries(MODULE_TAB_MAPPING)) {
+    const matchedTab = tabs.find((t) => t.category.toLowerCase() === categoryStr?.toLowerCase());
+    if (matchedTab) {
+      return { module: moduleName as ModuleType, tab: matchedTab.category };
+    }
+  }
+  return { module: "" as const, tab: "" };
+}
+
 export function AddGenericContentPageForm({ type }: { type: GenericContentType }) {
   const config = CONFIG[type];
   const router = useRouter();
@@ -63,6 +120,8 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [selectedModule, setSelectedModule] = useState<ModuleType | "">("");
+  const [selectedTab, setSelectedTab] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,11 +148,19 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
     if (isSubmitting) return;
     const titleValue = title.trim();
     const descriptionValue = description.trim();
-    const categoryValue = category.trim();
+    let categoryValue = "";
+
+    if (type === "other-page") {
+      if (!selectedModule) return notify("Module is required.", "warning");
+      if (!selectedTab) return notify("Page / Tab is required.", "warning");
+      categoryValue = selectedTab;
+    } else {
+      categoryValue = category.trim();
+      if (!categoryValue) return notify("Category is required.", "warning");
+    }
+
     if (!titleValue) return notify("Title is required.", "warning");
     if (!richTextToPlainText(descriptionValue)) return notify("Description is required.", "warning");
-    if (!categoryValue) return notify("Category is required.", "warning");
-    if (!coverImage) return notify("Image is required.", "warning");
 
     setIsSubmitting(true);
     void (async () => {
@@ -115,15 +182,17 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
         }
         notify(`${config.label} created.`, "success");
 
-          // reset form
-          setTitle("");
-          setDescription("");
-          setCategory("");
-          setCoverImage(null);
-          setSourceLocale("en");
-          
-          // optional redirect
-          router.push(config.listHref);
+        // reset form
+        setTitle("");
+        setDescription("");
+        setCategory("");
+        setSelectedModule("");
+        setSelectedTab("");
+        setCoverImage(null);
+        setSourceLocale("en");
+        
+        // redirect
+        router.push(config.listHref);
       } catch {
         notify(`Could not create ${config.label.toLowerCase()}.`, "error");
       } finally {
@@ -159,21 +228,61 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
             <Label>Image</Label>
             <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType={type} helperText="Upload image for this record." />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor={`${type}-category`}>Category</Label>
-            <select
-              id={`${type}-category`}
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Select category</option>
-              {categories.map((item) => (
-                <option key={item} value={item}>{item}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-end gap-2">
+          {type === "other-page" ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="module-select">Module</Label>
+                <select
+                  id="module-select"
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={selectedModule}
+                  onChange={(e) => {
+                    setSelectedModule(e.target.value as ModuleType);
+                    setSelectedTab("");
+                  }}
+                >
+                  <option value="">Select module</option>
+                  {Object.keys(MODULE_TAB_MAPPING).map((mod) => (
+                    <option key={mod} value={mod}>{mod}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tab-select">Page / Tab</Label>
+                <select
+                  id="tab-select"
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={selectedTab}
+                  onChange={(e) => setSelectedTab(e.target.value)}
+                  disabled={!selectedModule}
+                >
+                  <option value="">Select page / tab</option>
+                  {selectedModule &&
+                    MODULE_TAB_MAPPING[selectedModule].map((t) => (
+                      <option key={t.category} value={t.category}>
+                        {t.label}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor={`${type}-category`}>Category</Label>
+              <select
+                id={`${type}-category`}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="">Select category</option>
+                {categories.map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div className="flex justify-end gap-2 border-t border-border/60 pt-4">
             <Link href={config.listHref} className={buttonVariants({ variant: "outline", size: "default" })}>
               Cancel
             </Link>
@@ -242,8 +351,10 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
     const block = localeContent[editLocale];
     if (!block.title.trim()) return notify("Title is required for the selected language.", "warning");
     if (!richTextToPlainText(block.description.trim())) return notify("Description is required for the selected language.", "warning");
-    if (!block.category.trim()) return notify("Category is required for the selected language.", "warning");
-    if (!coverImage) return notify("Image is required.", "warning");
+    
+    if (type !== "other-page" && !block.category.trim()) {
+      return notify("Category is required for the selected language.", "warning");
+    }
 
     setIsSubmitting(true);
     void (async () => {
@@ -268,6 +379,9 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
   };
 
   const block = localeContent?.[editLocale];
+  const { module: activeModule, tab: activeTab } = type === "other-page" && block?.category
+    ? findModuleAndTabByCategory(block.category)
+    : { module: "" as const, tab: "" };
 
   return (
     <section className="space-y-4">
@@ -299,20 +413,61 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
               <Label>Image</Label>
               <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType={type} helperText="Upload image for this record." />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor={`${type}-edit-category`}>Category ({editLocale})</Label>
-              <select
-                id={`${type}-edit-category`}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                value={block.category}
-                onChange={(e) => patchLocale(editLocale, { category: e.target.value })}
-              >
-                <option value="">Select category</option>
-                {categories.map((item) => (
-                  <option key={item} value={item}>{item}</option>
-                ))}
-              </select>
-            </div>
+            {type === "other-page" ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="module-edit-select">Module ({editLocale})</Label>
+                  <select
+                    id="module-edit-select"
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={activeModule}
+                    onChange={(e) => {
+                      const nextModule = e.target.value as ModuleType;
+                      const firstTab = nextModule ? MODULE_TAB_MAPPING[nextModule][0]?.category : "";
+                      patchLocale(editLocale, { category: firstTab });
+                    }}
+                  >
+                    <option value="">Select module</option>
+                    {Object.keys(MODULE_TAB_MAPPING).map((mod) => (
+                      <option key={mod} value={mod}>{mod}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tab-edit-select">Page / Tab ({editLocale})</Label>
+                  <select
+                    id="tab-edit-select"
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={activeTab}
+                    onChange={(e) => patchLocale(editLocale, { category: e.target.value })}
+                    disabled={!activeModule}
+                  >
+                    <option value="">Select page / tab</option>
+                    {activeModule &&
+                      MODULE_TAB_MAPPING[activeModule].map((t) => (
+                        <option key={t.category} value={t.category}>
+                          {t.label}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor={`${type}-edit-category`}>Category ({editLocale})</Label>
+                <select
+                  id={`${type}-edit-category`}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={block.category}
+                  onChange={(e) => patchLocale(editLocale, { category: e.target.value })}
+                >
+                  <option value="">Select category</option>
+                  {categories.map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="flex justify-end gap-2 border-t border-border/60 pt-4">
               <Link href={config.listHref} className={buttonVariants({ variant: "outline", size: "default" })}>
                 Cancel

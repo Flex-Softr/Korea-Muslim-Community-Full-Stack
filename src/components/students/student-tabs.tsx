@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { cn } from "@/lib/utils";
+import { cn, cleanHtml } from "@/lib/utils";
 
 export type StudentPhotoItem = {
   id: string;
@@ -238,43 +238,108 @@ function StudentMediaCarousel({
   );
 }
 
+const TAB_CATEGORIES: Record<StudentTabKey, string> = {
+  overview: "Students - Overview",
+  admission: "Students - Admission",
+  classes: "Students - Classes",
+  events: "Students - Events",
+  support: "Students - Support",
+  resources: "Students - Resources",
+};
+
+function DynamicTabContent({ category }: { category: string }) {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const data = await res.json();
+        if (!res.ok || !active) return;
+        setItems(data.items ?? []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [category]);
+
+  if (loading) {
+    return (
+      <div className="py-12 text-center text-muted-foreground animate-pulse">
+        Loading content...
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        No content found. Please publish content from the admin dashboard under this category.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-10">
+      {items.map((item) => (
+        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
+          {item.image && item.image !== "/brand/logo.png" && (
+            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div 
+            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
+            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
+          />
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function StudentPanel({
   tab,
 }: {
   tab: {
+    key: StudentTabKey;
     label: string;
     icon: typeof GraduationCap;
   };
 }) {
   const Icon = tab.icon;
+  const categoryName = TAB_CATEGORIES[tab.key] || "Students - Overview";
 
   return (
-    <div className="space-y-5">
-      <div className="flex gap-4">
+    <div className="space-y-6">
+      <div className="flex gap-4 border-b border-border/65 pb-4">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-[#2c7bb6]/10 text-[#2c7bb6]">
           <Icon className="size-5" aria-hidden />
         </div>
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{tab.label}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            This section is ready for student page content. The title and details can be updated later.
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            Dynamic content for the student community.
           </p>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-md border border-border bg-background p-4">
-          <h3 className="text-sm font-semibold">{tab.label} information</h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Add the main content for this tab here.
-          </p>
-        </div>
-        <div className="rounded-md border border-border bg-background p-4">
-          <h3 className="text-sm font-semibold">Next steps</h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Add links, documents, or instructions for students here.
-          </p>
-        </div>
+      <div className="pt-2">
+        <DynamicTabContent category={categoryName} />
       </div>
     </div>
   );
