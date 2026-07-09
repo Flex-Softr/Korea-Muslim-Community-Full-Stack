@@ -2,6 +2,7 @@
 
 import { signIn } from "@/auth";
 import { CredentialsSignin } from "next-auth";
+import { authenticateCredentials } from "@/lib/auth-credentials";
 
 function safeCallbackUrl(raw: string | null): string {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/";
@@ -21,6 +22,17 @@ export async function loginWithCredentials(
   const trimmed = email.trim();
   if (!trimmed || !password) {
     return { ok: false, error: "Invalid email or password." };
+  }
+
+  const authResult = await authenticateCredentials(trimmed, password);
+  if (!authResult.ok) {
+    return {
+      ok: false,
+      error:
+        authResult.reason === "unverified"
+          ? "Please verify your email before signing in."
+          : "Invalid email or password.",
+    };
   }
 
   try {
