@@ -12,7 +12,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
-import { cn } from "@/lib/utils";
+import { cn, cleanHtml } from "@/lib/utils";
 
 export type MosquePhotoItem = {
   id: string;
@@ -222,43 +222,104 @@ function MosqueMediaCarousel({
   );
 }
 
+const TAB_CATEGORIES: Record<MosqueTabKey, string> = {
+  "our-mosque": "Mosque - Our Mosque",
+  "korea-mosques": "Mosque - Korea Mosques",
+};
+
+function DynamicTabContent({ category }: { category: string }) {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const data = await res.json();
+        if (!res.ok || !active) return;
+        setItems(data.items ?? []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [category]);
+
+  if (loading) {
+    return (
+      <div className="py-12 text-center text-muted-foreground animate-pulse">
+        লোড হচ্ছে...
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        কোন তথ্য পাওয়া যায়নি। অনুগ্রহ করে অ্যাডমিন ড্যাশবোর্ড থেকে এই ক্যাটাগরিতে কনটেন্ট পাবলিশ করুন।
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-10">
+      {items.map((item) => (
+        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
+          {item.image && item.image !== "/brand/logo.png" && (
+            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div 
+            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
+            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
+          />
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function MosquePanel({
   tab,
 }: {
   tab: {
+    key: MosqueTabKey;
     label: string;
     icon: typeof Landmark;
   };
 }) {
   const Icon = tab.icon;
+  const categoryName = TAB_CATEGORIES[tab.key] || "Mosque - Our Mosque";
 
   return (
-    <div className="space-y-5">
-      <div className="flex gap-4">
+    <div className="space-y-6">
+      <div className="flex gap-4 border-b border-border/65 pb-4">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-[#2c7bb6]/10 text-[#2c7bb6]">
           <Icon className="size-5" aria-hidden />
         </div>
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{tab.label}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            এই অংশে মসজিদ সম্পর্কিত কনটেন্ট পরে যোগ বা পরিবর্তন করা যাবে।
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            মসজিদ বিষয়ক ডাইনামিক কনটেন্ট।
           </p>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-md border border-border bg-background p-4">
-          <h3 className="text-sm font-semibold">{tab.label} তথ্য</h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            এই ট্যাবের মূল কনটেন্ট এখানে যোগ করা যাবে।
-          </p>
-        </div>
-        <div className="rounded-md border border-border bg-background p-4">
-          <h3 className="text-sm font-semibold">পরবর্তী তথ্য</h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            ঠিকানা, সময়সূচি, লিংক বা নির্দেশনা এখানে যোগ করা যাবে।
-          </p>
-        </div>
+      <div className="pt-2">
+        <DynamicTabContent category={categoryName} />
       </div>
     </div>
   );

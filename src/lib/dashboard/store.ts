@@ -392,7 +392,7 @@ export async function updateDashboardContent(
     category: canonicalCategory(localeContent),
     description: en.description || localeContent.ko.description || localeContent.bn.description,
     localeContent: localeContent as unknown as Prisma.InputJsonValue,
-    ...(input.coverImage !== undefined ? { coverImage: input.coverImage.trim() } : {}),
+    ...(input.coverImage !== undefined ? { coverImage: input.coverImage?.trim() || null } : {}),
     ...(input.videoUrl !== undefined ? { videoUrl: input.videoUrl.trim() || null } : {}),
     ...(type === "download" && input.fileUrl !== undefined ? { fileUrl: input.fileUrl.trim() || null } : {}),
     ...(input.status !== undefined
