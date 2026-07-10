@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
 
   output: "standalone", 
   cacheComponents: true,
+  transpilePackages: ["next-auth", "@auth/core"],
 
   async rewrites() {
     return {
