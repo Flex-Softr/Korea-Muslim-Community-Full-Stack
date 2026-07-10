@@ -131,7 +131,7 @@ export function OurActivitySection({
                   {featuredTitle}
                 </Link>
               </h3>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
                 {stripHtmlTags(featuredExcerpt)}
               </p>
               <Link
