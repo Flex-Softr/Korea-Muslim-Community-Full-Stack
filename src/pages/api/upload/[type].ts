@@ -1,6 +1,7 @@
 import path from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import multer from "multer";
+import { auth } from "@/auth";
 import { ensureUploadDirectory, resolveUploadParts, slugPart } from "@/lib/uploads";
 
 export const config = {
@@ -26,8 +27,30 @@ const storage = multer.diskStorage({
   },
 });
 
+const PUBLIC_UPLOAD_TYPES = new Set(["account", "profile"]);
+
+const ALLOWED_FILE_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+]);
+
 const upload = multer({
   storage,
+  fileFilter(req, file, cb) {
+    try {
+      const { folder } = resolveUploadParts(req.query.type, req.query.folder);
+      if (folder === "images" || folder === "content") {
+        cb(null, file.mimetype.startsWith("image/"));
+        return;
+      }
+      cb(null, ALLOWED_FILE_MIME_TYPES.has(file.mimetype));
+    } catch (error) {
+      cb(error as Error);
+    }
+  },
   limits: {
     fileSize: 20 * 1024 * 1024,
   },
@@ -62,9 +85,15 @@ export default async function handler(req: UploadedRequest, res: NextApiResponse
 
   try {
     const { type, folder } = resolveUploadParts(req.query.type, req.query.folder);
+    if (!PUBLIC_UPLOAD_TYPES.has(type)) {
+      const session = await auth(req, res);
+      if (!session?.user?.id) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+    }
     await runMiddleware(req, res);
     if (!req.file) {
-      return res.status(400).json({ error: "Missing file" });
+      return res.status(400).json({ error: "Missing file or unsupported file type" });
     }
     return res.status(201).json({
       url: `/${type}/${folder}/${req.file.filename}`,

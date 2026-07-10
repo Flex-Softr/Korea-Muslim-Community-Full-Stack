@@ -93,6 +93,8 @@ export function contentTypeForFile(filePath: string): string {
       return "image/gif";
     case ".webp":
       return "image/webp";
+    case ".avif":
+      return "image/avif";
     case ".svg":
       return "image/svg+xml";
     case ".pdf":
