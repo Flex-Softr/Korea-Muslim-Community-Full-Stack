@@ -203,7 +203,7 @@ export function ClientFooter() {
 
             <div className="mt-6 flex flex-wrap gap-2">
               <SocialLink
-                href="https://facebook.com"
+                href="https://www.facebook.com/koreamuslimcommunity"
                 label={t("footer.socialFacebook")}
                 className="bg-[#1877f2] hover:bg-[#166fe5]"
               >

@@ -35,11 +35,11 @@ export function queryValue(value: unknown): string | undefined {
 }
 
 export function getUploadRoot(): string {
-  return path.resolve(process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), "public"));
+  return path.resolve(process.env.UPLOAD_DIR?.trim() || path.join(/* turbopackIgnore: true */ process.cwd(), "public"));
 }
 
 export function getPublicUploadRoot(): string {
-  return path.resolve(process.cwd(), "public");
+  return path.resolve(/* turbopackIgnore: true */ process.cwd(), "public");
 }
 
 export function resolveUploadParts(rawType: unknown, rawFolder: unknown) {
