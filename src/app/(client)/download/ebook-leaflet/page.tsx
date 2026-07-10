@@ -1,6 +1,5 @@
 import { PageBanner } from "@/components/layout/page-banner";
 import { PageGridContent } from "../../components/page-grid-content";
-import { PageSidebar } from "../../components/page-sidebar";
 
 export default async function DownloadEbookLeafletPage() {
   return (
@@ -9,13 +8,8 @@ export default async function DownloadEbookLeafletPage() {
           titleKey="breadcrumbs.downloadEbookLeaflet"
           breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "breadcrumbs.downloadEbookLeaflet" }]}
         />
-         <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
-          <div className="sm:w-1/3 w-full">
-            <PageSidebar />
-          </div>
-          <div className="sm:w-2/3 w-full">
+         <div className="max-w-7xl mx-auto py-10 px-2">
              <PageGridContent />
-          </div>
         </div>
       </>
     )
