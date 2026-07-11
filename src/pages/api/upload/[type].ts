@@ -1,7 +1,7 @@
 import path from "node:path";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
 import multer from "multer";
-import { auth } from "@/auth";
 import { ensureUploadDirectory, resolveUploadParts, slugPart } from "@/lib/uploads";
 
 export const config = {
@@ -56,6 +56,23 @@ const upload = multer({
   },
 });
 
+function shouldUseSecureAuthCookie() {
+  const authUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
+  if (authUrl) return authUrl.startsWith("https://");
+  return process.env.NODE_ENV === "production";
+}
+
+async function hasUploadSession(req: NextApiRequest) {
+  const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  if (!secret) return false;
+  const token = await getToken({
+    req: { headers: req.headers as Record<string, string> },
+    secret,
+    secureCookie: shouldUseSecureAuthCookie(),
+  });
+  return Boolean(token?.sub);
+}
+
 function runMiddleware(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -86,8 +103,8 @@ export default async function handler(req: UploadedRequest, res: NextApiResponse
   try {
     const { type, folder } = resolveUploadParts(req.query.type, req.query.folder);
     if (!PUBLIC_UPLOAD_TYPES.has(type)) {
-      const session = await auth(req, res);
-      if (!session?.user?.id) {
+      const hasSession = await hasUploadSession(req);
+      if (!hasSession) {
         return res.status(401).json({ error: "Unauthorized" });
       }
     }
