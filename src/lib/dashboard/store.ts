@@ -241,26 +241,28 @@ export async function getDashboardContentById(
 export async function createDashboardContent(
   type: DashboardContentType,
   input: {
-    sourceLocale: ContentLocale;
-    title: string;
-    category: string;
+    sourceLocale?: ContentLocale;
+    title?: string;
+    category?: string;
     description?: string;
     coverImage?: string;
     videoUrl?: string;
     fileUrl?: string;
     createdById?: string;
     status?: "pending" | "published";
+    localeContent?: LocaleContentMap;
   },
 ): Promise<DashboardContentRow> {
   const resolvedStatus = input.status ?? (type === "blog" ? "pending" : "published");
-  const localeContent = buildLocaleContentMapFromSource(input.sourceLocale, {
-    title: input.title.trim(),
-    category: input.category.trim(),
+  const sourceLocale = input.sourceLocale ?? "en";
+  const localeContent = input.localeContent || buildLocaleContentMapFromSource(sourceLocale, {
+    title: (input.title ?? "").trim(),
+    category: (input.category ?? "").trim(),
     description: (input.description ?? "").trim(),
   });
   const baseSlug =
     slugify(localeContent.en.title) ||
-    slugify(localeContent[input.sourceLocale].title) ||
+    slugify(localeContent[sourceLocale].title) ||
     "content";
   const uniqueSlug = await allocateUniqueContentSlug(type, baseSlug);
   const en = localeContent.en;

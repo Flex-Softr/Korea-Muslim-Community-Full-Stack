@@ -11,9 +11,13 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { useToastSystem } from "@/components/ui/toast-system";
 import {
   DashboardContentLocaleTabBar,
-  DashboardWriterLanguageSelect,
 } from "@/components/dashboard/dashboard-locale-controls";
-import type { ContentLocale, LocaleContentMap } from "@/lib/i18n/content-locale";
+import {
+  CONTENT_LOCALES,
+  emptyLocaleContentMap,
+  type ContentLocale,
+  type LocaleContentMap,
+} from "@/lib/i18n/content-locale";
 
 type GenericContentType = "article" | "news" | "other-page";
 
@@ -116,12 +120,8 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
   const config = CONFIG[type];
   const router = useRouter();
   const { notify } = useToastSystem();
-  const [sourceLocale, setSourceLocale] = useState<ContentLocale>("en");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [selectedModule, setSelectedModule] = useState<ModuleType | "">("");
-  const [selectedTab, setSelectedTab] = useState("");
+  const [editLocale, setEditLocale] = useState<ContentLocale>("en");
+  const [localeContent, setLocaleContent] = useState<LocaleContentMap>(emptyLocaleContentMap());
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,23 +144,38 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
     };
   }, [config.categoryType, config.label, notify]);
 
+  const patchLocale = useCallback((locale: ContentLocale, patch: Partial<LocaleContentMap[ContentLocale]>) => {
+    setLocaleContent((prev) => {
+      return { ...prev, [locale]: { ...prev[locale], ...patch } };
+    });
+  }, []);
+
+  const setCategoryForAll = (newCategory: string) => {
+    setLocaleContent((prev) => {
+      const next = { ...prev };
+      for (const loc of CONTENT_LOCALES) {
+        next[loc] = { ...next[loc], category: newCategory };
+      }
+      return next;
+    });
+  };
+
   const onCreate = () => {
     if (isSubmitting) return;
-    const titleValue = title.trim();
-    const descriptionValue = description.trim();
-    let categoryValue = "";
+    const block = localeContent[editLocale];
+    const titleValue = block.title.trim();
+    const descriptionValue = block.description.trim();
+    const categoryValue = block.category.trim();
 
-    if (type === "other-page") {
-      if (!selectedModule) return notify("Module is required.", "warning");
-      if (!selectedTab) return notify("Page / Tab is required.", "warning");
-      categoryValue = selectedTab;
-    } else {
-      categoryValue = category.trim();
-      if (!categoryValue) return notify("Category is required.", "warning");
+    if (!titleValue) return notify("Title is required for the active language.", "warning");
+    if (!richTextToPlainText(descriptionValue)) return notify("Description is required for the active language.", "warning");
+    if (!categoryValue) {
+      if (type === "other-page") {
+        return notify("Page / Tab is required.", "warning");
+      } else {
+        return notify("Category is required.", "warning");
+      }
     }
-
-    if (!titleValue) return notify("Title is required.", "warning");
-    if (!richTextToPlainText(descriptionValue)) return notify("Description is required.", "warning");
 
     setIsSubmitting(true);
     void (async () => {
@@ -169,10 +184,8 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            sourceLocale,
-            title: titleValue,
-            category: categoryValue,
-            description: descriptionValue,
+            sourceLocale: editLocale,
+            localeContent,
             coverImage,
           }),
         });
@@ -183,13 +196,9 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
         notify(`${config.label} created.`, "success");
 
         // reset form
-        setTitle("");
-        setDescription("");
-        setCategory("");
-        setSelectedModule("");
-        setSelectedTab("");
+        setLocaleContent(emptyLocaleContentMap());
         setCoverImage(null);
-        setSourceLocale("en");
+        setEditLocale("en");
         
         // redirect
         router.push(config.listHref);
@@ -200,6 +209,11 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
       }
     })();
   };
+
+  const block = localeContent[editLocale];
+  const { module: activeModule, tab: activeTab } = type === "other-page" && block.category
+    ? findModuleAndTabByCategory(block.category)
+    : { module: "" as const, tab: "" };
 
   return (
     <section className="space-y-4">
@@ -215,14 +229,14 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         <div className="space-y-4">
-          <DashboardWriterLanguageSelect id={`${type}-source-locale`} value={sourceLocale} onChange={setSourceLocale} />
+          <DashboardContentLocaleTabBar value={editLocale} onChange={setEditLocale} />
           <div className="space-y-2">
-            <Label htmlFor={`${type}-title`}>Title</Label>
-            <Input id={`${type}-title`} value={title} onChange={(e) => setTitle(e.target.value)} maxLength={180} />
+            <Label htmlFor={`${type}-title`}>Title ({editLocale})</Label>
+            <Input id={`${type}-title`} value={block.title} onChange={(e) => patchLocale(editLocale, { title: e.target.value })} maxLength={180} />
           </div>
           <div className="space-y-2">
-            <Label>Description</Label>
-            <RichTextEditor value={description} onChange={setDescription} uploadType={type} placeholder="Write the description..." />
+            <Label>Description ({editLocale})</Label>
+            <RichTextEditor value={block.description} onChange={(val) => patchLocale(editLocale, { description: val })} uploadType={type} placeholder="Write the description..." />
           </div>
           <div className="space-y-2">
             <Label>Image</Label>
@@ -231,14 +245,15 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
           {type === "other-page" ? (
             <>
               <div className="space-y-2">
-                <Label htmlFor="module-select">Module</Label>
+                <Label htmlFor="module-select">Module ({editLocale})</Label>
                 <select
                   id="module-select"
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={selectedModule}
+                  value={activeModule}
                   onChange={(e) => {
-                    setSelectedModule(e.target.value as ModuleType);
-                    setSelectedTab("");
+                    const nextModule = e.target.value as ModuleType;
+                    const firstTab = nextModule ? MODULE_TAB_MAPPING[nextModule][0]?.category : "";
+                    setCategoryForAll(firstTab);
                   }}
                 >
                   <option value="">Select module</option>
@@ -248,17 +263,17 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
                 </select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tab-select">Page / Tab</Label>
+                <Label htmlFor="tab-select">Page / Tab ({editLocale})</Label>
                 <select
                   id="tab-select"
                   className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  value={selectedTab}
-                  onChange={(e) => setSelectedTab(e.target.value)}
-                  disabled={!selectedModule}
+                  value={activeTab}
+                  onChange={(e) => setCategoryForAll(e.target.value)}
+                  disabled={!activeModule}
                 >
                   <option value="">Select page / tab</option>
-                  {selectedModule &&
-                    MODULE_TAB_MAPPING[selectedModule].map((t) => (
+                  {activeModule &&
+                    MODULE_TAB_MAPPING[activeModule].map((t) => (
                       <option key={t.category} value={t.category}>
                         {t.label}
                       </option>
@@ -268,12 +283,12 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
             </>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor={`${type}-category`}>Category</Label>
+              <Label htmlFor={`${type}-category`}>Category ({editLocale})</Label>
               <select
                 id={`${type}-category`}
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={block.category}
+                onChange={(e) => setCategoryForAll(e.target.value)}
               >
                 <option value="">Select category</option>
                 {categories.map((item) => (

@@ -45,15 +45,31 @@ export function dashboardContentCollectionHandlers(type: DashboardContentType) {
         coverImage?: string;
         videoUrl?: string;
         fileUrl?: string;
+        localeContent?: LocaleContentMap;
       };
-      if (!body.title?.trim()) {
-        return NextResponse.json({ error: "Title is required" }, { status: 400 });
-      }
-      if (!body.category?.trim()) {
-        return NextResponse.json({ error: "Category is required" }, { status: 400 });
-      }
-      if (type !== "download" && !body.description?.trim()) {
-        return NextResponse.json({ error: "Description is required" }, { status: 400 });
+
+      if (body.localeContent) {
+        const sourceLocale = normalizeContentLocale(body.sourceLocale);
+        const block = body.localeContent[sourceLocale] || body.localeContent.en;
+        if (!block?.title?.trim()) {
+          return NextResponse.json({ error: "Title is required" }, { status: 400 });
+        }
+        if (!block?.category?.trim()) {
+          return NextResponse.json({ error: "Category is required" }, { status: 400 });
+        }
+        if (type !== "download" && !block?.description?.trim()) {
+          return NextResponse.json({ error: "Description is required" }, { status: 400 });
+        }
+      } else {
+        if (!body.title?.trim()) {
+          return NextResponse.json({ error: "Title is required" }, { status: 400 });
+        }
+        if (!body.category?.trim()) {
+          return NextResponse.json({ error: "Category is required" }, { status: 400 });
+        }
+        if (type !== "download" && !body.description?.trim()) {
+          return NextResponse.json({ error: "Description is required" }, { status: 400 });
+        }
       }
       if (type === "download" && !body.fileUrl?.trim()) {
         return NextResponse.json({ error: "File is required" }, { status: 400 });
@@ -62,13 +78,14 @@ export function dashboardContentCollectionHandlers(type: DashboardContentType) {
       const created = await createDashboardContent(type, {
         sourceLocale: normalizeContentLocale(body.sourceLocale),
         title: body.title,
-        category: body.category.trim(),
+        category: body.category?.trim(),
         description: body.description?.trim() ?? "",
         coverImage: body.coverImage?.trim(),
         videoUrl: body.videoUrl,
         fileUrl: body.fileUrl,
         createdById: session?.user?.id ?? undefined,
         status: "published",
+        localeContent: body.localeContent,
       });
       revalidateCmsContent(type);
       return NextResponse.json(created, { status: 201 });
