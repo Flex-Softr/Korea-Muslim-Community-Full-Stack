@@ -25,7 +25,13 @@ export type StudentPhotoItem = {
   category: string;
 };
 
-type StudentTabKey = "overview" | "admission" | "classes" | "events" | "support" | "resources";
+type StudentTabKey =
+  | "overview"
+  | "admission"
+  | "classes"
+  | "events"
+  | "support"
+  | "resources";
 
 const STUDENT_TABS: Array<{
   key: StudentTabKey;
@@ -57,7 +63,8 @@ export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
   const activeTab = tabFromParam(searchParams?.get("tab") ?? null);
-  const activeTabItem = STUDENT_TABS.find((tab) => tab.key === activeTab) ?? STUDENT_TABS[0];
+  const activeTabItem =
+    STUDENT_TABS.find((tab) => tab.key === activeTab) ?? STUDENT_TABS[0];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
@@ -65,7 +72,9 @@ export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="overflow-hidden rounded-lg border border-border bg-card">
             <div className="border-b border-border px-4 py-3">
-              <h2 className="text-base font-semibold">{t("nav.students")} media</h2>
+              <h2 className="text-base font-semibold">
+                {t("nav.students")} media
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Photos published with the Student category in the gallery.
               </p>
@@ -78,7 +87,10 @@ export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
         </aside>
 
         <main className="min-w-0">
-          <nav aria-label="Student sections" className="mb-6 flex flex-wrap gap-2">
+          <nav
+            aria-label="Student sections"
+            className="mb-6 flex flex-wrap gap-2"
+          >
             {STUDENT_TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -103,17 +115,16 @@ export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
               );
             })}
           </nav>
-
           <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
             <StudentPanel tab={activeTabItem} />
           </section>
-
           <section className="mt-8 rounded-lg bg-[#0f766e] px-5 py-6 text-white sm:px-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold">Need student support?</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/85">
-                  Contact the community team for student programs, resources, and guidance.
+                  Contact the community team for student programs, resources,
+                  and guidance.
                 </p>
               </div>
               <Link
@@ -227,7 +238,9 @@ function StudentMediaCarousel({
               onClick={() => setIndex(dotIndex)}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                dotIndex === index ? "w-5 bg-[#2c7bb6]" : "w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60",
+                dotIndex === index
+                  ? "w-5 bg-[#2c7bb6]"
+                  : "w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60",
               )}
               aria-label={`Show student media photo ${dotIndex + 1}`}
             />
@@ -256,7 +269,9 @@ function DynamicTabContent({ category }: { category: string }) {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const res = await fetch(
+          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`,
+        );
         const data = await res.json();
         if (!res.ok || !active) return;
         setItems(data.items ?? []);
@@ -283,31 +298,76 @@ function DynamicTabContent({ category }: { category: string }) {
   if (items.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        No content found. Please publish content from the admin dashboard under this category.
+        No content found. Please publish content from the admin dashboard under
+        this category.
       </div>
     );
   }
 
   return (
-    <div className="space-y-10">
-      {items.map((item) => (
-        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
-          {item.image && item.image !== "/brand/logo.png" && (
-            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => {
+        const categorySlug = item.category
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-");
+        const titleSlug =
+          item.slug ||
+          item.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+        const href = `/${categorySlug}/${titleSlug}`;
+        const hasImage = item.image && item.image !== "/brand/logo.png";
+
+        return (
+          <Link
+            key={item.id}
+            href={href}
+            className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/60"
+          >
+            {/* Cover image */}
+            <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+              {hasImage ? (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
+                  <GraduationCap className="size-12 text-[#2c7bb6]/30" aria-hidden />
+                </div>
+              )}
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
-          )}
-          <div 
-            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
-            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
-          />
-        </article>
-      ))}
+
+            {/* Card body */}
+            <div className="flex flex-1 flex-col gap-2 p-4">
+              <h3 className="line-clamp-2 text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-[#2c7bb6]">
+                {item.title}
+              </h3>
+              {item.description && (
+                <p
+                  className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHtml(item.description).replace(/<[^>]*>/g, " ").trim(),
+                  }}
+                />
+              )}
+              <div className="mt-auto pt-3 flex items-center gap-1 text-xs font-medium text-[#2c7bb6]">
+                <span>Read more</span>
+                <ChevronRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -337,7 +397,6 @@ function StudentPanel({
           </p>
         </div>
       </div>
-
       <div className="pt-2">
         <DynamicTabContent category={categoryName} />
       </div>

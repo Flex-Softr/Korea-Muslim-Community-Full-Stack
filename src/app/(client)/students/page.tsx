@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { PageBanner } from "@/components/layout/page-banner";
-import { StudentTabs, type StudentPhotoItem } from "@/components/students/student-tabs";
+import {
+  StudentTabs,
+  type StudentPhotoItem,
+} from "@/components/students/student-tabs";
 import { listPhotoItems } from "@/lib/content/repository";
 import { getRequestLang } from "@/lib/i18n/server-language";
 import { serverT } from "@/lib/i18n/server-translate";
@@ -32,7 +35,10 @@ export default async function StudentsPage() {
     <>
       <PageBanner
         titleKey="nav.students"
-        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "nav.students" }]}
+        breadcrumbs={[
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "nav.students" },
+        ]}
       />
       <StudentTabs photos={studentPhotos} />
     </>
