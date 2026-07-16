@@ -269,25 +269,69 @@ function DynamicTabContent({ category }: { category: string }) {
   }
 
   return (
-    <div className="space-y-10">
-      {items.map((item) => (
-        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
-          {item.image && item.image !== "/brand/logo.png" && (
-            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((item) => {
+        const categorySlug = item.category
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-");
+        const titleSlug =
+          item.slug ||
+          item.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+        const href = `/${categorySlug}/${titleSlug}`;
+        const hasImage = item.image && item.image !== "/brand/logo.png";
+
+        return (
+          <Link
+            key={item.id}
+            href={href}
+            className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/60"
+          >
+            {/* Cover image */}
+            <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+              {hasImage ? (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
+                  <Building2 className="size-12 text-[#2c7bb6]/30" aria-hidden />
+                </div>
+              )}
+              {/* Subtle gradient overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
-          )}
-          <div 
-            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
-            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
-          />
-        </article>
-      ))}
+
+            {/* Card body */}
+            <div className="flex flex-1 flex-col gap-2 p-4">
+              <h3 className="line-clamp-2 text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-[#2c7bb6]">
+                {item.title}
+              </h3>
+              {item.description && (
+                <p
+                  className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHtml(item.description).replace(/<[^>]*>/g, " ").trim(),
+                  }}
+                />
+              )}
+              <div className="mt-auto pt-3 flex items-center gap-1 text-xs font-medium text-[#2c7bb6]">
+                <span>Read more</span>
+                <ChevronRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+              </div>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }
