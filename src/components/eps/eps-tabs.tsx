@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Download, ExternalLink, FileText, MessageCircle, Smartphone } from "lucide-react";
-import { useLanguage } from "@/components/providers/language-provider";
+import { useLanguage, useI18n } from "@/components/providers/language-provider";
 import { cn, cleanHtml } from "@/lib/utils";
 
 export type EpsPhotoItem = {
@@ -221,6 +221,7 @@ const TAB_CATEGORIES: Record<EpsTabKey, string> = {
 };
 
 function DynamicTabContent({ category }: { category: string }) {
+  const { lang } = useI18n();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -229,7 +230,9 @@ function DynamicTabContent({ category }: { category: string }) {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const res = await fetch(
+          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20&lang=${encodeURIComponent(lang)}`,
+        );
         const data = await res.json();
         if (!res.ok || !active) return;
         setItems(data.items ?? []);
@@ -243,7 +246,7 @@ function DynamicTabContent({ category }: { category: string }) {
     return () => {
       active = false;
     };
-  }, [category]);
+  }, [category, lang]);
 
   if (loading) {
     return (
@@ -262,24 +265,38 @@ function DynamicTabContent({ category }: { category: string }) {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
       {items.map((item) => (
-        <article key={item.id} className="prose max-w-none border-b border-border/60 pb-8 last:border-0 last:pb-0">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">{item.title}</h2>
-          {item.image && item.image !== "/brand/logo.png" && (
-            <div className="relative aspect-video max-w-2xl overflow-hidden rounded-lg border border-border/80 bg-muted mb-6">
+        <Link
+          key={item.id}
+          href={`/eps/detail/${item.id}`}
+          className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2c7bb6]/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50"
+        >
+          {/* Card image / icon */}
+          <div className="relative aspect-video w-full overflow-hidden bg-muted">
+            {item.image && item.image !== "/brand/logo.png" ? (
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-            </div>
-          )}
-          <div 
-            className="text-muted-foreground leading-relaxed space-y-4 rich-content"
-            dangerouslySetInnerHTML={{ __html: cleanHtml(item.description) }} 
-          />
-        </article>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-[#2c7bb6]/10 text-[#2c7bb6]">
+                <FileText className="size-8" aria-hidden />
+              </div>
+            )}
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-[#2c7bb6]/0 transition-colors duration-200 group-hover:bg-[#2c7bb6]/10" />
+            <ArrowUpRight className="absolute right-2 top-2 size-4 rounded-full bg-white/80 p-0.5 text-[#2c7bb6] opacity-0 shadow-sm transition-opacity duration-200 group-hover:opacity-100" aria-hidden />
+          </div>
+
+          {/* Card title */}
+          <div className="flex flex-1 items-center px-3 py-2.5">
+            <span className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-[#2c7bb6]">
+              {item.title}
+            </span>
+          </div>
+        </Link>
       ))}
     </div>
   );
