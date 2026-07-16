@@ -18,7 +18,7 @@ export function FileUploader({
   value,
   onChange,
   accept = ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,image/*",
-  maxSizeMb = 12,
+  maxSizeMb = 15,
   helperText,
   uploadType = "download",
   uploadFolder = "files",
@@ -28,7 +28,9 @@ export function FileUploader({
   const [error, setError] = React.useState<string | null>(null);
   const [uploading, setUploading] = React.useState(false);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
     const maxBytes = maxSizeMb * 1024 * 1024;
@@ -40,10 +42,13 @@ export function FileUploader({
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch(`/api/upload/${uploadType}?folder=${uploadFolder}`, {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `/api/upload/${uploadType}?folder=${uploadFolder}`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
         setError(data.error ?? "Could not upload the file.");
@@ -69,7 +74,12 @@ export function FileUploader({
         onChange={handleFileChange}
       />
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" variant="outline" disabled={uploading} onClick={() => inputRef.current?.click()}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+        >
           {uploading ? "Uploading..." : value ? "Replace file" : "Upload file"}
         </Button>
         {value ? (
@@ -87,10 +97,14 @@ export function FileUploader({
         ) : null}
       </div>
       {fileName || value ? (
-        <p className="text-xs text-muted-foreground">{fileName || "File uploaded."}</p>
+        <p className="text-xs text-muted-foreground">
+          {fileName || "File uploaded."}
+        </p>
       ) : null}
       {error || helperText ? (
-        <p className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}>
+        <p
+          className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}
+        >
           {error ?? helperText}
         </p>
       ) : null}

@@ -55,14 +55,23 @@ const navItems: Array<
     labelKey: "dashboard.nav.blogs",
     icon: FileText,
     children: [
-      { href: "/dashboard/content/blog/blogs", labelKey: "dashboard.nav.allBlogs", icon: FileText },
+      {
+        href: "/dashboard/content/blog/blogs",
+        labelKey: "dashboard.nav.allBlogs",
+        icon: FileText,
+      },
       {
         href: "/dashboard/content/blog/categories",
         labelKey: "dashboard.nav.categories",
         icon: FolderKanban,
         adminOnly: true,
       },
-      { href: "/dashboard/blogs/pending", labelKey: "dashboard.nav.pendingBlogs", icon: Clock3, adminOnly: true },
+      {
+        href: "/dashboard/blogs/pending",
+        labelKey: "dashboard.nav.pendingBlogs",
+        icon: Clock3,
+        adminOnly: true,
+      },
     ],
   },
   {
@@ -71,8 +80,16 @@ const navItems: Array<
     icon: Activity,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/activity/activities", labelKey: "dashboard.nav.allActivities", icon: Activity },
-      { href: "/dashboard/content/activity/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/activity/activities",
+        labelKey: "dashboard.nav.allActivities",
+        icon: Activity,
+      },
+      {
+        href: "/dashboard/content/activity/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -81,8 +98,16 @@ const navItems: Array<
     icon: FileText,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/article/articles", labelKey: "dashboard.nav.allArticles", icon: FileText },
-      { href: "/dashboard/content/article/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/article/articles",
+        labelKey: "dashboard.nav.allArticles",
+        icon: FileText,
+      },
+      {
+        href: "/dashboard/content/article/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -91,8 +116,16 @@ const navItems: Array<
     icon: Newspaper,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/news/news", labelKey: "dashboard.nav.allNews", icon: Newspaper },
-      { href: "/dashboard/content/news/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/news/news",
+        labelKey: "dashboard.nav.allNews",
+        icon: Newspaper,
+      },
+      {
+        href: "/dashboard/content/news/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -101,8 +134,16 @@ const navItems: Array<
     icon: FolderKanban,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/other-pages-data/items", labelKey: "dashboard.nav.allOtherPagesData", icon: FileText },
-      { href: "/dashboard/content/other-pages-data/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/other-pages-data/items",
+        labelKey: "dashboard.nav.allOtherPagesData",
+        icon: FileText,
+      },
+      {
+        href: "/dashboard/content/other-pages-data/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -111,8 +152,11 @@ const navItems: Array<
     icon: Download,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/download/items", labelKey: "dashboard.nav.allDownloads", icon: Download },
-      { href: "/dashboard/content/download/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/download/items",
+        labelKey: "dashboard.nav.allDownloads",
+        icon: Download,
+      },
     ],
   },
   {
@@ -121,8 +165,16 @@ const navItems: Array<
     icon: ImageIcon,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/photo-gallery/photos", labelKey: "dashboard.nav.allPhotos", icon: ImageIcon },
-      { href: "/dashboard/content/photo-gallery/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/photo-gallery/photos",
+        labelKey: "dashboard.nav.allPhotos",
+        icon: ImageIcon,
+      },
+      {
+        href: "/dashboard/content/photo-gallery/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -131,8 +183,16 @@ const navItems: Array<
     icon: Video,
     adminOnly: true,
     children: [
-      { href: "/dashboard/content/video-gallery/videos", labelKey: "dashboard.nav.allVideos", icon: Video },
-      { href: "/dashboard/content/video-gallery/categories", labelKey: "dashboard.nav.categories", icon: FolderKanban },
+      {
+        href: "/dashboard/content/video-gallery/videos",
+        labelKey: "dashboard.nav.allVideos",
+        icon: Video,
+      },
+      {
+        href: "/dashboard/content/video-gallery/categories",
+        labelKey: "dashboard.nav.categories",
+        icon: FolderKanban,
+      },
     ],
   },
   {
@@ -141,13 +201,39 @@ const navItems: Array<
     icon: Users,
     adminOnly: true,
     children: [
-      { href: "/dashboard/users", labelKey: "dashboard.nav.allUsers", icon: Users, adminOnly: true },
-      { href: "/dashboard/users/pending", labelKey: "dashboard.nav.pendingUsers", icon: UserCheck, adminOnly: true },
-      { href: "/dashboard/members", labelKey: "dashboard.nav.members", icon: UsersRound, adminOnly: true },
+      {
+        href: "/dashboard/users",
+        labelKey: "dashboard.nav.allUsers",
+        icon: Users,
+        adminOnly: true,
+      },
+      {
+        href: "/dashboard/users/pending",
+        labelKey: "dashboard.nav.pendingUsers",
+        icon: UserCheck,
+        adminOnly: true,
+      },
+      {
+        href: "/dashboard/members",
+        labelKey: "dashboard.nav.members",
+        icon: UsersRound,
+        adminOnly: true,
+      },
     ],
   },
-  { type: "link", href: "/dashboard", labelKey: "dashboard.nav.profile", icon: User },
-  { type: "link", href: "/dashboard/carosal", labelKey: "dashboard.nav.carouselSlider", icon: Images, adminOnly: true },
+  {
+    type: "link",
+    href: "/dashboard",
+    labelKey: "dashboard.nav.profile",
+    icon: User,
+  },
+  {
+    type: "link",
+    href: "/dashboard/carosal",
+    labelKey: "dashboard.nav.carouselSlider",
+    icon: Images,
+    adminOnly: true,
+  },
   {
     type: "link",
     href: "/dashboard/contact-submissions",
@@ -156,7 +242,12 @@ const navItems: Array<
     adminOnly: true,
   },
 
-  { type: "link", href: "/dashboard/settings", labelKey: "common.settings", icon: Settings },
+  {
+    type: "link",
+    href: "/dashboard/settings",
+    labelKey: "common.settings",
+    icon: Settings,
+  },
 ];
 
 export function DashboardNavLinks({
@@ -185,7 +276,9 @@ export function DashboardNavLinks({
         return item;
       }
       if (item.adminOnly && !isAdmin) return null;
-      const children = item.children.filter((child) => !(child.adminOnly && !isAdmin));
+      const children = item.children.filter(
+        (child) => !(child.adminOnly && !isAdmin),
+      );
       if (children.length === 0) return null;
       return { ...item, children };
     })
@@ -197,10 +290,15 @@ export function DashboardNavLinks({
     const loadPendingCount = async () => {
       setPendingUsersLoading(true);
       try {
-        const res = await fetch("/api/dashboard/users?status=pending&count=true", { cache: "no-store" });
+        const res = await fetch(
+          "/api/dashboard/users?status=pending&count=true",
+          { cache: "no-store" },
+        );
         const data = (await res.json()) as { count?: number };
         if (!res.ok || !active) return;
-        setPendingUsersCount(Number.isFinite(data.count) ? Number(data.count) : 0);
+        setPendingUsersCount(
+          Number.isFinite(data.count) ? Number(data.count) : 0,
+        );
       } finally {
         if (active) setPendingUsersLoading(false);
       }
@@ -216,17 +314,20 @@ export function DashboardNavLinks({
   }, [isAdmin, pathname]);
 
   // Create open state for groups, use map from label to boolean
-  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(() => {
-    // Open any group that contains an active link by default
-    const initialState: Record<string, boolean> = {};
-    visibleItems.forEach((item) => {
-      if (item.type === "group") {
-        initialState[item.labelKey] =
-          item.children.some((child) => pathname.startsWith(child.href));
-      }
-    });
-    return initialState;
-  });
+  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
+    () => {
+      // Open any group that contains an active link by default
+      const initialState: Record<string, boolean> = {};
+      visibleItems.forEach((item) => {
+        if (item.type === "group") {
+          initialState[item.labelKey] = item.children.some((child) =>
+            pathname.startsWith(child.href),
+          );
+        }
+      });
+      return initialState;
+    },
+  );
 
   const handleToggleGroup = (label: string) => {
     setOpenGroups((prev) => ({
@@ -236,7 +337,10 @@ export function DashboardNavLinks({
   };
 
   return (
-    <nav className={cn("flex flex-col gap-1.5 p-2.5 sm:p-3", className)} aria-label={t("dashboard.navAria")}>
+    <nav
+      className={cn("flex flex-col gap-1.5 p-2.5 sm:p-3", className)}
+      aria-label={t("dashboard.navAria")}
+    >
       {visibleItems.map((item) => {
         if (item.type === "link") {
           const isActive =
@@ -252,15 +356,29 @@ export function DashboardNavLinks({
               onClick={() => onNavigate?.()}
               className={cn(
                 "relative flex min-h-11 items-center rounded-xl text-sm font-medium transition-all duration-200 ease-out sm:min-h-0 sm:py-2",
-                collapsed ? "justify-center px-0 py-2.5" : "gap-2.5 px-3 py-2.5",
+                collapsed
+                  ? "justify-center px-0 py-2.5"
+                  : "gap-2.5 px-3 py-2.5",
                 isActive
                   ? "rounded-xl bg-white/14 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
-                  : "text-white/80 hover:bg-white/8 hover:text-white"
+                  : "text-white/80 hover:bg-white/8 hover:text-white",
               )}
             >
-              {isActive ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" /> : null}
-              {Icon ? <Icon className={cn("size-4 shrink-0", isActive ? "opacity-100" : "opacity-80")} aria-hidden /> : null}
-              {!collapsed ? <span className="min-w-0 truncate">{tNav(item.labelKey)}</span> : null}
+              {isActive ? (
+                <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" />
+              ) : null}
+              {Icon ? (
+                <Icon
+                  className={cn(
+                    "size-4 shrink-0",
+                    isActive ? "opacity-100" : "opacity-80",
+                  )}
+                  aria-hidden
+                />
+              ) : null}
+              {!collapsed ? (
+                <span className="min-w-0 truncate">{tNav(item.labelKey)}</span>
+              ) : null}
             </Link>
           );
         }
@@ -269,7 +387,7 @@ export function DashboardNavLinks({
         const GroupIcon = item.icon;
         // If any child is active, treat group as open for the chevron
         const isAnyChildActive = item.children.some((child) =>
-          pathname.startsWith(child.href)
+          pathname.startsWith(child.href),
         );
         return (
           <div key={item.labelKey} className="space-y-0.5">
@@ -278,10 +396,10 @@ export function DashboardNavLinks({
               title={collapsed ? tNav(item.labelKey) : undefined}
               className={cn(
                 "flex w-full rounded-xl text-sm font-semibold text-white/85 select-none transition-all duration-200 ease-out hover:bg-white/8 hover:text-white",
-                collapsed ? "items-center justify-center px-0 py-2.5" : "items-center gap-2 px-3 py-2.5",
-                isAnyChildActive && !isOpen
-                  ? "bg-white/8 text-white"
-                  : ""
+                collapsed
+                  ? "items-center justify-center px-0 py-2.5"
+                  : "items-center gap-2 px-3 py-2.5",
+                isAnyChildActive && !isOpen ? "bg-white/8 text-white" : "",
               )}
               aria-expanded={isOpen}
               onClick={() => handleToggleGroup(item.labelKey)}
@@ -289,7 +407,9 @@ export function DashboardNavLinks({
               <GroupIcon className="size-4 shrink-0 opacity-85" aria-hidden />
               {!collapsed ? (
                 <>
-                  <span className="min-w-0 flex-1 text-left truncate">{tNav(item.labelKey)}</span>
+                  <span className="min-w-0 flex-1 text-left truncate">
+                    {tNav(item.labelKey)}
+                  </span>
                   <span>
                     {isOpen ? (
                       <ChevronDown className="size-4 opacity-80" aria-hidden />
@@ -317,12 +437,22 @@ export function DashboardNavLinks({
                           : "text-white/80 hover:bg-white/8 hover:text-white",
                       )}
                     >
-                      {isActive ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" /> : null}
+                      {isActive ? (
+                        <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-r-full bg-white/80" />
+                      ) : null}
                       <span className="flex min-w-0 items-center gap-2.5">
-                        <ChildIcon className={cn("size-4 shrink-0", isActive ? "opacity-100" : "opacity-80")} />
+                        <ChildIcon
+                          className={cn(
+                            "size-4 shrink-0",
+                            isActive ? "opacity-100" : "opacity-80",
+                          )}
+                        />
                         <span className="truncate">{tNav(child.labelKey)}</span>
                         {child.href === "/dashboard/users/pending" ? (
-                          <CountBadge count={pendingUsersCount} loading={pendingUsersLoading} />
+                          <CountBadge
+                            count={pendingUsersCount}
+                            loading={pendingUsersLoading}
+                          />
                         ) : null}
                       </span>
                     </Link>

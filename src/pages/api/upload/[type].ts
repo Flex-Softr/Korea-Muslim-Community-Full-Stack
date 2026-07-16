@@ -30,11 +30,31 @@ const storage = multer.diskStorage({
 const PUBLIC_UPLOAD_TYPES = new Set(["account", "profile"]);
 
 const ALLOWED_FILE_MIME_TYPES = new Set([
+  // Images
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/avif",
+  "image/svg+xml",
+  "image/bmp",
+  "image/tiff",
+  // PDF
   "application/pdf",
+  // Word
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  // Excel
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  // PowerPoint
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  // ZIP / compressed archives
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-zip",
+  "application/octet-stream",
 ]);
 
 const upload = multer({
@@ -46,7 +66,8 @@ const upload = multer({
         cb(null, file.mimetype.startsWith("image/"));
         return;
       }
-      cb(null, ALLOWED_FILE_MIME_TYPES.has(file.mimetype));
+      // For the "files" folder: allow images + all document/archive types
+      cb(null, file.mimetype.startsWith("image/") || ALLOWED_FILE_MIME_TYPES.has(file.mimetype));
     } catch (error) {
       cb(error as Error);
     }
