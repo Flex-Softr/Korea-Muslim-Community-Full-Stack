@@ -22,9 +22,16 @@ export function RichTextEditor({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Quill | null>(null);
   const isSettingRef = useRef(false);
+  const onChangeRef = useRef(onChange);
+  const uploadTypeRef = useRef(uploadType);
+  const placeholderRef = useRef(placeholder);
   const id = useId();
   const toolbarId = `quill-toolbar-${id.replace(/:/g, "")}`;
   const [isCodeView, setIsCodeView] = useState(false);
+
+  onChangeRef.current = onChange;
+  uploadTypeRef.current = uploadType;
+  placeholderRef.current = placeholder;
 
   useEffect(() => {
     let active = true;
@@ -45,7 +52,7 @@ export function RichTextEditor({
 
       const quill = new Quill(root, {
         theme: "snow",
-        placeholder,
+        placeholder: placeholderRef.current,
         modules: {
           table: true,
           toolbar: {
@@ -61,7 +68,7 @@ export function RichTextEditor({
                   const formData = new FormData();
                   formData.append("file", file);
                   try {
-                    const res = await fetch(`/api/upload/${uploadType}?folder=content`, {
+                    const res = await fetch(`/api/upload/${uploadTypeRef.current}?folder=content`, {
                       method: "POST",
                       body: formData,
                     });
@@ -91,7 +98,7 @@ export function RichTextEditor({
 
       quill.on("text-change", () => {
         if (isSettingRef.current) return;
-        onChange(quill.root.innerHTML);
+        onChangeRef.current(quill.root.innerHTML);
       });
     };
 
@@ -104,7 +111,7 @@ export function RichTextEditor({
         root.parentNode.removeChild(root);
       }
     };
-  }, [onChange, placeholder, toolbarId, uploadType]);
+  }, [toolbarId]);
 
   useEffect(() => {
     if (isCodeView) return; // Skip updating Quill while user is editing in HTML code view
