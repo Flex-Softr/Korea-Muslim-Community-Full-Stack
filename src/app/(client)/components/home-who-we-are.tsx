@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { ArrowUpRight, BookOpen, Globe2, HeartHandshake, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  BookOpen,
+  Globe2,
+  HeartHandshake,
+  Users,
+} from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 
 const HIGHLIGHT_ICONS = [
@@ -56,7 +62,6 @@ export function HomeWhoWeAre() {
         }}
         aria-hidden
       />
-
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">

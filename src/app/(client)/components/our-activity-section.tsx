@@ -5,7 +5,10 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ActivityNewsCard } from "@/components/activity/activity-news-card";
-import { activityDetailPath, type ActivityNewsItem } from "@/data/activity-news";
+import {
+  activityDetailPath,
+  type ActivityNewsItem,
+} from "@/data/activity-news";
 import { useLanguage } from "@/components/providers/language-provider";
 import { pickLocalizedFields } from "@/lib/i18n/content-locale";
 import { cn } from "@/lib/utils";

@@ -55,10 +55,7 @@ function HomeSectionFallback({ tiles = 4 }: { tiles?: number }) {
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: tiles }, (_, i) => (
-            <Skeleton
-              key={i}
-              className="aspect-[16/10] w-full rounded-xl"
-            />
+            <Skeleton key={i} className="aspect-16/10 w-full rounded-xl" />
           ))}
         </div>
       </div>
@@ -69,13 +66,7 @@ function HomeSectionFallback({ tiles = 4 }: { tiles?: number }) {
 async function HomeData() {
   const lang = await getRequestLang();
 
-  const [
-    carouselRows,
-    activities,
-    blogs,
-    photos,
-    videos,
-  ] = await Promise.all([
+  const [carouselRows, activities, blogs, photos, videos] = await Promise.all([
     listPublicDashboardCarousel(),
 
     listCachedActivityItems(
@@ -87,7 +78,7 @@ async function HomeData() {
       {
         maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP,
         withFacets: false,
-      }
+      },
     ),
 
     listCachedBlogPosts(
@@ -99,7 +90,7 @@ async function HomeData() {
       {
         maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP,
         withFacets: false,
-      }
+      },
     ),
 
     listCachedPhotoItems(
@@ -111,7 +102,7 @@ async function HomeData() {
       {
         maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP,
         withFacets: false,
-      }
+      },
     ),
 
     listCachedVideoItems(
@@ -123,7 +114,7 @@ async function HomeData() {
       {
         maxRowsFromDb: CMS_LIST_QUICK_PREVIEW_CAP,
         withFacets: false,
-      }
+      },
     ),
   ]);
 
@@ -150,31 +141,15 @@ async function HomeContent() {
   return (
     <>
       <HeroCarousel carouselSources={data.carouselSources} />
-
       <HomeWhoWeAre />
-
       <OurActivitySection
         secondaryItemLimit={6}
         sourceItems={data.activities.items}
       />
-
-      <OurBlogSection
-        secondaryItemLimit={6}
-        sourceItems={data.blogs.items}
-      />
-
-      <PhotoGallery
-        maxItems={6}
-        sourceItems={data.photos.items}
-      />
-
-      <VideoGallery
-        maxItems={8}
-        sourceItems={data.videos.items}
-      />
-
+      <OurBlogSection secondaryItemLimit={6} sourceItems={data.blogs.items} />
+      <PhotoGallery maxItems={6} sourceItems={data.photos.items} />
+      <VideoGallery maxItems={8} sourceItems={data.videos.items} />
       <HomeDonationCta />
-
       <HomeQuickContact />
     </>
   );
@@ -189,12 +164,6 @@ export default function HomePage() {
     </div>
   );
 }
-
-
-
-
-
-
 
 // import { Suspense } from "react";
 // import { HomeDonationCta } from "../components/home-donation-cta";

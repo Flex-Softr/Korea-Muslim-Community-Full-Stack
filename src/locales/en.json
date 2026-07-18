@@ -204,10 +204,33 @@
     "about": {
       "subtitle": "Who we are, what we stand for, and how we serve Muslims and friends of the community in Korea.",
       "metaDescription": "Korea Muslim Community — who we are, what we do, and how we support Muslims across the Republic of Korea.",
-      "whoHeading": "Who we are",
-      "bodyAfterOrgName": "(한국 무슬림 커뮤니티) is a community organisation for Muslims living, studying, and working across the Republic of Korea. We welcome families, students, professionals, and new arrivals who want to connect, learn, and support one another.",
-      "bodyP2": "We host gatherings, educational programs, spiritual activities, and outreach that reflect Islamic values while respecting Korean law and the diverse society we share. Our work is voluntary, transparent, and open to cooperation with other groups where goals align.",
-      "bodyP3": "This website shares public updates, resources, and ways to get involved. For membership services and internal tools, signed-in members can use the dashboard.",
+      "whoHeading": "About us",
+      "bismillah": "In the name of Allah, the Most Gracious, the Most Merciful.",
+      "bodyAfterOrgName": "Welcome to South Korea, the Land of the Morning Calm, where technology meets tradition. In this modern and vibrant nation, the Korea Muslim Community works tirelessly to uphold the noble ideals, heritage, and halal lifestyle of Islam. Through the sincere efforts of thousands of devout expatriates from Bangladesh—who have come here for employment, business, and higher education—a vibrant, disciplined, and brotherly Islamic society has flourished.",
+      "bodyP2": "Despite living in a country with a completely different language and culture, we have preserved our religious values. With the spontaneous participation of Bangladeshi expatriates, numerous mosques, prayer halls (musollas), and Islamic educational centers have been established across various regions of South Korea. Our primary objectives include spreading Islamic morality among the younger generation, standing by expatriates in times of need, and building a robust halal ecosystem on Korean soil.",
+      "bodyP3": "Amidst the busy routines of expatriate life, we stand united to remain enlightened by the light of faith and to extend mutual support to one another.",
+      "permanentPrinciples": {
+        "title": "Permanent Principles of Operation",
+        "options": [
+          "In making any decision or adopting any course of action, this organization shall solely adhere to the laws and guidance ordained by Allah and demonstrated by the Prophet (PBUH).",
+          "To achieve its vision and mission, this organization shall never adopt any means or methods that contradict honesty and trustworthiness, or that lead to chaos and corruption in the world."
+        ]
+      },
+      "dawah": {
+        "title": "Dawah (Invitation to Islam)",
+        "options": [
+          "Inviting all people in general, and Muslims in particular, to submit to the servitude of Allah the Almighty and obey the Prophet (PBUH) in every aspect of life.",
+          "Urging all individuals who have accepted Islam and claimed faith to become complete Muslims by avoiding contradictions between their words and actions in practical life."
+        ]
+      },
+      "permanentPrograms": {
+        "title": "Permanent Programs",
+        "options": [
+          "Dawah: To present and explain the true form of Islam to people of all walks of life, thereby purifying their thoughts and awakening a sense of urgency regarding the establishment of Islam.",
+          "Organization & Training: To organize those who are eager to establish Islam in every aspect of life, and to implement effective measures to develop them into capable workers who can prove the supremacy of Islam against all challenges of ignorance (Jahiliyyah) and work towards its implementation.",
+          "Social Welfare: To work towards social reform, moral reconstruction, and the service of distressed humanity based on Islamic values."
+        ]
+      },
       "glanceHeading": "At a glance",
       "glanceOrgDt": "Organisation",
       "glanceOrgDd": "Korea Muslim Community — nationwide, member-driven",
@@ -215,8 +238,8 @@
       "glanceFocusDd": "Faith, education, mutual aid, civic participation, and welcoming new Muslims and residents.",
       "glanceContactDt": "Contact",
       "glanceContactLink": "Reach our team",
-      "missionHeading": "Mission & approach",
-      "missionLead": "We help Muslims in Korea thrive in faith and daily life — through reliable information, community programmes, and practical support.",
+      "missionHeading": "Vision & Mission",
+      "missionLead": "The vision and mission of this organization are to earn the pleasure of Allah and attain success in the Hereafter by reorganizing human life in its entirety and promoting overall human welfare, in accordance with the laws ordained by Allah and the path demonstrated by the Prophet (PBUH).",
       "missionCard1Title": "Education & guidance",
       "missionCard1Desc": "Talks, study circles, and resources in Korean and English so members can grow in knowledge and confidence.",
       "missionCard2Title": "Service & solidarity",
@@ -322,14 +345,14 @@
     "ctaContact": "Get in touch",
     "imageCaption": "Connecting Muslims through education, gatherings, and service — open to everyone who shares our values.",
     "imageAlt": "Community gathering outdoors",
-    "highlightNationwideTitle": "Nationwide community",
-    "highlightNationwideText": "Muslims living, studying, and working across Korea — connected in dignity and mutual support.",
-    "highlightLearningTitle": "Learning & faith",
-    "highlightLearningText": "Study circles, programmes, and spiritual gatherings rooted in Islamic values and Korean context.",
-    "highlightOpenTitle": "Open & respectful",
-    "highlightOpenText": "We cooperate where goals align and welcome neighbours who share our values of service and unity.",
-    "highlightServiceTitle": "Service & relief",
-    "highlightServiceText": "Outreach, seasonal aid, and spaces where families and newcomers can find practical help."
+    "highlightNationwideTitle": "Leadership & Organizational Structure",
+    "highlightNationwideText": "A disciplined framework managed through the joint coordination of the Korea Muslim Community (KMC) and local Bangladeshi socio-religious organizations, encompassing systematic mosque management across various regions and the organization of regular social and educational conferences.",
+    "highlightLearningTitle": "Education & Faith",
+    "highlightLearningText": "Various study circles, programs, and spiritual conferences conducted in light of Islamic values, taking the Korean social context into consideration.",
+    "highlightOpenTitle": "Synergy of Labor & Intellect",
+    "highlightOpenText": "An economically robust and intellectually advanced societal structure formed by the convergence of professionals working in South Korea's manufacturing sectors and highly educated researchers and students conducting research at leading universities.",
+    "highlightServiceTitle": "Services & Support",
+    "highlightServiceText": "The expansion of community outreach, various welfare activities, and the provision of diverse practical and institutional support for expatriate families and newcomers."
   },
   "homeDonationCta": {
     "title": "Donate and Support",

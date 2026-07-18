@@ -4,6 +4,8 @@ import React from "react";
 import type { i18n as I18nInstance } from "i18next";
 import { I18nextProvider, useTranslation } from "react-i18next";
 
+import { useRouter } from "next/navigation";
+
 import { createAppI18n } from "@/i18n";
 import type { Lang } from "@/lib/i18n/lang";
 
@@ -51,6 +53,7 @@ export function LanguageProvider({
   children: React.ReactNode;
   initialLang: Lang;
 }) {
+  const router = useRouter();
   const i18nRef = React.useRef<I18nInstance | null>(null);
   if (i18nRef.current === null) {
     i18nRef.current = createAppI18n(initialLang);
@@ -74,7 +77,19 @@ export function LanguageProvider({
 
     const syncFromI18n = (lng: string) => {
       const code = normalizeResolvedLang(lng);
-      writeLangCookie(code);
+      
+      const match = document.cookie.match(/(?:^|;\s*)lang=([^;]*)/);
+      const rawCookie = match?.[1]?.trim();
+      const currentCookieLang = rawCookie ? normalizeResolvedLang(decodeURIComponent(rawCookie)) : undefined;
+      const hasCookie = !!rawCookie;
+
+      if (currentCookieLang !== code) {
+        writeLangCookie(code);
+        if (hasCookie || code !== initialLang) {
+          router.refresh();
+        }
+      }
+
       try {
         window.localStorage?.setItem(I18NEXT_LS_KEY, code);
       } catch {
@@ -94,7 +109,7 @@ export function LanguageProvider({
     return () => {
       i18nInstance.off("languageChanged", syncFromI18n);
     };
-  }, [i18nInstance]);
+  }, [i18nInstance, initialLang, router]);
 
   return (
     <I18nextProvider i18n={i18nInstance}>{children}</I18nextProvider>
