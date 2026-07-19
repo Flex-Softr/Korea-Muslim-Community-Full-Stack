@@ -154,6 +154,7 @@ function StudentMediaCarousel({
   const active = photos[index] ?? null;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIndex((current) => {
       if (photos.length === 0) return 0;
       return current >= photos.length ? 0 : current;
@@ -260,9 +261,20 @@ const TAB_CATEGORIES: Record<StudentTabKey, string> = {
   resources: "Students - Resources",
 };
 
+interface OtherPageDataItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  rawCategory: string;
+  slug: string;
+}
+
 function DynamicTabContent({ category }: { category: string }) {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<OtherPageDataItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     let active = true;
@@ -270,7 +282,7 @@ function DynamicTabContent({ category }: { category: string }) {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`,
+          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20&lang=${encodeURIComponent(lang)}`,
         );
         const data = await res.json();
         if (!res.ok || !active) return;
@@ -285,7 +297,7 @@ function DynamicTabContent({ category }: { category: string }) {
     return () => {
       active = false;
     };
-  }, [category]);
+  }, [category, lang]);
 
   if (loading) {
     return (
@@ -307,7 +319,7 @@ function DynamicTabContent({ category }: { category: string }) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => {
-        const categorySlug = item.category
+        const categorySlug = (item.rawCategory || item.category)
           .toLowerCase()
           .trim()
           .replace(/[^a-z0-9\s-]/g, "")
@@ -331,8 +343,9 @@ function DynamicTabContent({ category }: { category: string }) {
             className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/60"
           >
             {/* Cover image */}
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
               {hasImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={item.image}
                   alt={item.title}
@@ -340,11 +353,14 @@ function DynamicTabContent({ category }: { category: string }) {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
-                  <GraduationCap className="size-12 text-[#2c7bb6]/30" aria-hidden />
+                  <GraduationCap
+                    className="size-12 text-[#2c7bb6]/30"
+                    aria-hidden
+                  />
                 </div>
               )}
               {/* Subtle gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
 
             {/* Card body */}
@@ -356,13 +372,18 @@ function DynamicTabContent({ category }: { category: string }) {
                 <p
                   className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtml(item.description).replace(/<[^>]*>/g, " ").trim(),
+                    __html: cleanHtml(item.description)
+                      .replace(/<[^>]*>/g, " ")
+                      .trim(),
                   }}
                 />
               )}
               <div className="mt-auto pt-3 flex items-center gap-1 text-xs font-medium text-[#2c7bb6]">
                 <span>Read more</span>
-                <ChevronRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+                <ChevronRight
+                  className="size-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
               </div>
             </div>
           </Link>

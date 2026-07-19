@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { PageBanner } from "@/components/layout/page-banner";
 import { SimpleDetailLayout } from "@/components/cms/simple-detail-layout";
 import { listDashboardOtherPageData } from "@/lib/dashboard/store";
 
@@ -35,25 +34,23 @@ export default async function OtherPageDataDetailPage({
       title: item.title,
       image: item.coverImage || "/brand/logo.png",
       description: item.description,
+      localeContent: item.localeContent,
     }));
 
   return (
-    <>
-      <PageBanner
-        title={row.title}
-        breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { label: row.category }, { label: row.title }]}
-      />
-      <SimpleDetailLayout
-        sidebarTitle={`Latest ${row.category}`}
-        item={{
-          id: row.id,
-          href: `/${slugify(row.category)}/${row.slug}`,
-          title: row.title,
-          image: row.coverImage || "/brand/logo.png",
-          description: row.description,
-        }}
-        sidebarItems={sidebarItems}
-      />
-    </>
+    <SimpleDetailLayout
+      sidebarTitle={`Latest ${row.category}`}
+      parentLabel={row.category}
+      parentHref={`/${slugify(row.category)}`}
+      item={{
+        id: row.id,
+        href: `/${slugify(row.category)}/${row.slug}`,
+        title: row.title,
+        image: row.coverImage || "/brand/logo.png",
+        description: row.description,
+        localeContent: row.localeContent,
+      }}
+      sidebarItems={sidebarItems}
+    />
   );
 }

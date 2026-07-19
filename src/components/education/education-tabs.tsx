@@ -143,6 +143,7 @@ function EducationMediaCarousel({
   const active = photos[index] ?? null;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIndex((current) => {
       if (photos.length === 0) return 0;
       return current >= photos.length ? 0 : current;
@@ -247,9 +248,20 @@ const TAB_CATEGORIES: Record<EducationTabKey, string> = {
   resources: "Education - Resources",
 };
 
+interface OtherPageDataItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  rawCategory: string;
+  slug: string;
+}
+
 function DynamicTabContent({ category }: { category: string }) {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<OtherPageDataItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     let active = true;
@@ -257,7 +269,7 @@ function DynamicTabContent({ category }: { category: string }) {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`,
+          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20&lang=${encodeURIComponent(lang)}`,
         );
         const data = await res.json();
         if (!res.ok || !active) return;
@@ -272,7 +284,7 @@ function DynamicTabContent({ category }: { category: string }) {
     return () => {
       active = false;
     };
-  }, [category]);
+  }, [category, lang]);
 
   if (loading) {
     return (
@@ -294,7 +306,7 @@ function DynamicTabContent({ category }: { category: string }) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => {
-        const categorySlug = item.category
+        const categorySlug = (item.rawCategory || item.category)
           .toLowerCase()
           .trim()
           .replace(/[^a-z0-9\s-]/g, "")
@@ -327,7 +339,10 @@ function DynamicTabContent({ category }: { category: string }) {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
-                  <GraduationCap className="size-12 text-[#2c7bb6]/30" aria-hidden />
+                  <GraduationCap
+                    className="size-12 text-[#2c7bb6]/30"
+                    aria-hidden
+                  />
                 </div>
               )}
               {/* Subtle gradient overlay on hover */}
@@ -343,13 +358,18 @@ function DynamicTabContent({ category }: { category: string }) {
                 <p
                   className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtml(item.description).replace(/<[^>]*>/g, " ").trim(),
+                    __html: cleanHtml(item.description)
+                      .replace(/<[^>]*>/g, " ")
+                      .trim(),
                   }}
                 />
               )}
               <div className="mt-auto pt-3 flex items-center gap-1 text-xs font-medium text-[#2c7bb6]">
                 <span>Read more</span>
-                <ChevronRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+                <ChevronRight
+                  className="size-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
               </div>
             </div>
           </Link>

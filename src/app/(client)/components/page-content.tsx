@@ -13,6 +13,7 @@ type PageDataItem = {
   title: string;
   description: string;
   category: string;
+  rawCategory: string;
   slug: string;
 };
 
@@ -43,7 +44,7 @@ function slugify(input: string): string {
 }
 
 export function PageContent({ category }: { category?: string }) {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const pathnameRaw = usePathname();
   const pathname = pathnameRaw ?? ""; // ✅ FIX: ensure never null
@@ -76,13 +77,14 @@ export function PageContent({ category }: { category?: string }) {
           category: pageCategory,
           page: String(page),
           pageSize: "3",
+          lang: lang,
         });
 
         const res = await fetch(
           `/api/public/other-page-data?${params.toString()}`,
           {
             cache: "no-store",
-          }
+          },
         );
 
         const data = (await res.json()) as PageDataResponse;
@@ -105,9 +107,10 @@ export function PageContent({ category }: { category?: string }) {
     return () => {
       cancelled = true;
     };
-  }, [page, pageCategory]);
+  }, [page, pageCategory, lang]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [pageCategory]);
 
@@ -151,7 +154,7 @@ export function PageContent({ category }: { category?: string }) {
               </p>
 
               <Link
-                href={`/${slugify(block.category)}/${block.slug}`}
+                href={`/${slugify(block.rawCategory || block.category)}/${block.slug}`}
                 className="mt-3 inline-block text-sm font-medium text-[#2c7bb6] underline-offset-4 hover:underline"
               >
                 Read more

@@ -27,6 +27,7 @@ export async function GET(request: Request) {
         description: fields.description || row.description || "",
         image: row.coverImage || "/brand/logo.png",
         category: fields.category || row.category,
+        rawCategory: row.category,
         slug: row.slug,
       };
     }),

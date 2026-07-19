@@ -41,7 +41,8 @@ export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
   const activeTab = tabFromParam(searchParams?.get("tab") ?? null);
-  const activeTabItem = MOSQUE_TABS.find((tab) => tab.key === activeTab) ?? MOSQUE_TABS[0];
+  const activeTabItem =
+    MOSQUE_TABS.find((tab) => tab.key === activeTab) ?? MOSQUE_TABS[0];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
@@ -49,7 +50,9 @@ export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="overflow-hidden rounded-lg border border-border bg-card">
             <div className="border-b border-border px-4 py-3">
-              <h2 className="text-base font-semibold">{t("nav.mosque")} media</h2>
+              <h2 className="text-base font-semibold">
+                {t("nav.mosque")} media
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Photos published with the Mosque category in the gallery.
               </p>
@@ -62,7 +65,10 @@ export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
         </aside>
 
         <main className="min-w-0">
-          <nav aria-label="Mosque sections" className="mb-6 flex flex-wrap gap-2">
+          <nav
+            aria-label="Mosque sections"
+            className="mb-6 flex flex-wrap gap-2"
+          >
             {MOSQUE_TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -95,9 +101,12 @@ export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
           <section className="mt-8 rounded-lg bg-[#0f766e] px-5 py-6 text-white sm:px-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-semibold">মসজিদ বিষয়ে সাহায্য দরকার?</h2>
+                <h2 className="text-xl font-semibold">
+                  মসজিদ বিষয়ে সাহায্য দরকার?
+                </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/85">
-                  মসজিদ, নামাজের স্থান অথবা কমিউনিটি তথ্যের জন্য আমাদের সাথে যোগাযোগ করুন।
+                  মসজিদ, নামাজের স্থান অথবা কমিউনিটি তথ্যের জন্য আমাদের সাথে
+                  যোগাযোগ করুন।
                 </p>
               </div>
               <Link
@@ -127,6 +136,7 @@ function MosqueMediaCarousel({
   const active = photos[index] ?? null;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIndex((current) => {
       if (photos.length === 0) return 0;
       return current >= photos.length ? 0 : current;
@@ -211,7 +221,9 @@ function MosqueMediaCarousel({
               onClick={() => setIndex(dotIndex)}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                dotIndex === index ? "w-5 bg-[#2c7bb6]" : "w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60",
+                dotIndex === index
+                  ? "w-5 bg-[#2c7bb6]"
+                  : "w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60",
               )}
               aria-label={`Show mosque media photo ${dotIndex + 1}`}
             />
@@ -227,16 +239,29 @@ const TAB_CATEGORIES: Record<MosqueTabKey, string> = {
   "korea-mosques": "Mosque - Korea Mosques",
 };
 
+interface OtherPageDataItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  category: string;
+  rawCategory: string;
+  slug: string;
+}
+
 function DynamicTabContent({ category }: { category: string }) {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<OtherPageDataItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     let active = true;
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20`);
+        const res = await fetch(
+          `/api/public/other-page-data?category=${encodeURIComponent(category)}&pageSize=20&lang=${encodeURIComponent(lang)}`,
+        );
         const data = await res.json();
         if (!res.ok || !active) return;
         setItems(data.items ?? []);
@@ -250,7 +275,7 @@ function DynamicTabContent({ category }: { category: string }) {
     return () => {
       active = false;
     };
-  }, [category]);
+  }, [category, lang]);
 
   if (loading) {
     return (
@@ -263,7 +288,8 @@ function DynamicTabContent({ category }: { category: string }) {
   if (items.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        কোন তথ্য পাওয়া যায়নি। অনুগ্রহ করে অ্যাডমিন ড্যাশবোর্ড থেকে এই ক্যাটাগরিতে কনটেন্ট পাবলিশ করুন।
+        কোন তথ্য পাওয়া যায়নি। অনুগ্রহ করে অ্যাডমিন ড্যাশবোর্ড থেকে এই
+        ক্যাটাগরিতে কনটেন্ট পাবলিশ করুন।
       </div>
     );
   }
@@ -271,7 +297,7 @@ function DynamicTabContent({ category }: { category: string }) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => {
-        const categorySlug = item.category
+        const categorySlug = (item.rawCategory || item.category)
           .toLowerCase()
           .trim()
           .replace(/[^a-z0-9\s-]/g, "")
@@ -304,7 +330,10 @@ function DynamicTabContent({ category }: { category: string }) {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
-                  <Building2 className="size-12 text-[#2c7bb6]/30" aria-hidden />
+                  <Building2
+                    className="size-12 text-[#2c7bb6]/30"
+                    aria-hidden
+                  />
                 </div>
               )}
               {/* Subtle gradient overlay on hover */}
@@ -320,13 +349,18 @@ function DynamicTabContent({ category }: { category: string }) {
                 <p
                   className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtml(item.description).replace(/<[^>]*>/g, " ").trim(),
+                    __html: cleanHtml(item.description)
+                      .replace(/<[^>]*>/g, " ")
+                      .trim(),
                   }}
                 />
               )}
               <div className="mt-auto pt-3 flex items-center gap-1 text-xs font-medium text-[#2c7bb6]">
                 <span>Read more</span>
-                <ChevronRight className="size-3 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden />
+                <ChevronRight
+                  className="size-3 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
               </div>
             </div>
           </Link>
