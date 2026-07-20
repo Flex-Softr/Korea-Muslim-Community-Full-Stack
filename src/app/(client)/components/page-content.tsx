@@ -44,7 +44,7 @@ function slugify(input: string): string {
 }
 
 export function PageContent({ category }: { category?: string }) {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
 
   const pathnameRaw = usePathname();
   const pathname = pathnameRaw ?? ""; // ✅ FIX: ensure never null
@@ -133,12 +133,12 @@ export function PageContent({ category }: { category?: string }) {
           key={block.id}
           className="flex flex-col gap-3 border-b-4 border-[#5bc0de] px-3 py-4 shadow-sm shadow-gray-400"
         >
-          <h1 className="cursor-pointer text-3xl hover:underline">
+          <h2 className="cursor-pointer text-xl font-semibold hover:underline">
             {block.title}
-          </h1>
+          </h2>
 
-          <div className="flex flex-col gap-4 md:flex-row">
-            <div className="w-full md:w-1/3">
+          <div className="">
+            <div className="w-full ">
               <Image
                 src={block.image}
                 alt={block.title}
@@ -148,17 +148,10 @@ export function PageContent({ category }: { category?: string }) {
               />
             </div>
 
-            <div className="w-full md:w-2/3">
-              <p className="line-clamp-4 text-lg">
-                {stripHtml(block.description)}
-              </p>
-
-              <Link
-                href={`/${slugify(block.rawCategory || block.category)}/${block.slug}`}
-                className="mt-3 inline-block text-sm font-medium text-[#2c7bb6] underline-offset-4 hover:underline"
-              >
-                Read more
-              </Link>
+            <div className="mt-5">
+              <div
+                dangerouslySetInnerHTML={{ __html: block.description }}
+              ></div>
             </div>
           </div>
         </div>

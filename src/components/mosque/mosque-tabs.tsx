@@ -28,7 +28,11 @@ const MOSQUE_TABS: Array<{
   label: string;
   icon: typeof Landmark;
 }> = [
-  { key: "our-mosque", label: "আমাদের মসজিদ", icon: Landmark },
+  {
+    key: "our-mosque",
+    label: "বায়তুল ফালাহ মসজিদ এন্ড ইসলামিক সেন্টার",
+    icon: Landmark,
+  },
   { key: "korea-mosques", label: "কোরিয়ার মসজিদ সমূহ", icon: Building2 },
 ];
 
@@ -93,11 +97,9 @@ export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
               );
             })}
           </nav>
-
           <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
             <MosquePanel tab={activeTabItem} />
           </section>
-
           <section className="mt-8 rounded-lg bg-[#0f766e] px-5 py-6 text-white sm:px-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -174,7 +176,7 @@ function MosqueMediaCarousel({
   return (
     <div className="p-3">
       <div className="relative overflow-hidden rounded-md bg-muted">
-        <div className="relative aspect-[4/3]">
+        <div className="relative aspect-4/3">
           <Image
             key={active.id}
             src={active.imageSrc}
@@ -183,7 +185,7 @@ function MosqueMediaCarousel({
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 280px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-3 text-white">
             <p className="line-clamp-2 text-sm font-semibold">{active.title}</p>
             <p className="mt-1 text-xs text-white/80">{active.category}</p>
@@ -321,15 +323,16 @@ function DynamicTabContent({ category }: { category: string }) {
             className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[#2c7bb6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/60"
           >
             {/* Cover image */}
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
               {hasImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={item.image}
                   alt={item.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
+                <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
                   <Building2
                     className="size-12 text-[#2c7bb6]/30"
                     aria-hidden
@@ -337,7 +340,7 @@ function DynamicTabContent({ category }: { category: string }) {
                 </div>
               )}
               {/* Subtle gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </div>
 
             {/* Card body */}
@@ -349,9 +352,11 @@ function DynamicTabContent({ category }: { category: string }) {
                 <p
                   className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtml(item.description)
-                      .replace(/<[^>]*>/g, " ")
-                      .trim(),
+                    __html:
+                      cleanHtml(item.description)
+                        .replace(/<[^>]*>/g, " ")
+                        .trim()
+                        .slice(0, 100) + "...",
                   }}
                 />
               )}
@@ -390,9 +395,6 @@ function MosquePanel({
         </div>
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{tab.label}</h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            মসজিদ বিষয়ক ডাইনামিক কনটেন্ট।
-          </p>
         </div>
       </div>
 
