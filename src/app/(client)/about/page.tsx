@@ -254,7 +254,7 @@ export default async function AboutPage() {
           <section className="mt-16 text-center sm:mt-20">
             <p className="text-muted-foreground">{a("ctaLead")}</p>
             <Link
-              href="/contact"
+              href="/supporter-submission"
               className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
             >
               {a("ctaButton")}
