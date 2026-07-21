@@ -464,7 +464,8 @@
       "pendingUsers": "Pending Users",
       "members": "Members",
       "carouselSlider": "Carousel Slider",
-      "contactSubmissions": "Contact messages"
+      "contactSubmissions": "Contact messages",
+      "supporterSubmissions": "Supporter submissions"
     },
     "contactSubmissions": {
       "title": "Contact messages",
@@ -546,5 +547,46 @@
     "article3Title": "Parliament-related reform",
     "article3Excerpt": "Rules so that party or independent MPs cannot paralyse parliament by staying absent from sessions.",
     "gridImageAlt": "Article thumbnail"
+  },
+  "supporterSubmission": {
+    "pageTitle": "Supporter Submission",
+    "successSubmitTitle": "Successfully Submitted!",
+    "errorSubmitTitle": "There was a problem submitting the form",
+    "termsAndConditions": "I believe that Islam is the religion and way of life chosen by Allah, and that the well-being of humankind in this world and salvation in the hereafter lie in following it. In support of this purpose, I knowingly agree with the programs undertaken by the Korea Muslim Community and hereby express my support for this organization.",
+    "options": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "form": {
+      "name": "Name",
+      "mobileNumber": "Mobile Number",
+      "occupation": "Occupation",
+      "address": "Address",
+      "visaType": "Visa Type",
+      "whyWantBecomeSupporter": "Why do you want to become a supporter",
+      "previouslySupporter": "Have you been a supporter before?",
+      "directJoinOnOrganization": "Do you want to join the organization directly?",
+      "submit": "Submit"
+    },
+    "placeholder": {
+      "name": "Enter your full name",
+      "mobileNumber": "e.g. 01XXXXXXXXX",
+      "occupation": "Enter your occupation",
+      "address": "Enter your current address",
+      "visaType": "e.g. Work Permit, Student Visa",
+      "whyWantBecomeSupporter": "Briefly describe why you're interested in becoming a supporter",
+      "previouslySupporter": "Select an option",
+      "directJoinOnOrganization": "Select an option"
+    },
+    "validation": {
+      "name": "Name is required",
+      "mobileNumber": "Mobile number is required",
+      "occupation": "Occupation is required",
+      "address": "Address is required",
+      "visaType": "Visa type is required",
+      "whyWantBecomeSupporter": "Please state why you want to become a supporter",
+      "previouslySupporter": "Please indicate whether you've been a supporter before",
+      "directJoinOnOrganization": "Please indicate whether you want to join the organization directly"
+    }
   }
 }

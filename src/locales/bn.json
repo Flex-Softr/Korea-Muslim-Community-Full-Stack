@@ -464,7 +464,8 @@
       "pendingUsers": "অনুমোদনের অপেক্ষায় ব্যবহারকারী",
       "members": "সদস্য",
       "carouselSlider": "ক্যারোসেল স্লাইডার",
-      "contactSubmissions": "যোগাযোগ বার্তা"
+      "contactSubmissions": "যোগাযোগ বার্তা",
+      "supporterSubmissions": "সাপোর্টার সাবমিশন"
     },
     "contactSubmissions": {
       "title": "যোগাযোগ বার্তা",
@@ -546,5 +547,46 @@
     "article3Title": "সংসদ বিষয়ক সংস্কার",
     "article3Excerpt": "কোন দলীয় বা নির্দলীয় সংসদ সদস্যগণ যাতে পার্লামেন্ট অধিবেশনে অনুপস্থিত থেকে সংসদকে অকার্যকর করতে না পারে সে জন্য সংসদের রুলস .",
     "gridImageAlt": "শিক্ষা"
+  },
+  "supporterSubmission": {
+    "pageTitle": "সাপোর্টার সাবমিশন",
+    "successSubmitTitle": "সফলভাবে জমা হয়েছে!",
+    "errorSubmitTitle": "ফর্ম জমা দিতে সমস্যা হয়েছে",
+    "termsAndConditions": "আমি বিশ্বাস করি যে, ইসলামই আল্লাহর মনোনীত দ্বীন বা জীবন-ব্যবস্থা এবং এর অনুসরণের মধ্যেই মানব জীবনের ইহকালীন কল্যাণ ও পরকালীন মুক্তি নিহিত রয়েছে। এ উদ্দেশ্যে কোরিয়া মুসলিম কমিউনিটি যে কর্মসূচী গ্রহণ করেছে আমি তার সাথে সচেতনভাবে একমত হয়ে এই সংগঠনকে সমর্থন করছি।",
+    "options": {
+      "yes": "হ্যাঁ",
+      "no": "না"
+    },
+    "form": {
+      "name": "নাম",
+      "mobileNumber": "মোবাইল নম্বর",
+      "occupation": "পেশা",
+      "address": "ঠিকানা",
+      "visaType": "ভিসার ধরন",
+      "whyWantBecomeSupporter": "কেন আপনি সাপোর্টার হতে চান",
+      "previouslySupporter": "আপনি কি আগে সাপোর্টার ছিলেন?",
+      "directJoinOnOrganization": "আপনি কি সংগঠনের সাথে সরাসরি যুক্ত হতে চান?",
+      "submit": "জমা দিন"
+    },
+    "placeholder": {
+      "name": "আপনার পূর্ণ নাম লিখুন",
+      "mobileNumber": "যেমনঃ 01XXXXXXXXX",
+      "occupation": "আপনার পেশা লিখুন",
+      "address": "আপনার বর্তমান ঠিকানা লিখুন",
+      "visaType": "যেমনঃ ওয়ার্ক পারমিট, স্টুডেন্ট ভিসা",
+      "whyWantBecomeSupporter": "সংক্ষেপে লিখুন কেন আপনি সাপোর্টার হতে আগ্রহী",
+      "previouslySupporter": "একটি অপশন নির্বাচন করুন",
+      "directJoinOnOrganization": "একটি অপশন নির্বাচন করুন"
+    },
+    "validation": {
+      "name": "নাম অবশ্যই দিতে হবে",
+      "mobileNumber": "মোবাইল নম্বর অবশ্যই দিতে হবে",
+      "occupation": "পেশা অবশ্যই দিতে হবে",
+      "address": "ঠিকানা অবশ্যই দিতে হবে",
+      "visaType": "ভিসার ধরন অবশ্যই দিতে হবে",
+      "whyWantBecomeSupporter": "আপনি কেন সাপোর্টার হতে চান তা অবশ্যই দিতে হবে",
+      "previouslySupporter": "আপনি আগে সাপোর্টার ছিলেন কিনা তা অবশ্যই দিতে হবে",
+      "directJoinOnOrganization": "আপনি সংগঠনের সাথে সরাসরি যুক্ত হতে চান কিনা তা অবশ্যই দিতে হবে"
+    }
   }
 }

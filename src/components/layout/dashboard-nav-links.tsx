@@ -21,6 +21,7 @@ import {
   UsersRound,
   Inbox,
   Download,
+  ClipboardList,
 } from "lucide-react";
 import { hasMinimumRole, type UserRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
@@ -226,6 +227,12 @@ const navItems: Array<
     href: "/dashboard",
     labelKey: "dashboard.nav.profile",
     icon: User,
+  },
+  {
+    type: "link",
+    href: "/dashboard/supporter-submissions",
+    labelKey: "dashboard.nav.supporterSubmissions",
+    icon: ClipboardList,
   },
   {
     type: "link",

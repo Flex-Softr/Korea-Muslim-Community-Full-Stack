@@ -464,7 +464,8 @@
       "pendingUsers": "승인 대기 사용자",
       "members": "회원",
       "carouselSlider": "캐러셀 슬라이더",
-      "contactSubmissions": "문의 메시지"
+      "contactSubmissions": "문의 메시지",
+      "supporterSubmissions": "지지자 제출 자료"
     },
     "contactSubmissions": {
       "title": "문의 메시지",
@@ -546,5 +547,46 @@
     "article3Title": "국회 관련 개혁",
     "article3Excerpt": "당적·무소속 의원이 회기에 불참해 의회를 마비시키지 못하도록 하는 의회 규칙.",
     "gridImageAlt": "기사 썸네일"
+  },
+  "supporterSubmission": {
+    "pageTitle": "서포터 신청",
+    "successSubmitTitle": "성공적으로 제출되었습니다!",
+    "errorSubmitTitle": "양식 제출 중 문제가 발생했습니다",
+    "termsAndConditions": "저는 이슬람이 알라께서 선택하신 종교이자 삶의 방식이며, 이를 따르는 것에 현세의 복지와 내세의 구원이 있다고 믿습니다. 이러한 목적을 위해 코리아 무슬림 커뮤니티가 추진하는 프로그램에 저는 자발적으로 동의하며 이 단체를 지지함을 표명합니다.",
+    "options": {
+      "yes": "예",
+      "no": "아니오"
+    },
+    "form": {
+      "name": "이름",
+      "mobileNumber": "휴대폰 번호",
+      "occupation": "직업",
+      "address": "주소",
+      "visaType": "비자 종류",
+      "whyWantBecomeSupporter": "서포터가 되고 싶은 이유",
+      "previouslySupporter": "이전에 서포터였던 적이 있습니까?",
+      "directJoinOnOrganization": "단체에 직접 가입하고 싶습니까?",
+      "submit": "제출"
+    },
+    "placeholder": {
+      "name": "이름을 입력하세요",
+      "mobileNumber": "예: 01XXXXXXXXX",
+      "occupation": "직업을 입력하세요",
+      "address": "현재 주소를 입력하세요",
+      "visaType": "예: 취업 비자, 유학생 비자",
+      "whyWantBecomeSupporter": "서포터가 되고 싶은 이유를 간략히 작성해주세요",
+      "previouslySupporter": "옵션을 선택하세요",
+      "directJoinOnOrganization": "옵션을 선택하세요"
+    },
+    "validation": {
+      "name": "이름을 입력해야 합니다",
+      "mobileNumber": "휴대폰 번호를 입력해야 합니다",
+      "occupation": "직업을 입력해야 합니다",
+      "address": "주소를 입력해야 합니다",
+      "visaType": "비자 종류를 입력해야 합니다",
+      "whyWantBecomeSupporter": "서포터가 되고 싶은 이유를 입력해야 합니다",
+      "previouslySupporter": "이전에 서포터였는지 여부를 선택해야 합니다",
+      "directJoinOnOrganization": "단체에 직접 가입하고 싶은지 여부를 선택해야 합니다"
+    }
   }
 }

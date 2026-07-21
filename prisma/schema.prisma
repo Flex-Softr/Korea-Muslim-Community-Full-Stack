@@ -12,23 +12,23 @@ model CommunityMember {
   /// Optional display / internal membership code (e.g. BA-2024-001).
   memberCode String? @unique
 
-  name    String
-  nameBn  String?
+  name         String
+  nameBn       String?
   /// Association role on the directory (President, Volunteer coordinator, …).
-  title   String?
+  title        String?
   /// Public-facing designation shown under member name.
-  designation String?
+  designation  String?
   /// Short intro (e.g. one sentence for cards and profile lead).
   aboutSummary String?
   /// Longer bio / story; separate paragraphs with blank lines.
-  bio     String?
-  imageUrl String?
+  bio          String?
+  imageUrl     String?
 
   /// Achievements & credentials (multiline text each).
-  awards              String?
-  publications        String?
-  researchPapers      String?
-  scholarshipsHonors  String?
+  awards             String?
+  publications       String?
+  researchPapers     String?
+  scholarshipsHonors String?
 
   /// Engagement stats — set when community feed / events are integrated; null = hide.
   activityPostsCount    Int?
@@ -38,10 +38,10 @@ model CommunityMember {
   activityNotes         String?
 
   /// MALE | FEMALE | OTHER | PREFER_NOT_TO_SAY
-  gender               String?
-  dateOfBirth          DateTime?
+  gender              String?
+  dateOfBirth         DateTime?
   /// When true, only the birth year is shown to viewers allowed to see DOB.
-  dateOfBirthYearOnly  Boolean @default(false)
+  dateOfBirthYearOnly Boolean   @default(false)
 
   universityKr   String?
   degree         String?
@@ -51,18 +51,18 @@ model CommunityMember {
   yearAdmission  Int?
   graduationYear Int?
 
-  locationCity     String?
+  locationCity   String?
   /// Bangladesh division of origin (home), for directory filters — matches `BD_DIVISIONS` labels.
   homeDivisionBd String?
   /// Bangladesh district of origin under `homeDivisionBd` — matches district lists per division.
   homeDistrictBd String?
   /// STUDENT | JOB_HOLDER | BUSINESS_OWNER | OTHER
-  occupationType   String?
-  companyName      String?
-  jobTitle         String?
+  occupationType String?
+  companyName    String?
+  jobTitle       String?
 
   /// PUBLIC | MEMBERS_ONLY — contact, journey & DOB follow this rule.
-  profileVisibility String @default("PUBLIC")
+  profileVisibility String  @default("PUBLIC")
   contactEmail      String?
   phone             String?
   whatsApp          String?
@@ -75,11 +75,11 @@ model CommunityMember {
   scholarshipInfo     String?
   educationBangladesh String?
 
-  skillsTechnical   String?
-  koreanLevelTopik  String?
-  certifications    String?
+  skillsTechnical  String?
+  koreanLevelTopik String?
+  certifications   String?
 
-  sortOrder Int @default(0)
+  sortOrder Int      @default(0)
   /// EXECUTIVE | ADVISOR_BODY
   category  String
   createdAt DateTime @default(now())
@@ -90,16 +90,16 @@ model CommunityMember {
 }
 
 model User {
-  id                        String                    @id @default(cuid()) @map("_id")
-  email                     String                    @unique
-  password                  String
-  name                      String?
-  role                      String                    @default("USER")
-  emailVerified             DateTime?
-  createdAt                 DateTime                  @default(now())
-  updatedAt                 DateTime                  @updatedAt
-  passwordResetTokens       PasswordResetToken[]
-  emailVerificationTokens   EmailVerificationToken[]
+  id                      String                   @id @default(cuid()) @map("_id")
+  email                   String                   @unique
+  password                String
+  name                    String?
+  role                    String                   @default("USER")
+  emailVerified           DateTime?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 model PasswordResetToken {
@@ -126,19 +126,19 @@ model EmailVerificationToken {
 
 /// CMS blog posts (was `type: "blog"` on legacy `DashboardContent`).
 model DashboardBlog {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -151,19 +151,19 @@ model DashboardBlog {
 
 /// CMS activity articles.
 model DashboardActivity {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -176,19 +176,19 @@ model DashboardActivity {
 
 /// CMS article sidebar/listing items.
 model DashboardArticle {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -201,19 +201,19 @@ model DashboardArticle {
 
 /// CMS news sidebar/listing items.
 model DashboardNews {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -226,19 +226,19 @@ model DashboardNews {
 
 /// Dynamic data used by the older static content pages.
 model DashboardOtherPageData {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -251,20 +251,20 @@ model DashboardOtherPageData {
 
 /// Downloadable resources grouped by dashboard-managed category.
 model DashboardDownload {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  fileUrl     String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  fileUrl       String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -277,19 +277,19 @@ model DashboardDownload {
 
 /// Photo gallery CMS items.
 model DashboardPhoto {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -302,19 +302,19 @@ model DashboardPhoto {
 
 /// Video gallery CMS items.
 model DashboardVideo {
-  id          String   @id @default(cuid()) @map("_id")
-  title       String
-  category    String
-  description String?
-  coverImage  String?
-  videoUrl    String?
-  slug        String?
+  id            String    @id @default(cuid()) @map("_id")
+  title         String
+  category      String
+  description   String?
+  coverImage    String?
+  videoUrl      String?
+  slug          String?
   localeContent Json?
-  createdById String?
-  status      String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  status        String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([createdById])
@@ -338,18 +338,18 @@ model DashboardCategory {
 }
 
 model DashboardCarousel {
-  id        String   @id @default(cuid()) @map("_id")
-  title     String
-  subtitle  String
-  imageUrl  String
-  ctaLabel  String?
-  ctaHref   String?
+  id            String   @id @default(cuid()) @map("_id")
+  title         String
+  subtitle      String
+  imageUrl      String
+  ctaLabel      String?
+  ctaHref       String?
   /// `{ "en": { title, subtitle, ctaLabel }, ... }`
   localeContent Json?
-  isActive  Boolean  @default(true)
-  sortOrder Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([isActive, sortOrder])
 }
@@ -368,11 +368,27 @@ model ContactFormSubmission {
   name         String
   mobileNumber String
   /// student | job_holder | eps
-  occupation String
-  address    String
-  visaType   String
-  message    String
-  createdAt  DateTime @default(now())
+  occupation   String
+  address      String
+  visaType     String
+  message      String
+  createdAt    DateTime @default(now())
 
   @@index([createdAt])
+}
+
+model SupporterSubmission {
+  id                       String   @id @default(uuid()) @map("_id")
+  name                     String
+  mobileNumber             String
+  occupation               String
+  address                  String
+  visaType                 String
+  whyWantBecomeSupporter   String
+  previouslySupporter      Boolean
+  directJoinOnOrganization Boolean
+  createdAt                DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("supporter_submissions")
 }
