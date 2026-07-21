@@ -192,7 +192,7 @@ function StudentMediaCarousel({
   return (
     <div className="p-3">
       <div className="relative overflow-hidden rounded-md bg-muted">
-        <div className="relative aspect-[4/3]">
+        <div className="relative aspect-4/3">
           <Image
             key={active.id}
             src={active.imageSrc}
@@ -201,7 +201,7 @@ function StudentMediaCarousel({
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 280px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-3 text-white">
             <p className="line-clamp-2 text-sm font-semibold">{active.title}</p>
             <p className="mt-1 text-xs text-white/80">{active.category}</p>
@@ -352,7 +352,7 @@ function DynamicTabContent({ category }: { category: string }) {
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
+                <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-[#2c7bb6]/10 to-[#2c7bb6]/5">
                   <GraduationCap
                     className="size-12 text-[#2c7bb6]/30"
                     aria-hidden
@@ -372,9 +372,11 @@ function DynamicTabContent({ category }: { category: string }) {
                 <p
                   className="line-clamp-3 text-sm leading-relaxed text-muted-foreground"
                   dangerouslySetInnerHTML={{
-                    __html: cleanHtml(item.description)
-                      .replace(/<[^>]*>/g, " ")
-                      .trim(),
+                    __html:
+                      cleanHtml(item.description)
+                        .replace(/<[^>]*>/g, " ")
+                        .trim()
+                        .slice(0, 100) + "...",
                   }}
                 />
               )}
@@ -413,9 +415,6 @@ function StudentPanel({
         </div>
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{tab.label}</h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Dynamic content for the student community.
-          </p>
         </div>
       </div>
       <div className="pt-2">

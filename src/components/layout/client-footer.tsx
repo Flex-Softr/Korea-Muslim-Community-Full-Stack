@@ -39,72 +39,66 @@ function SocialLink({
   );
 }
 
-
 const INTRO_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/brief-introduction`,
+    href: `/introduction/brief-introduction`,
     labelKey: "footer.linkIntroBriefIntroduction",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/constitution`,
+    href: `/introduction/constitution`,
     labelKey: "footer.linkIntroConstitution",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/organizational-method`,
+    href: `/introduction/organizational-method`,
     labelKey: "footer.linkIntroOrganizationalMethod",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/policies`,
+    href: `/introduction/policies`,
     labelKey: "footer.linkIntroPolicies",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/introductory-registration`,
+    href: `/introduction/introductory-registration`,
     labelKey: "footer.linkIntroIntroductoryRegistration",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/introduction/history-and-tradition`,
+    href: `/introduction/history-and-tradition`,
     labelKey: "footer.linkIntroHistoryAndTradition",
   },
 ];
 
 const CENTRAL_ORG_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-working-procedure`,
+    href: `/organizational-structure/central-organization/central-working-procedure`,
     labelKey: "footer.linkCentralWorkingProcedure",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/central-shura-council`,
+    href: `/organizational-structure/central-organization/central-shura-council`,
     labelKey: "footer.linkCentralShuraCouncil",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/organizational-structure/central-organization/other-leadership`,
+    href: `/organizational-structure/central-organization/other-leadership`,
     labelKey: "footer.linkOtherLeadership",
   },
 ];
 
 const ORG_LINKS: { href: string; labelKey: string }[] = [
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/women-s-division`,
+    href: `/procedure/women-s-division`,
     labelKey: "footer.linkProcedureWomenDivision",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-division`,
+    href: `/procedure/student-division`,
     labelKey: "footer.linkProcedureStudentDivision",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/professional-division`,
+    href: `/procedure/professional-division`,
     labelKey: "footer.linkProcedureProfessionalDivision",
   },
   {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/national-and-international`,
+    href: `/procedure/national-and-international`,
     labelKey: "footer.linkProcedureNationalAndInternational",
   },
-  {
-    href: `${process.env.NEXT_PUBLIC_APP_URL}/procedure/student-s-division`,
-    labelKey: "footer.linkProcedureStudentsDivision",
-  },
 ];
-
 
 const MEMBER_FOOTER_LINKS: { href: string; labelKey: string }[] =
   MEMBER_SLUGS.map((slug) => ({
@@ -129,8 +123,6 @@ const OTHER_FOOTER_LINKS: { href: string; labelKey: string }[] = [
   { href: "/education", labelKey: "nav.education" },
   { href: "/mosque", labelKey: "nav.mosque" },
 ];
-
-
 
 /** Dynamic keys from `.map()` widen to `string`; narrow `t` to satisfy react-i18next + JSX typing (TS2322 / TS2589). */
 function footerLinkLabel(
@@ -195,11 +187,15 @@ export function ClientFooter() {
               <SiteLogoMark />
               <div>
                 <p className="text-xl font-bold">{t("footer.brandTitle")}</p>
-                <p className="text-md text-white/80">{t("footer.brandTagline")}</p>
+                <p className="text-md text-white/80">
+                  {t("footer.brandTagline")}
+                </p>
               </div>
             </div>
 
-            <p className="mt-5 max-w-md text-md text-white/70">{t("footer.description")}</p>
+            <p className="mt-5 max-w-md text-md text-white/70">
+              {t("footer.description")}
+            </p>
 
             <div className="mt-6 flex flex-wrap gap-2">
               <SocialLink
@@ -241,7 +237,9 @@ export function ClientFooter() {
             </div>
 
             <div className="mt-8">
-              <h3 className="text-lg font-semibold">{t("footer.contactTitle")}</h3>
+              <h3 className="text-lg font-semibold">
+                {t("footer.contactTitle")}
+              </h3>
               <ul className="mt-4 space-y-3 text-md">
                 <li>
                   <Link
@@ -284,7 +282,7 @@ export function ClientFooter() {
               t={t}
             />
 
-           <FooterNavColumn
+            <FooterNavColumn
               titleKey="footer.secOther"
               links={OTHER_FOOTER_LINKS}
               t={t}
@@ -305,8 +303,6 @@ export function ClientFooter() {
               links={MEDIA_FOOTER_LINKS}
               t={t}
             />
-           
-
           </div>
         </div>
       </div>

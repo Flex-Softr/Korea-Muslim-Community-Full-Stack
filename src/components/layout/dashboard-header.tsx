@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -16,16 +17,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getLangTriggerShortLabel } from "@/lib/i18n/lang-trigger-label";
 
 const LANG_OPTIONS: Array<{
   value: Lang;
-  labelKey: "common.bengali" | "common.english" | "common.korean";
+  label: string;
+  flagSrc: string;
 }> = [
-  { value: "bn", labelKey: "common.bengali" },
-  { value: "en", labelKey: "common.english" },
-  { value: "ko", labelKey: "common.korean" },
+  { value: "en", label: "English", flagSrc: "/flags/us.svg" },
+  { value: "bn", label: "বাংলা", flagSrc: "/flags/bd.svg" },
+  { value: "ko", label: "한국어", flagSrc: "/flags/kr.svg" },
 ];
+
+const LANGUAGE_FLAG_SRC: Record<Lang, string> = {
+  en: "/flags/us.svg",
+  bn: "/flags/bd.svg",
+  ko: "/flags/kr.svg",
+};
 
 function initials(name: string | null | undefined, email: string) {
   if (name?.trim()) {
@@ -53,6 +60,7 @@ export function DashboardHeader({
   const [langOpen, setLangOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
   const label = initials(name, email);
+  const triggerFlagSrc = LANGUAGE_FLAG_SRC[lang] ?? LANGUAGE_FLAG_SRC.en;
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur sm:gap-4 sm:px-6">
@@ -87,18 +95,24 @@ export function DashboardHeader({
           <DropdownMenuTrigger
             className={cn(
               buttonVariants({ variant: "outline", size: "sm" }),
-              "h-9 px-2.5 text-sm font-semibold",
+              "h-9 gap-1.5 px-2.5 text-sm font-semibold",
             )}
           >
-            <span>{t("dashboard.headerLanguageShort")}:</span>
-            <span className="pl-1 font-bold">{getLangTriggerShortLabel(lang)}</span>
+            <Image
+              src={triggerFlagSrc}
+              alt={lang}
+              width={20}
+              height={14}
+              className="h-3.5 w-5 shrink-0 rounded-[2px] object-cover"
+            />
+            <span className="font-bold">{lang.toUpperCase()}</span>
             <ChevronDown className="ml-1 size-4 opacity-80" aria-hidden />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={8}>
             {LANG_OPTIONS.map((option) => (
               <DropdownMenuItem
                 key={option.value}
-                className="cursor-pointer"
+                className="flex cursor-pointer items-center"
                 onClick={() => {
                   void (async () => {
                     await setLang(option.value);
@@ -106,7 +120,14 @@ export function DashboardHeader({
                   })();
                 }}
               >
-                {t(option.labelKey)}
+                <Image
+                  src={option.flagSrc}
+                  alt={option.label}
+                  width={20}
+                  height={14}
+                  className="mr-2 h-3.5 w-5 shrink-0 rounded-[2px] object-cover"
+                />
+                {option.label}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

@@ -4,11 +4,11 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/providers/theme-provider";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { useMounted } from "@/hooks/use-mounted";
 
 export function ModeToggle({ onBrand = false }: { onBrand?: boolean }) {
   const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const isDark = resolvedTheme === "dark";
 
