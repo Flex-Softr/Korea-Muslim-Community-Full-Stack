@@ -1,120 +1,57 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  BookOpen,
-  CalendarDays,
-  ChevronLeft,
   ChevronRight,
-  ClipboardList,
-  FileText,
   GraduationCap,
   MessageCircle,
-  Users,
 } from "lucide-react";
+import { ModuleTabsSidebar } from "@/components/layout/module-tabs-sidebar";
 import { useLanguage } from "@/components/providers/language-provider";
-import { cn, cleanHtml } from "@/lib/utils";
+import {
+  PARENT_MODULES,
+  tabHref as buildTabHref,
+} from "@/lib/module-sections/config";
+import { cleanHtml } from "@/lib/utils";
 
-export type StudentPhotoItem = {
-  id: string;
-  title: string;
-  imageSrc: string;
-  category: string;
-};
-
-type StudentTabKey =
-  | "overview"
-  | "admission"
-  | "classes"
-  | "events"
-  | "support"
-  | "resources";
-
-const STUDENT_TABS: Array<{
-  key: StudentTabKey;
-  label: string;
-  icon: typeof GraduationCap;
-}> = [
-  { key: "overview", label: "Overview", icon: GraduationCap },
-  { key: "admission", label: "Admission", icon: ClipboardList },
-  { key: "classes", label: "Classes", icon: BookOpen },
-  { key: "events", label: "Events", icon: CalendarDays },
-  { key: "support", label: "Support", icon: Users },
-  { key: "resources", label: "Resources", icon: FileText },
-];
+const STUDENTS_MODULE = PARENT_MODULES.students;
+type StudentTabKey = (typeof STUDENTS_MODULE.tabs)[number]["key"];
 
 function tabFromParam(value: string | null): StudentTabKey {
-  if (
-    value === "admission" ||
-    value === "classes" ||
-    value === "events" ||
-    value === "support" ||
-    value === "resources"
-  ) {
-    return value;
-  }
-  return "overview";
+  const match = STUDENTS_MODULE.tabs.find((tab) => tab.key === value);
+  return match?.key ?? STUDENTS_MODULE.tabs[0].key;
 }
 
-export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
+export function StudentTabs() {
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
   const activeTab = tabFromParam(searchParams?.get("tab") ?? null);
   const activeTabItem =
-    STUDENT_TABS.find((tab) => tab.key === activeTab) ?? STUDENT_TABS[0];
+    STUDENTS_MODULE.tabs.find((tab) => tab.key === activeTab) ??
+    STUDENTS_MODULE.tabs[0];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="overflow-hidden rounded-lg border border-border bg-card">
-            <div className="border-b border-border px-4 py-3">
-              <h2 className="text-base font-semibold">
-                {t("nav.students")} media
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Photos published with the Student category in the gallery.
-              </p>
-            </div>
-            <StudentMediaCarousel
-              photos={photos}
-              emptyLabel="No Student category photos have been published yet."
-            />
-          </div>
+          <ModuleTabsSidebar
+            titleKey={STUDENTS_MODULE.sidebarTitleKey}
+            subtitleKey={STUDENTS_MODULE.sidebarSubtitleKey}
+            activeKey={activeTab}
+            selectId="students-tab-select"
+            ariaLabel="Student sections"
+            tabs={STUDENTS_MODULE.tabs.map((tab) => ({
+              key: tab.key,
+              href: buildTabHref(STUDENTS_MODULE.basePath, tab.key),
+              label: tab.label,
+              labelKey: tab.labelKey,
+              icon: tab.icon,
+            }))}
+          />
         </aside>
 
         <main className="min-w-0">
-          <nav
-            aria-label="Student sections"
-            className="mb-6 flex flex-wrap gap-2"
-          >
-            {STUDENT_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.key;
-              const q = new URLSearchParams(searchParams?.toString() ?? "");
-              q.set("tab", tab.key);
-
-              return (
-                <Link
-                  key={tab.key}
-                  href={`/students?${q.toString()}`}
-                  scroll={false}
-                  className={cn(
-                    "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors",
-                    isActive
-                      ? "border-[#2c7bb6] bg-[#2c7bb6] text-white shadow-sm"
-                      : "border-border bg-background text-foreground hover:bg-muted",
-                  )}
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
           <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
             <StudentPanel tab={activeTabItem} />
           </section>
@@ -141,125 +78,6 @@ export function StudentTabs({ photos }: { photos: StudentPhotoItem[] }) {
     </div>
   );
 }
-
-function StudentMediaCarousel({
-  photos,
-  emptyLabel,
-}: {
-  photos: StudentPhotoItem[];
-  emptyLabel: string;
-}) {
-  const [index, setIndex] = useState(0);
-  const hasMultiple = photos.length > 1;
-  const active = photos[index] ?? null;
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIndex((current) => {
-      if (photos.length === 0) return 0;
-      return current >= photos.length ? 0 : current;
-    });
-  }, [photos.length]);
-
-  useEffect(() => {
-    if (!hasMultiple) return;
-    const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % photos.length);
-    }, 4500);
-    return () => window.clearInterval(timer);
-  }, [hasMultiple, photos.length]);
-
-  const goPrev = () => {
-    if (!hasMultiple) return;
-    setIndex((current) => (current - 1 + photos.length) % photos.length);
-  };
-
-  const goNext = () => {
-    if (!hasMultiple) return;
-    setIndex((current) => (current + 1) % photos.length);
-  };
-
-  if (!active) {
-    return (
-      <div className="p-3">
-        <p className="rounded-md bg-muted px-3 py-4 text-sm text-muted-foreground">
-          {emptyLabel}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-3">
-      <div className="relative overflow-hidden rounded-md bg-muted">
-        <div className="relative aspect-4/3">
-          <Image
-            key={active.id}
-            src={active.imageSrc}
-            alt={active.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 280px"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-            <p className="line-clamp-2 text-sm font-semibold">{active.title}</p>
-            <p className="mt-1 text-xs text-white/80">{active.category}</p>
-          </div>
-        </div>
-
-        {hasMultiple ? (
-          <>
-            <button
-              type="button"
-              onClick={goPrev}
-              className="absolute left-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-              aria-label="Previous student media photo"
-            >
-              <ChevronLeft className="size-4" aria-hidden />
-            </button>
-            <button
-              type="button"
-              onClick={goNext}
-              className="absolute right-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-md bg-black/35 text-white transition-colors hover:bg-black/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-              aria-label="Next student media photo"
-            >
-              <ChevronRight className="size-4" aria-hidden />
-            </button>
-          </>
-        ) : null}
-      </div>
-
-      {hasMultiple ? (
-        <div className="mt-3 flex items-center justify-center gap-1.5">
-          {photos.map((photo, dotIndex) => (
-            <button
-              key={photo.id}
-              type="button"
-              onClick={() => setIndex(dotIndex)}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
-                dotIndex === index
-                  ? "w-5 bg-[#2c7bb6]"
-                  : "w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60",
-              )}
-              aria-label={`Show student media photo ${dotIndex + 1}`}
-            />
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-const TAB_CATEGORIES: Record<StudentTabKey, string> = {
-  overview: "Students - Overview",
-  admission: "Students - Admission",
-  classes: "Students - Classes",
-  events: "Students - Events",
-  support: "Students - Support",
-  resources: "Students - Resources",
-};
 
 interface OtherPageDataItem {
   id: string;
@@ -398,14 +216,10 @@ function DynamicTabContent({ category }: { category: string }) {
 function StudentPanel({
   tab,
 }: {
-  tab: {
-    key: StudentTabKey;
-    label: string;
-    icon: typeof GraduationCap;
-  };
+  tab: (typeof STUDENTS_MODULE.tabs)[number];
 }) {
   const Icon = tab.icon;
-  const categoryName = TAB_CATEGORIES[tab.key] || "Students - Overview";
+  const categoryName = tab.category;
 
   return (
     <div className="space-y-6">
@@ -414,7 +228,9 @@ function StudentPanel({
           <Icon className="size-5" aria-hidden />
         </div>
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">{tab.label}</h2>
+          <h2 className="text-xl font-semibold tracking-tight">
+            {tab.label ?? tab.key}
+          </h2>
         </div>
       </div>
       <div className="pt-2">

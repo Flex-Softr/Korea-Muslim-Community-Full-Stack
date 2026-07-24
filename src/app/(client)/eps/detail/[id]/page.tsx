@@ -31,7 +31,7 @@ export default async function EpsDetailPage({ params }: PageProps) {
 
   return (
     <EpsDetailView
-      id={row.id}
+      category={row.category}
       localeContent={row.localeContent}
       coverImage={row.coverImage ?? null}
       dateIso={row.dateIso}

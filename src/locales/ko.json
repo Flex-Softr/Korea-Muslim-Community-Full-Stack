@@ -152,8 +152,8 @@
     },
     "eps": {
       "subtitle": "EPS 양식, 유용한 링크, 앱 정보를 한곳에서 확인하세요.",
-      "sidebarTitle": "EPS 미디어",
-      "sidebarSubtitle": "갤러리에서 EPS 카테고리로 게시된 사진입니다.",
+      "sidebarTitle": "EPS 섹션",
+      "sidebarSubtitle": "양식, 링크, 앱을 보려면 섹션을 선택하세요.",
       "sidebarEmpty": "아직 EPS 카테고리 사진이 게시되지 않았습니다.",
       "formTitle": "EPS 양식",
       "formBody": "EPS 신청, 준비, 필요 서류 양식 정보를 여기에서 확인할 수 있습니다.",
@@ -176,6 +176,18 @@
       "ctaTitle": "EPS 도움이 필요하신가요?",
       "ctaBody": "질문이나 지원이 필요하면 문의해 주세요.",
       "ctaButton": "문의하기"
+    },
+    "students": {
+      "sidebarTitle": "학생 섹션",
+      "sidebarSubtitle": "학생 정보를 보려면 섹션을 선택하세요."
+    },
+    "education": {
+      "sidebarTitle": "교육 섹션",
+      "sidebarSubtitle": "교육 정보를 보려면 섹션을 선택하세요."
+    },
+    "mosque": {
+      "sidebarTitle": "모스크 섹션",
+      "sidebarSubtitle": "모스크 정보를 보려면 섹션을 선택하세요."
     },
     "team": {
       "subtitle": "담당 구성원과 코디네이터 — 프로필과 역할은 여기에 게시됩니다.",

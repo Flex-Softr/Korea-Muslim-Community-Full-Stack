@@ -152,8 +152,8 @@
     },
     "eps": {
       "subtitle": "EPS forms, useful links, and app information in one place.",
-      "sidebarTitle": "EPS media",
-      "sidebarSubtitle": "Photos published with the EPS category in the gallery.",
+      "sidebarTitle": "EPS sections",
+      "sidebarSubtitle": "Choose a section to browse forms, links, or apps.",
       "sidebarEmpty": "No EPS category photos have been published yet.",
       "formTitle": "EPS Form",
       "formBody": "Find EPS application, preparation, and document form information here.",
@@ -176,6 +176,18 @@
       "ctaTitle": "Need help with EPS?",
       "ctaBody": "Contact us with your questions or support needs.",
       "ctaButton": "Contact us"
+    },
+    "students": {
+      "sidebarTitle": "Student sections",
+      "sidebarSubtitle": "Choose a section to browse student information."
+    },
+    "education": {
+      "sidebarTitle": "Education sections",
+      "sidebarSubtitle": "Choose a section to browse education information."
+    },
+    "mosque": {
+      "sidebarTitle": "Mosque sections",
+      "sidebarSubtitle": "Choose a section to browse mosque information."
     },
     "team": {
       "subtitle": "Responsible members and coordinators — profiles and roles will be listed here.",

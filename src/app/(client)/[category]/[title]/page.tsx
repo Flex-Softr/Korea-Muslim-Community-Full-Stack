@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import { SimpleDetailLayout } from "@/components/cms/simple-detail-layout";
+import { ParentModuleSidebar } from "@/components/layout/parent-module-sidebar";
 import { listDashboardOtherPageData } from "@/lib/dashboard/store";
+import {
+  resolveParentModule,
+  tabHref,
+} from "@/lib/module-sections/config";
 
 function slugify(input: string): string {
   return input
@@ -25,6 +30,7 @@ export default async function OtherPageDataDetailPage({
   );
   if (!row) notFound();
 
+  const parent = resolveParentModule(row.category);
   const sidebarItems = rows
     .filter((item) => item.id !== row.id && item.category === row.category)
     .slice(0, 5)
@@ -39,9 +45,18 @@ export default async function OtherPageDataDetailPage({
 
   return (
     <SimpleDetailLayout
-      sidebarTitle={`Latest ${row.category}`}
-      parentLabel={row.category}
-      parentHref={`/${slugify(row.category)}`}
+      sidebarTitle={
+        parent
+          ? `Latest ${parent.module.id}`
+          : `Latest ${row.category}`
+      }
+      parentLabel={parent ? undefined : row.category}
+      parentLabelKey={parent ? parent.module.parentLabelKey : undefined}
+      parentHref={
+        parent
+          ? tabHref(parent.module.basePath, parent.activeTabKey)
+          : `/${slugify(row.category)}`
+      }
       item={{
         id: row.id,
         href: `/${slugify(row.category)}/${row.slug}`,
@@ -49,8 +64,17 @@ export default async function OtherPageDataDetailPage({
         image: row.coverImage || "/brand/logo.png",
         description: row.description,
         localeContent: row.localeContent,
+        category: row.category,
       }}
-      sidebarItems={sidebarItems}
+      sidebarItems={parent ? undefined : sidebarItems}
+      sidebar={
+        parent ? (
+          <ParentModuleSidebar
+            category={row.category}
+            selectId={`${parent.module.id}-detail-tab-select`}
+          />
+        ) : undefined
+      }
     />
   );
 }

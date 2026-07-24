@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import {
   PageBanner,
   type PageBannerBreadcrumb,
@@ -31,6 +32,7 @@ export function SimpleDetailLayout({
   sidebarTitleKey,
   item,
   sidebarItems,
+  sidebar,
   parentHref,
   parentLabel,
   parentLabelKey,
@@ -38,7 +40,9 @@ export function SimpleDetailLayout({
   sidebarTitle: string;
   sidebarTitleKey?: TranslationKey;
   item: SimpleDetailItem;
-  sidebarItems: SimpleDetailItem[];
+  sidebarItems?: SimpleDetailItem[];
+  /** When provided, replaces the default “latest items” sidebar. */
+  sidebar?: ReactNode;
   parentHref?: string;
   parentLabel?: string;
   parentLabelKey?: TranslationKey;
@@ -60,7 +64,7 @@ export function SimpleDetailLayout({
   };
 
   const resolvedItem = resolveItem(item);
-  const resolvedSidebarItems = sidebarItems.map(resolveItem);
+  const resolvedSidebarItems = (sidebarItems ?? []).map(resolveItem);
   const resolvedSidebarTitle = sidebarTitleKey
     ? translate(sidebarTitleKey)
     : sidebarTitle;
@@ -83,60 +87,60 @@ export function SimpleDetailLayout({
           ]}
         />
       ) : null}
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-2 py-10 sm:flex-row">
-        <aside className="w-full sm:w-1/3">
-          <div className="border-1 p-2 shadow-sm shadow-gray-400">
-            <h2 className="bg-[#0a1628] p-3 text-lg text-white">
-              {resolvedSidebarTitle}
-            </h2>
-            <div className="flex flex-col gap-4 bg-[#5bc0de] px-4 py-6">
-              {resolvedSidebarItems.length === 0 ? (
-                <p className="text-base">No other items found.</p>
-              ) : (
-                resolvedSidebarItems.map((sidebarItem) => (
-                  <Link
-                    key={sidebarItem.id}
-                    href={sidebarItem.href}
-                    className="flex gap-3 text-left hover:underline"
-                  >
-                    <span className="relative size-16 shrink-0 overflow-hidden bg-white/30">
-                      <Image
-                        src={sidebarItem.image}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                      />
-                    </span>
-                    <span className="line-clamp-2 text-lg">
-                      {sidebarItem.title}
-                    </span>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-        </aside>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            {sidebar ?? (
+              <div className="overflow-hidden rounded-lg border border-border bg-card">
+                <div className="border-b border-border px-4 py-3">
+                  <h2 className="text-base font-semibold">
+                    {resolvedSidebarTitle}
+                  </h2>
+                </div>
+                <div className="flex flex-col gap-4 p-4">
+                  {resolvedSidebarItems.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No other items found.
+                    </p>
+                  ) : (
+                    resolvedSidebarItems.map((sidebarItem) => (
+                      <Link
+                        key={sidebarItem.id}
+                        href={sidebarItem.href}
+                        className="flex gap-3 text-left transition-colors hover:text-[#2c7bb6]"
+                      >
+                        <span className="relative size-14 shrink-0 overflow-hidden rounded-md bg-muted">
+                          <Image
+                            src={sidebarItem.image}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                          />
+                        </span>
+                        <span className="line-clamp-2 text-sm font-medium">
+                          {sidebarItem.title}
+                        </span>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </aside>
 
-        <article className="w-full border-b-4 border-[#5bc0de] px-3 py-4 shadow-sm shadow-gray-400 sm:w-2/3">
-          {/* <div className="relative mb-5 aspect-video w-full overflow-hidden bg-muted">
-            <Image
-              src={resolvedItem.image}
-              alt={resolvedItem.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, 66vw"
-              priority
+          <article className="min-w-0 rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
+            <h1 className="text-3xl font-semibold tracking-tight">
+              {resolvedItem.title}
+            </h1>
+            <div
+              className="prose prose-slate mt-4 max-w-none text-lg dark:prose-invert rich-content"
+              dangerouslySetInnerHTML={{
+                __html: cleanHtml(resolvedItem.description || ""),
+              }}
             />
-          </div> */}
-          <h1 className="text-3xl font-semibold">{resolvedItem.title}</h1>
-          <div
-            className="prose prose-slate mt-4 max-w-none text-lg dark:prose-invert rich-content"
-            dangerouslySetInnerHTML={{
-              __html: cleanHtml(resolvedItem.description || ""),
-            }}
-          />
-        </article>
+          </article>
+        </div>
       </div>
     </>
   );
