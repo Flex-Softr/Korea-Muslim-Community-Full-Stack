@@ -82,7 +82,7 @@
     "epsForm": "ফর্ম",
     "epsLink": "লিংক",
     "epsApp": "অ্যাপ",
-    "download": "Download",
+    "download": "গ্রন্থাগার",
     "students": "ছাত্র",
     "education": "শিক্ষা",
     "mosque": "মসজিদ"
@@ -432,7 +432,7 @@
     "nextVideo": "পরের ভিডিও"
   },
   "download": {
-    "menu": "ডাউনলোড",
+    "menu": "গ্রন্থাগার",
     "itemPdf": "পিডিএফ",
     "itemEbookLeaflet": "ই-বুক ও লিফলেট",
     "itemBook": "বই",

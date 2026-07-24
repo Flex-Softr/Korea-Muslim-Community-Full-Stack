@@ -82,7 +82,7 @@
     "epsForm": "양식",
     "epsLink": "링크",
     "epsApp": "앱",
-    "download": "Download",
+    "download": "자료실",
     "students": "학생",
     "education": "교육",
     "mosque": "모스크"
@@ -432,7 +432,7 @@
     "nextVideo": "다음 동영상"
   },
   "download": {
-    "menu": "다운로드",
+    "menu": "자료실",
     "itemPdf": "PDF",
     "itemEbookLeaflet": "전자책·리플렛",
     "itemBook": "도서",

@@ -82,7 +82,7 @@
     "epsForm": "Form",
     "epsLink": "Link",
     "epsApp": "App",
-    "download": "Download",
+    "download": "Library",
     "students": "Students",
     "education": "Education",
     "mosque": "Mosque"
@@ -432,7 +432,7 @@
     "nextVideo": "Next video"
   },
   "download": {
-    "menu": "Download",
+    "menu": "Library",
     "itemPdf": "PDF",
     "itemEbookLeaflet": "eBook & Leaflet",
     "itemBook": "Book",
