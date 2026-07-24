@@ -67,6 +67,8 @@ Set **both** or **neither**:
 | **`SEED_USER_PASSWORD`** | Min 8 characters. |
 | **`SEED_USER_NAME`** | Optional display name. |
 | **`SEED_USER_ROLE`** | Optional: `USER`, `ADMIN`, or `SUPER_ADMIN` (default `ADMIN`). |
+| **`SUPER_ADMIN_EMAILS`** | Optional. Comma-separated emails always elevated to `SUPER_ADMIN` (upgrade-only). |
+| **`ADMIN_EMAILS`** | Optional. Comma-separated emails always elevated to `ADMIN` (upgrade-only). |
 
 ### SMTP & contact mail
 
@@ -95,6 +97,8 @@ APP_NAME="Korea Muslim Community"
 # SEED_USER_PASSWORD=
 # SEED_USER_NAME=
 # SEED_USER_ROLE=ADMIN
+# SUPER_ADMIN_EMAILS=admin@example.com
+# ADMIN_EMAILS=
 
 # EMAIL_FROM=
 # SMTP_HOST=

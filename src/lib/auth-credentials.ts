@@ -2,7 +2,8 @@ import "server-only";
 
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { parseUserRole, type UserRole } from "@/lib/roles";
+import { ensurePrivilegedDbRole } from "@/lib/privileged-roles";
+import type { UserRole } from "@/lib/roles";
 
 export type AuthenticatedCredentialsUser = {
   id: string;
@@ -60,6 +61,8 @@ export async function authenticateCredentials(
     return { ok: false, reason: "unverified" };
   }
 
+  const role = await ensurePrivilegedDbRole(user.id, user.email, user.role);
+
   return {
     ok: true,
     user: {
@@ -67,7 +70,7 @@ export async function authenticateCredentials(
       email: user.email,
       name: user.name ?? undefined,
       image: await resolveProfileImage(user.email),
-      role: parseUserRole(user.role),
+      role,
       emailVerified: true,
     },
   };

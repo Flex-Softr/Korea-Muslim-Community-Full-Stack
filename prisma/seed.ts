@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { loadServerEnv } from "../src/config/load-server-env";
-import { isUserRole, type UserRole } from "../src/lib/roles";
+import { parseUserRole, type UserRole } from "../src/lib/roles";
 
 const prisma = new PrismaClient();
 
@@ -10,9 +10,9 @@ async function main() {
   const email = env.SEED_USER_EMAIL;
   const password = env.SEED_USER_PASSWORD;
   const name = env.SEED_USER_NAME;
-  const rawRole = env.SEED_USER_ROLE;
-  const role: UserRole =
-    rawRole && isUserRole(rawRole) ? rawRole : "ADMIN";
+  const role: UserRole = env.SEED_USER_ROLE
+    ? parseUserRole(env.SEED_USER_ROLE)
+    : "ADMIN";
 
   if (!email || !password) {
     console.info(

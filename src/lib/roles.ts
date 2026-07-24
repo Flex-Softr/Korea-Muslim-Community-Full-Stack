@@ -19,23 +19,50 @@ const rank: Record<UserRole, number> = {
   SUPER_ADMIN: 2,
 };
 
+/** Normalize common aliases / casing to a canonical role, or null if unrecognized. */
+export function normalizeRoleString(
+  value: string | undefined | null,
+): UserRole | null {
+  if (!value?.trim()) return null;
+  const trimmed = value.trim();
+  if (isUserRole(trimmed)) return trimmed;
+
+  const underscored = trimmed.toUpperCase().replace(/[\s-]+/g, "_");
+  if (isUserRole(underscored)) return underscored;
+
+  const compact = trimmed.toLowerCase().replace(/[\s_-]+/g, "");
+  if (compact === "superadmin") return "SUPER_ADMIN";
+  if (compact === "admin") return "ADMIN";
+  if (compact === "user") return "USER";
+  return null;
+}
+
+export function roleRank(role: UserRole): number {
+  return rank[role];
+}
+
+export function higherRole(a: UserRole, b: UserRole): UserRole {
+  return rank[a] >= rank[b] ? a : b;
+}
+
 export function hasMinimumRole(
   userRole: string | undefined | null,
   minimum: UserRole,
 ): boolean {
-  if (!userRole || !isUserRole(userRole)) return false;
-  return rank[userRole] >= rank[minimum];
+  const role = normalizeRoleString(userRole);
+  if (!role) return false;
+  return rank[role] >= rank[minimum];
 }
 
 export function hasAnyRole(
   userRole: string | undefined | null,
   allowed: readonly UserRole[],
 ): boolean {
-  if (!userRole || !isUserRole(userRole)) return false;
-  return allowed.includes(userRole);
+  const role = normalizeRoleString(userRole);
+  if (!role) return false;
+  return allowed.includes(role);
 }
 
 export function parseUserRole(value: string | undefined | null): UserRole {
-  if (value && isUserRole(value)) return value;
-  return "USER";
+  return normalizeRoleString(value) ?? "USER";
 }

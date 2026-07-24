@@ -13,6 +13,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
+    "db:promote-user": "tsx scripts/promote-user-role.ts",
     "db:studio": "prisma studio",
     "db:migrate:split-content": "tsx scripts/migrate-split-dashboard-content.ts"
   },

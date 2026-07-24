@@ -210,7 +210,11 @@ export function UsersModule() {
       {
         key: "role",
         header: "Role",
-        render: (row) => (row.role === "ADMIN" ? "admin" : "user"),
+        render: (row) => {
+          if (row.role === "SUPER_ADMIN") return "super admin";
+          if (row.role === "ADMIN") return "admin";
+          return "user";
+        },
       },
       {
         key: "status",
@@ -250,7 +254,7 @@ export function UsersModule() {
             >
               <Eye className="size-4" />
             </Link>
-            {row.role === "ADMIN" ? (
+            {row.role === "SUPER_ADMIN" ? null : row.role === "ADMIN" ? (
               <Button
                 type="button"
                 size="icon-sm"
@@ -348,6 +352,7 @@ export function UsersModule() {
             <option value="">All roles</option>
             <option value="USER">user</option>
             <option value="ADMIN">admin</option>
+            <option value="SUPER_ADMIN">super admin</option>
           </select>
           <select
             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
@@ -391,7 +396,13 @@ export function UsersModule() {
                   <DetailItem label="Email" value={userDetails[row.id].email} />
                   <DetailItem
                     label="Role"
-                    value={userDetails[row.id].role === "ADMIN" ? "admin" : "user"}
+                    value={
+                      userDetails[row.id].role === "SUPER_ADMIN"
+                        ? "super admin"
+                        : userDetails[row.id].role === "ADMIN"
+                          ? "admin"
+                          : "user"
+                    }
                   />
                   <DetailItem label="Status" value={userDetails[row.id].status} />
                   <DetailItem label="Member Account" value={row.isMember ? "Yes" : "No"} />

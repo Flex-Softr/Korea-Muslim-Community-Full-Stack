@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { prisma } from "@/lib/prisma";
-import { parseUserRole } from "@/lib/roles";
+import { ensurePrivilegedDbRole } from "@/lib/privileged-roles";
 
 export default async function DashboardLayout({
   children,
@@ -36,7 +36,11 @@ export default async function DashboardLayout({
     redirect("/verify-email/pending");
   }
 
-  const role = parseUserRole(user.role);
+  const role = await ensurePrivilegedDbRole(
+    session.user.id,
+    user.email,
+    user.role,
+  );
 
   return (
     <DashboardShell

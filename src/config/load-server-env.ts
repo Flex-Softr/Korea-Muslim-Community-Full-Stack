@@ -30,6 +30,10 @@ const serverEnvSchema = z
       emptyToUndef,
       z.enum(["USER", "ADMIN", "SUPER_ADMIN"]).optional(),
     ),
+    /** Comma-separated emails always treated as SUPER_ADMIN (upgrade-only). */
+    SUPER_ADMIN_EMAILS: z.preprocess(emptyToUndef, z.string().optional()),
+    /** Comma-separated emails always treated as ADMIN (upgrade-only). */
+    ADMIN_EMAILS: z.preprocess(emptyToUndef, z.string().optional()),
     APP_NAME: z.preprocess(emptyToUndef, z.string().max(120).optional()),
     EMAIL_FROM: z.preprocess(emptyToUndef, z.string().min(1).optional()),
     SMTP_HOST: z.preprocess(emptyToUndef, z.string().min(1).optional()),
@@ -73,6 +77,8 @@ export function loadServerEnv(): ServerEnv {
     SEED_USER_PASSWORD: process.env.SEED_USER_PASSWORD,
     SEED_USER_NAME: process.env.SEED_USER_NAME,
     SEED_USER_ROLE: process.env.SEED_USER_ROLE,
+    SUPER_ADMIN_EMAILS: process.env.SUPER_ADMIN_EMAILS,
+    ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     APP_NAME: process.env.APP_NAME,
     EMAIL_FROM: process.env.EMAIL_FROM,
     SMTP_HOST: process.env.SMTP_HOST,
