@@ -41,6 +41,20 @@ type MemberRow = {
   profileVisibility: ProfileVisibility;
   contactEmail: string | null;
   sortOrder: number;
+  createdAt: string;
+};
+
+type MemberDetail = {
+  id: string;
+  memberCode: string | null;
+  name: string;
+  designation: string | null;
+  nameBn: string | null;
+  title: string | null;
+  category: string;
+  profileVisibility: ProfileVisibility;
+  contactEmail: string | null;
+  sortOrder: number;
   aboutSummary: string | null;
   bio: string | null;
   imageUrl: string | null;

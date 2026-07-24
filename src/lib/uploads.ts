@@ -35,11 +35,16 @@ export function queryValue(value: unknown): string | undefined {
 }
 
 export function getUploadRoot(): string {
-  return path.resolve(process.env.UPLOAD_DIR?.trim() || path.join(/* turbopackIgnore: true */ process.cwd(), "public"));
+  const configured = process.env.UPLOAD_DIR?.trim();
+  if (configured) {
+    // Dynamic upload root must not be file-traced into the bundle.
+    return path.resolve(/* turbopackIgnore: true */ configured);
+  }
+  return path.join(/* turbopackIgnore: true */ process.cwd(), "public");
 }
 
 export function getPublicUploadRoot(): string {
-  return path.resolve(/* turbopackIgnore: true */ process.cwd(), "public");
+  return path.join(/* turbopackIgnore: true */ process.cwd(), "public");
 }
 
 export function resolveUploadParts(rawType: unknown, rawFolder: unknown) {
