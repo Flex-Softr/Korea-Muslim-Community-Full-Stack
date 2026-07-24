@@ -99,7 +99,7 @@ const MODULE_TAB_MAPPING = {
     { label: "App", category: "EPS - App" },
   ],
   "Mosque": [
-    { label: "Our Mosque", category: "Mosque - Our Mosque" },
+    { label: "Mosque", category: "Mosque - Mosque" },
     { label: "Korea Mosques", category: "Mosque - Korea Mosques" },
   ],
 } as const;
@@ -107,8 +107,12 @@ const MODULE_TAB_MAPPING = {
 type ModuleType = keyof typeof MODULE_TAB_MAPPING;
 
 function findModuleAndTabByCategory(categoryStr: string) {
+  const normalized =
+    categoryStr?.toLowerCase() === "mosque - our mosque"
+      ? "Mosque - Mosque"
+      : categoryStr;
   for (const [moduleName, tabs] of Object.entries(MODULE_TAB_MAPPING)) {
-    const matchedTab = tabs.find((t) => t.category.toLowerCase() === categoryStr?.toLowerCase());
+    const matchedTab = tabs.find((t) => t.category.toLowerCase() === normalized?.toLowerCase());
     if (matchedTab) {
       return { module: moduleName as ModuleType, tab: matchedTab.category };
     }

@@ -21,7 +21,7 @@ export type MosquePhotoItem = {
   category: string;
 };
 
-type MosqueTabKey = "our-mosque" | "korea-mosques";
+type MosqueTabKey = "mosque" | "korea-mosques";
 
 const MOSQUE_TABS: Array<{
   key: MosqueTabKey;
@@ -29,7 +29,7 @@ const MOSQUE_TABS: Array<{
   icon: typeof Landmark;
 }> = [
   {
-    key: "our-mosque",
+    key: "mosque",
     label: "বায়তুল ফালাহ মসজিদ এন্ড ইসলামিক সেন্টার",
     icon: Landmark,
   },
@@ -38,7 +38,7 @@ const MOSQUE_TABS: Array<{
 
 function tabFromParam(value: string | null): MosqueTabKey {
   if (value === "korea-mosques") return "korea-mosques";
-  return "our-mosque";
+  return "mosque";
 }
 
 export function MosqueTabs({ photos }: { photos: MosquePhotoItem[] }) {
@@ -237,7 +237,7 @@ function MosqueMediaCarousel({
 }
 
 const TAB_CATEGORIES: Record<MosqueTabKey, string> = {
-  "our-mosque": "Mosque - Our Mosque",
+  mosque: "Mosque - Mosque",
   "korea-mosques": "Mosque - Korea Mosques",
 };
 
@@ -385,7 +385,7 @@ function MosquePanel({
   };
 }) {
   const Icon = tab.icon;
-  const categoryName = TAB_CATEGORIES[tab.key] || "Mosque - Our Mosque";
+  const categoryName = TAB_CATEGORIES[tab.key] || "Mosque - Mosque";
 
   return (
     <div className="space-y-6">
