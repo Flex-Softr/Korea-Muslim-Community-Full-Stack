@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma";
  * Use for load balancers and deploy scripts.
  */
 export async function GET() {
+  // Runtime-only — must not be prerendered without DATABASE_URL at build time.
+  await connection();
+
   const timestamp = new Date().toISOString();
   try {
     await prisma.user.findFirst({ select: { id: true } });

@@ -1,9 +1,9 @@
 import { GoogleAuth } from "google-auth-library";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 
 let token: null | string = null;
 
-async function getVisitorsByCountry(token: string) {
+async function getVisitorsByCountry(accessToken: string) {
   const propertyId = process.env.GA4_PROPERTY_ID;
 
   const response = await fetch(
@@ -11,7 +11,7 @@ async function getVisitorsByCountry(token: string) {
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -42,34 +42,52 @@ async function getVisitorsByCountry(token: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(_request: Request) {
+  // Opt out of Cache Components prerender — GA credentials are runtime-only.
+  await connection();
+
   const privateKey = process.env.GA_PRIVATE_KEY;
   const email = process.env.GA_CLIENT_EMAIL;
 
-  if (!token) {
-    const auth = new GoogleAuth({
-      credentials: {
-        client_email: email,
-        private_key: privateKey,
-      },
-      scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
-    });
-
-    const client = await auth.getClient();
-    token = (await client.getAccessToken()).token || null;
-
-    if (!token) {
-      return NextResponse.json({
-        status: 500,
-        message: "Google auth failed.",
-      });
-    }
+  if (!email || !privateKey || !process.env.GA4_PROPERTY_ID) {
+    return NextResponse.json(
+      { status: 503, message: "Google Analytics is not configured." },
+      { status: 503 },
+    );
   }
 
-  const data = await getVisitorsByCountry(token);
+  try {
+    if (!token) {
+      const auth = new GoogleAuth({
+        credentials: {
+          client_email: email,
+          private_key: privateKey,
+        },
+        scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
+      });
 
-  return NextResponse.json({
-    status: 200,
-    message: "OK",
-    data,
-  });
+      const client = await auth.getClient();
+      token = (await client.getAccessToken()).token || null;
+
+      if (!token) {
+        return NextResponse.json(
+          { status: 500, message: "Google auth failed." },
+          { status: 500 },
+        );
+      }
+    }
+
+    const data = await getVisitorsByCountry(token);
+
+    return NextResponse.json({
+      status: 200,
+      message: "OK",
+      data,
+    });
+  } catch (error) {
+    console.error("[visitor-history]", error);
+    return NextResponse.json(
+      { status: 500, message: "Failed to fetch visitor history." },
+      { status: 500 },
+    );
+  }
 }

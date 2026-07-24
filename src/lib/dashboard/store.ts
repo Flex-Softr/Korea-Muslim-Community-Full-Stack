@@ -715,11 +715,16 @@ export async function listPublicDashboardCarousel(): Promise<DashboardCarouselRo
   "use cache";
   cacheLife("minutes");
   cacheTag("cms:carousel", "cms:home");
-  const rows = await prisma.dashboardCarousel.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-  });
-  return rows.map((row) => mapCarouselRow(row as DbCarouselRow));
+  try {
+    const rows = await prisma.dashboardCarousel.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    });
+    return rows.map((row) => mapCarouselRow(row as DbCarouselRow));
+  } catch (error) {
+    console.error("[listPublicDashboardCarousel]", error);
+    return [];
+  }
 }
 
 export async function createDashboardCarousel(

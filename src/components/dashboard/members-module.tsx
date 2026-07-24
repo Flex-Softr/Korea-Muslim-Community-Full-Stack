@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState, startTransition } from "react";
 import Image from "next/image";
 import { Pencil, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -377,7 +377,9 @@ export function MembersModule() {
   }, [page, search, categoryFilter, visibilityFilter, notify]);
 
   useEffect(() => {
-    void load();
+    startTransition(() => {
+      void load();
+    });
   }, [load]);
 
   const applySearch = () => {
