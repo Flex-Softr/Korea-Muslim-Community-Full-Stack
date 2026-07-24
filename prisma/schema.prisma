@@ -80,7 +80,7 @@ model CommunityMember {
   certifications   String?
 
   sortOrder Int      @default(0)
-  /// EXECUTIVE | ADVISOR_BODY
+  /// CENTRAL_MEMBER | SURAH_MEMBER | MEMBER (legacy: EXECUTIVE | ADVISOR_BODY)
   category  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

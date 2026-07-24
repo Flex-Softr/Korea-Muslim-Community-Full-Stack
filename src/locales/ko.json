@@ -73,6 +73,8 @@
     "professionalDivision": "전문직 부문",
     "nationalAndInternational": "국내 및 국제",
     "media": "미디어",
+    "blog": "블로그",
+    "activity": "활동",
     "photoGallery": "사진 갤러리",
     "videoGallery": "비디오 갤러리",
     "members": "회원",
@@ -87,28 +89,34 @@
   },
   "members": {
     "nav": {
-      "executive": "임원 회원",
-      "advisorBody": "자문 위원회"
+      "centralMember": "중앙 책임자",
+      "surahMember": "수라 구성원",
+      "member": "구성원"
     },
     "detail": {
       "backTo": "목록으로"
     },
     "publicProfile": {
-      "bannerSubtitleAdvisor": "자문 회원",
-      "bannerSubtitleExecutive": "임원 회원",
-      "bannerSubtitleMember": "회원",
+      "bannerSubtitleSurahMember": "수라 구성원",
+      "bannerSubtitleCentralMember": "중앙 책임자",
+      "bannerSubtitleMember": "구성원",
       "metaTitleSuffix": "회원 프로필"
     },
     "section": {
-      "executive": {
-        "title": "임원 회원",
+      "centralMember": {
+        "title": "중앙 책임자",
         "subtitle": "프로그램을 조정하고 공동체를 대표하는 리더십과 직책 담당자입니다.",
-        "emptyMessage": "프로필이 게시되면 임원 목록이 여기에 표시됩니다."
+        "emptyMessage": "프로필이 게시되면 중앙 책임자 목록이 여기에 표시됩니다."
       },
-      "advisorBody": {
-        "title": "자문 위원회",
+      "surahMember": {
+        "title": "수라 구성원",
         "subtitle": "신앙, 윤리, 전략에서 조직을 안내하는 학자와 고위 자문입니다.",
-        "emptyMessage": "게시되면 자문 프로필이 여기에 표시됩니다."
+        "emptyMessage": "게시되면 수라 구성원 프로필이 여기에 표시됩니다."
+      },
+      "member": {
+        "title": "구성원",
+        "subtitle": "프로그램과 지역 활동에 참여하는 한국 전역의 커뮤니티 구성원입니다.",
+        "emptyMessage": "게시되면 구성원 프로필이 여기에 표시됩니다."
       }
     }
   },
@@ -283,7 +291,7 @@
     "description": "행사·교육·영적 지지·상호 부조로 한국의 무슬림을 연결합니다. 모두에게 열려 있습니다.",
     "contactTitle": "문의",
     "emailContactForm": "이메일 / 문의 양식",
-    "location": "대한민국",
+    "location": "경기도 화성시 팔탄면 구장리 212-22",
     "contactUs": "문의하기",
     "copyright": "© {{year}} 코리아 무슬림 커뮤니티. 무단 전재를 금합니다.",
     "developedBy": "제작:",

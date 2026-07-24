@@ -2,7 +2,9 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   isMemberCategory,
+  SLUG_CATEGORY_FILTERS,
   type MemberCategory,
+  type MemberSlug,
 } from "@/lib/members/config";
 
 /** Safe for client-boundary listing (no contact / journey / DOB). */
@@ -147,13 +149,20 @@ function mapProfileRow(m: CommunityMemberRow): CommunityMemberProfileDTO {
 }
 
 export async function getMembersByCategory(
-  category: MemberCategory,
+  categoryOrSlug: MemberCategory | MemberSlug,
   filters?: {
     homeDivisionBd?: string | null;
     homeDistrictBd?: string | null;
   },
 ): Promise<CommunityMemberListDTO[]> {
-  const where: Prisma.CommunityMemberWhereInput = { category };
+  const categories =
+    categoryOrSlug in SLUG_CATEGORY_FILTERS
+      ? SLUG_CATEGORY_FILTERS[categoryOrSlug as MemberSlug]
+      : [categoryOrSlug as MemberCategory];
+
+  const where: Prisma.CommunityMemberWhereInput = {
+    category: { in: categories },
+  };
   if (filters?.homeDivisionBd) {
     where.homeDivisionBd = filters.homeDivisionBd;
   }

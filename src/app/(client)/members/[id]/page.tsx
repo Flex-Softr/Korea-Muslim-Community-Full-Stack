@@ -16,14 +16,22 @@ type PageProps = {
 };
 
 function memberCategoryNavKey(category: string): string {
-  if (category === "ADVISOR_BODY") return "members.nav.advisorBody";
-  if (category === "EXECUTIVE") return "members.nav.executive";
-  return "members.publicProfile.bannerSubtitleMember";
+  if (category === "SURAH_MEMBER" || category === "ADVISOR_BODY") {
+    return "members.nav.surahMember";
+  }
+  if (category === "CENTRAL_MEMBER" || category === "EXECUTIVE") {
+    return "members.nav.centralMember";
+  }
+  return "members.nav.member";
 }
 
 function bannerFallbackSubtitle(st: (key: string) => string, category: string): string {
-  if (category === "ADVISOR_BODY") return st("members.publicProfile.bannerSubtitleAdvisor");
-  if (category === "EXECUTIVE") return st("members.publicProfile.bannerSubtitleExecutive");
+  if (category === "SURAH_MEMBER" || category === "ADVISOR_BODY") {
+    return st("members.publicProfile.bannerSubtitleSurahMember");
+  }
+  if (category === "CENTRAL_MEMBER" || category === "EXECUTIVE") {
+    return st("members.publicProfile.bannerSubtitleCentralMember");
+  }
   return st("members.publicProfile.bannerSubtitleMember");
 }
 

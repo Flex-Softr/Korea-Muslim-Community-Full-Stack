@@ -6,7 +6,6 @@ import { MemberTypeTabs } from "@/components/members/member-type-tabs";
 import { PageBanner } from "@/components/layout/page-banner";
 import {
   MEMBER_SECTION_I18N_KEYS,
-  SLUG_TO_CATEGORY,
   slugFromSearchParam,
 } from "@/lib/members/config";
 import { getMembersByCategory } from "@/lib/members/queries";
@@ -52,9 +51,8 @@ export default async function MemberDirectoryPage({ searchParams }: PageProps) {
   const st = await getServerT();
   const { type } = await searchParams;
   const slug = slugFromSearchParam(type);
-  const category = SLUG_TO_CATEGORY[slug];
   const keys = MEMBER_SECTION_I18N_KEYS[slug];
-  const members = await getMembersByCategory(category);
+  const members = await getMembersByCategory(slug);
 
   return (
     <>

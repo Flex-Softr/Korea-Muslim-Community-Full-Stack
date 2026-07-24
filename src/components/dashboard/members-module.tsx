@@ -22,8 +22,14 @@ import {
   patchDashboardMember,
 } from "@/lib/services/dashboard-members";
 
-type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY";
+type MemberCategory = "CENTRAL_MEMBER" | "SURAH_MEMBER" | "MEMBER";
 type ProfileVisibility = "PUBLIC" | "MEMBERS_ONLY";
+
+function normalizeCategory(value: string): MemberCategory {
+  if (value === "SURAH_MEMBER" || value === "ADVISOR_BODY") return "SURAH_MEMBER";
+  if (value === "MEMBER") return "MEMBER";
+  return "CENTRAL_MEMBER";
+}
 
 type MemberRow = {
   id: string;
@@ -31,21 +37,7 @@ type MemberRow = {
   name: string;
   designation: string | null;
   title: string | null;
-  category: MemberCategory;
-  profileVisibility: ProfileVisibility;
-  contactEmail: string | null;
-  sortOrder: number;
-  createdAt: string;
-};
-
-type MemberDetail = {
-  id: string;
-  memberCode: string | null;
-  name: string;
-  designation: string | null;
-  nameBn: string | null;
-  title: string | null;
-  category: MemberCategory;
+  category: string;
   profileVisibility: ProfileVisibility;
   contactEmail: string | null;
   sortOrder: number;
@@ -99,7 +91,11 @@ type MembersResponse = {
 };
 
 const PAGE_SIZE = 10;
-const CATEGORY_OPTIONS: MemberCategory[] = ["EXECUTIVE", "ADVISOR_BODY"];
+const CATEGORY_OPTIONS: MemberCategory[] = [
+  "CENTRAL_MEMBER",
+  "SURAH_MEMBER",
+  "MEMBER",
+];
 const VISIBILITY_OPTIONS: ProfileVisibility[] = ["PUBLIC", "MEMBERS_ONLY"];
 
 type BasicMemberForm = {
@@ -159,7 +155,7 @@ const EMPTY_FORM: BasicMemberForm = {
   designation: "",
   memberCode: "",
   title: "",
-  category: "EXECUTIVE",
+  category: "CENTRAL_MEMBER",
   profileVisibility: "PUBLIC",
   contactEmail: "",
   sortOrder: "0",
@@ -223,7 +219,7 @@ function detailToForm(detail: MemberDetail): FullMemberForm {
     designation: nullableToInput(detail.designation),
     memberCode: nullableToInput(detail.memberCode),
     title: nullableToInput(detail.title),
-    category: detail.category,
+    category: normalizeCategory(detail.category),
     profileVisibility: detail.profileVisibility,
     contactEmail: nullableToInput(detail.contactEmail),
     sortOrder: String(detail.sortOrder),
@@ -266,9 +262,10 @@ function detailToForm(detail: MemberDetail): FullMemberForm {
   };
 }
 
-function categoryLabel(value: MemberCategory): string {
-  if (value === "ADVISOR_BODY") return "Advisor Body";
-  return "Executive Member";
+function categoryLabel(value: string): string {
+  if (value === "SURAH_MEMBER" || value === "ADVISOR_BODY") return "Surah Member";
+  if (value === "MEMBER") return "Member";
+  return "Central Coordinator";
 }
 
 function visibilityLabel(value: ProfileVisibility): string {
@@ -450,7 +447,7 @@ export function MembersModule() {
       designation: row.designation ?? "",
       memberCode: row.memberCode ?? "",
       title: row.title ?? "",
-      category: row.category,
+      category: normalizeCategory(row.category),
       profileVisibility: row.profileVisibility,
       contactEmail: row.contactEmail ?? "",
       sortOrder: String(row.sortOrder),

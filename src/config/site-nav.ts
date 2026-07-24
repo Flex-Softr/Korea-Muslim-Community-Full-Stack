@@ -79,26 +79,27 @@ export const SITE_NAV: SiteNavItem[] = [
         labelKey: "nav.organizationalStructure",
         items: [
           {
-            kind: "submenu",
-            id: "central-organization",
+            // kind: "submenu",
+            kind: "link",
+            href: "/procedure/central-organization",
             labelKey: "nav.centralOrganization",
-            items: [
-              {
-                kind: "link",
-                href: "/organizational-structure/central-organization/central-working-procedure",
-                labelKey: "nav.centralWorkingProcedure",
-              },
-              {
-                kind: "link",
-                href: "/organizational-structure/central-organization/central-shura-council",
-                labelKey: "nav.centralShuraCouncil",
-              },
-              {
-                kind: "link",
-                href: "/organizational-structure/central-organization/other-leadership",
-                labelKey: "nav.otherLeadership",
-              },
-            ],
+            // items: [
+            //   {
+            //     kind: "link",
+            //     href: "/organizational-structure/central-organization/central-working-procedure",
+            //     labelKey: "nav.centralWorkingProcedure",
+            //   },
+            //   {
+            //     kind: "link",
+            //     href: "/organizational-structure/central-organization/central-shura-council",
+            //     labelKey: "nav.centralShuraCouncil",
+            //   },
+            //   {
+            //     kind: "link",
+            //     href: "/organizational-structure/central-organization/other-leadership",
+            //     labelKey: "nav.otherLeadership",
+            //   },
+            // ],
           },
           {
             kind: "link",
@@ -139,6 +140,16 @@ export const SITE_NAV: SiteNavItem[] = [
         kind: "link",
         href: "/video-gallery",
         labelKey: "nav.videoGallery",
+      },
+      {
+        kind: "link",
+        href: "/blog",
+        labelKey: "nav.blog",
+      },
+      {
+        kind: "link",
+        href: "/activity",
+        labelKey: "nav.activity",
       },
     ],
   },
@@ -187,7 +198,7 @@ export function isNavItemActive(
   }
 
   if (item.kind === "submenu" && item.items) {
-    return item.items.some((child) =>
+    return item.items.some(child =>
       isNavItemActive(pathname, searchParams, child),
     );
   }

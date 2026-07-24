@@ -305,12 +305,24 @@ type VideoProvider = "youtube" | "facebook" | "unknown";
 function detectVideoProvider(videoUrl: string): VideoProvider {
   if (!videoUrl) return "unknown";
   try {
-    const url = new URL(videoUrl.trim().startsWith("http") ? videoUrl.trim() : `https://${videoUrl.trim()}`);
+    const url = new URL(
+      videoUrl.trim().startsWith("http")
+        ? videoUrl.trim()
+        : `https://${videoUrl.trim()}`,
+    );
     const host = url.hostname.replace(/^www\./, "").toLowerCase();
-    if (host === "youtube.com" || host === "youtu.be" || host === "m.youtube.com") {
+    if (
+      host === "youtube.com" ||
+      host === "youtu.be" ||
+      host === "m.youtube.com"
+    ) {
       return "youtube";
     }
-    if (host === "facebook.com" || host === "fb.watch" || host === "m.facebook.com") {
+    if (
+      host === "facebook.com" ||
+      host === "fb.watch" ||
+      host === "m.facebook.com"
+    ) {
       return "facebook";
     }
   } catch {
@@ -546,7 +558,7 @@ export function VideoGallery({
   const [localYear, setLocalYear] = useState<number | null>(null);
   const baseItems = useMemo(() => {
     const items = sourceItems ?? VIDEO_GALLERY_ITEMS;
-    return items.map((item) => {
+    return items.map(item => {
       if (!item.localeContent) return item;
       const localized = pickLocalizedFields(item.localeContent, lang);
       return {
@@ -572,7 +584,7 @@ export function VideoGallery({
 
   const videoCategories = useMemo(
     () =>
-      [...new Set(baseItems.map((v) => v.category))].sort((a, b) =>
+      [...new Set(baseItems.map(v => v.category))].sort((a, b) =>
         a.localeCompare(b),
       ),
     [baseItems],
@@ -581,7 +593,7 @@ export function VideoGallery({
     () =>
       [
         ...new Set(
-          baseItems.map((v) => Number.parseInt(v.dateIso.slice(0, 4), 10)),
+          baseItems.map(v => Number.parseInt(v.dateIso.slice(0, 4), 10)),
         ),
       ]
         .filter(Number.isFinite)
@@ -592,7 +604,7 @@ export function VideoGallery({
   const fullList = useMemo(() => {
     const base = maxItems != null ? baseItems.slice(0, maxItems) : baseItems;
     if (!paginated) return base;
-    return base.filter((v) => {
+    return base.filter(v => {
       if (selectedCategory != null && v.category !== selectedCategory) {
         return false;
       }
@@ -700,11 +712,11 @@ export function VideoGallery({
   ]);
 
   const goPrev = useCallback(() => {
-    setOpenIndex((i) => (i === null ? i : (i - 1 + count) % count));
+    setOpenIndex(i => (i === null ? i : (i - 1 + count) % count));
   }, [count]);
 
   const goNext = useCallback(() => {
-    setOpenIndex((i) => (i === null ? i : (i + 1) % count));
+    setOpenIndex(i => (i === null ? i : (i + 1) % count));
   }, [count]);
 
   useEffect(() => {
@@ -760,12 +772,6 @@ export function VideoGallery({
             </p>
           </>
         ) : null}
-        <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis
-          distinctio placeat iusto veniam corrupti amet et tenetur quidem
-          voluptatem pariatur culpa, recusandae voluptatum quasi rem.
-          Consequatur illo vel minus obcaecati!
-        </p>
         {paginated ? (
           <>
             <ActivityCategoryFilter
@@ -856,7 +862,7 @@ export function VideoGallery({
       </div>
       <Dialog
         open={openIndex !== null}
-        onOpenChange={(next) => {
+        onOpenChange={next => {
           if (!next) {
             setOpenIndex(null);
           }
@@ -915,7 +921,8 @@ export function VideoGallery({
                     {active.title}
                   </p>
                   <p className="max-w-sm text-sm text-white/80">
-                    Facebook videos cannot be embedded directly. Watch it on Facebook instead.
+                    Facebook videos cannot be embedded directly. Watch it on
+                    Facebook instead.
                   </p>
                   <a
                     href={active.embedUrl}

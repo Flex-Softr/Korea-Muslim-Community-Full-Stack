@@ -62,7 +62,7 @@ type UsersResponse = {
   };
 };
 
-type MemberCategory = "EXECUTIVE" | "ADVISOR_BODY";
+type MemberCategory = "CENTRAL_MEMBER" | "SURAH_MEMBER" | "MEMBER";
 
 const PAGE_SIZE = 10;
 
@@ -118,7 +118,7 @@ export function UsersModule() {
   const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
   const [suspendTarget, setSuspendTarget] = useState<UserRow | null>(null);
   const [convertTarget, setConvertTarget] = useState<UserRow | null>(null);
-  const [convertRole, setConvertRole] = useState<MemberCategory>("EXECUTIVE");
+  const [convertRole, setConvertRole] = useState<MemberCategory>("CENTRAL_MEMBER");
   const [userDetails, setUserDetails] = useState<Record<string, UserDetail>>({});
   const [loadingDetails, setLoadingDetails] = useState<Record<string, boolean>>({});
 
@@ -290,7 +290,7 @@ export function UsersModule() {
                 variant="outline"
                 onClick={() => {
                   setConvertTarget(row);
-                  setConvertRole("EXECUTIVE");
+                  setConvertRole("CENTRAL_MEMBER");
                 }}
                 title="Convert to member"
                 className="hover:bg-muted hover:text-foreground"
@@ -445,7 +445,7 @@ export function UsersModule() {
         onOpenChange={(open) => {
           if (!open) {
             setConvertTarget(null);
-            setConvertRole("EXECUTIVE");
+            setConvertRole("CENTRAL_MEMBER");
           }
         }}
         title="Convert user to member?"
@@ -457,7 +457,7 @@ export function UsersModule() {
           if (!convertTarget) return;
           void convertToMember(convertTarget, convertRole);
           setConvertTarget(null);
-          setConvertRole("EXECUTIVE");
+          setConvertRole("CENTRAL_MEMBER");
         }}
       >
         <div className="space-y-2">
@@ -470,8 +470,9 @@ export function UsersModule() {
             value={convertRole}
             onChange={(e) => setConvertRole(e.target.value as MemberCategory)}
           >
-            <option value="EXECUTIVE">Executive Member</option>
-            <option value="ADVISOR_BODY">Advisor Body</option>
+            <option value="CENTRAL_MEMBER">Central Coordinator</option>
+            <option value="SURAH_MEMBER">Surah Member</option>
+            <option value="MEMBER">Member</option>
           </select>
         </div>
       </ConfirmActionModal>

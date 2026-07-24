@@ -73,6 +73,8 @@
     "professionalDivision": "Professional Division",
     "nationalAndInternational": "National & International",
     "media": "Media",
+    "blog": "Blog",
+    "activity": "Activity",
     "photoGallery": "Photo Gallery",
     "videoGallery": "Video Gallery",
     "members": "Members",
@@ -87,28 +89,34 @@
   },
   "members": {
     "nav": {
-      "executive": "Executive Member",
-      "advisorBody": "Advisor Body"
+      "centralMember": "Central Coordinator",
+      "surahMember": "Surah Member",
+      "member": "Member"
     },
     "detail": {
       "backTo": "Back to"
     },
     "publicProfile": {
-      "bannerSubtitleAdvisor": "Advisor member",
-      "bannerSubtitleExecutive": "Executive member",
+      "bannerSubtitleSurahMember": "Surah member",
+      "bannerSubtitleCentralMember": "Central coordinator",
       "bannerSubtitleMember": "Member",
       "metaTitleSuffix": "Member profile"
     },
     "section": {
-      "executive": {
-        "title": "Executive members",
+      "centralMember": {
+        "title": "Central coordinators",
         "subtitle": "Leadership and office holders who coordinate programmes and represent the community.",
-        "emptyMessage": "Executive listings will appear here once profiles are published."
+        "emptyMessage": "Central coordinator listings will appear here once profiles are published."
       },
-      "advisorBody": {
-        "title": "Advisor body",
+      "surahMember": {
+        "title": "Surah members",
         "subtitle": "Scholars and senior advisors who guide the organisation on faith, ethics, and strategy.",
-        "emptyMessage": "Advisor profiles will appear here once they are published."
+        "emptyMessage": "Surah member profiles will appear here once they are published."
+      },
+      "member": {
+        "title": "Members",
+        "subtitle": "Community members across Korea who participate in programmes and local activities.",
+        "emptyMessage": "Member profiles will appear here once they are published."
       }
     }
   },
@@ -283,7 +291,7 @@
     "description": "Connecting Muslims across Korea through events, education, spiritual support, and mutual aid — open to everyone.",
     "contactTitle": "Contact",
     "emailContactForm": "Email / contact form",
-    "location": "Republic of Korea",
+    "location": "212-22 Gujang-ri, Paltan-myeon, Hwaseong-si, Gyeonggi-do, South Korea",
     "contactUs": "Contact us",
     "copyright": "© {{year}} Korea Muslim Community. All rights reserved.",
     "developedBy": "Developed by",
