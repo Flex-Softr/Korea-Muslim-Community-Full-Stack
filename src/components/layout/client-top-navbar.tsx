@@ -23,6 +23,7 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { useToastSystem } from "../ui/toast-system";
 import { ClientUserMenu } from "./client-user-menu";
 
+import { SITE_CONTACT } from "@/lib/site-contact";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -68,12 +69,12 @@ export function TopHeaderBar({
         <div className="hidden items-center gap-6 text-sm md:flex">
           <span className="flex gap-1.5">
             <Mail className="size-4" />
-            <a href="mailto:info@kmc.com">info@kmc.com</a>
+            <a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
           </span>
 
           <span className="flex gap-1.5">
             <Phone className="size-4" />
-            <a href="tel:+821012345678">+82 10-1234-5678</a>
+            <a href={`tel:${SITE_CONTACT.phoneTel}`}>{SITE_CONTACT.phoneDisplay}</a>
           </span>
         </div>
 
@@ -221,11 +222,11 @@ export function TopHeaderBar({
 //         <div className="hidden items-center gap-6 text-sm md:flex">
 //           <span className="flex gap-1.5">
 //             <Mail className="size-4" />{" "}
-//             <a href="mailto:info@kmc.com">info@kmc.com</a>
+//             <a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
 //           </span>
 //           <span className="flex gap-1.5">
 //             <Phone className="size-4" />{" "}
-//             <a href="tel:+821012345678">+82 10-1234-5678</a>
+//             <a href={`tel:${SITE_CONTACT.phoneTel}`}>{SITE_CONTACT.phoneDisplay}</a>
 //           </span>
 //         </div>
 

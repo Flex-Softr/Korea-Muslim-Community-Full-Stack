@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { FooterScrollTop } from "@/components/layout/footer-scroll-top";
 import { SiteLogoMark } from "@/components/layout/site-logo-mark";
 import { useLanguage } from "@/components/providers/language-provider";
@@ -10,6 +10,7 @@ import {
   MEMBER_SLUGS,
   memberListingHref,
 } from "@/lib/members/config";
+import { SITE_CONTACT } from "@/lib/site-contact";
 import { cn } from "@/lib/utils";
 
 function SocialLink({
@@ -242,17 +243,27 @@ export function ClientFooter() {
               </h3>
               <ul className="mt-4 space-y-3 text-md">
                 <li>
-                  <Link
-                    href="/contact"
+                  <a
+                    href={`mailto:${SITE_CONTACT.email}`}
                     className="flex gap-3 text-white/70 hover:text-white"
                   >
-                    <Mail className="size-4 text-sky-400" />
-                    {t("footer.emailContactForm")}
-                  </Link>
+                    <Mail className="size-4 shrink-0 text-sky-400" />
+                    {SITE_CONTACT.email}
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href={`tel:${SITE_CONTACT.phoneTel}`}
+                    className="flex gap-3 text-white/70 hover:text-white"
+                  >
+                    <Phone className="size-4 shrink-0 text-sky-400" />
+                    {SITE_CONTACT.phoneDisplay}
+                  </a>
                 </li>
 
                 <li className="flex gap-3 text-white/70">
-                  <MapPin className="size-4 text-sky-400" />
+                  <MapPin className="size-4 shrink-0 text-sky-400" />
                   {t("footer.location")}
                 </li>
 
@@ -261,7 +272,7 @@ export function ClientFooter() {
                     href="/contact"
                     className="flex gap-3 text-white/70 hover:text-white"
                   >
-                    <MessageCircle className="size-4 text-sky-400" />
+                    <MessageCircle className="size-4 shrink-0 text-sky-400" />
                     {t("footer.contactUs")}
                   </Link>
                 </li>
