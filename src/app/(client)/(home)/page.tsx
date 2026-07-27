@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 
 import { HomeDonationCta } from "../components/home-donation-cta";
+import { HomeGeography } from "../components/home-geography";
 import { HomeQuickContact } from "../components/home-quick-contact";
 import { HeroCarousel } from "../components/hero-carousel";
 import { HomeWhoWeAre } from "../components/home-who-we-are";
@@ -151,6 +152,7 @@ async function HomeContent() {
       <VideoGallery maxItems={8} sourceItems={data.videos.items} />
       <HomeDonationCta />
       <HomeQuickContact />
+      <HomeGeography />
     </>
   );
 }

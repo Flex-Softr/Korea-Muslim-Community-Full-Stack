@@ -356,6 +356,15 @@
     "actYouthSports": "청년·체육",
     "actInternational": "국제"
   },
+  "homeGeography": {
+    "eyebrow": "웹사이트 방문자",
+    "title": "국가별 방문자",
+    "totalLabel": "사이트 방문자 (365일)",
+    "countriesLabel": "국가",
+    "visitorsLabel": "방문자",
+    "mapLabel": "국가별 웹사이트 방문자",
+    "empty": "방문자 데이터를 불러올 수 없습니다."
+  },
   "homeWhoWeAre": {
     "eyebrow": "우리를 소개합니다",
     "subtitle": "한국 무슬림 커뮤니티",

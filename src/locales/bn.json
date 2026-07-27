@@ -356,6 +356,15 @@
     "actYouthSports": "যুব ও ক্রীড়া",
     "actInternational": "আন্তর্জাতিক"
   },
+  "homeGeography": {
+    "eyebrow": "ওয়েবসাইট ভিজিটর",
+    "title": "দেশ অনুযায়ী ভিজিটর",
+    "totalLabel": "সাইট ভিজিটর (৩৬৫ দিন)",
+    "countriesLabel": "দেশ",
+    "visitorsLabel": "ভিজিটর",
+    "mapLabel": "দেশ অনুযায়ী ওয়েবসাইট ভিজিটর",
+    "empty": "ভিজিটর ডেটা এখন উপলব্ধ নয়।"
+  },
   "homeWhoWeAre": {
     "eyebrow": "আমরা কারা",
     "subtitle": "কোরিয়ার মুসলিম কমিউনিটি",
