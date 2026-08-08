@@ -2,7 +2,7 @@
   "common": {
     "login": "로그인",
     "home": "홈",
-    "blog": "블로그",
+    "blog": "공지",
     "activity": "활동",
     "about": "소개",
     "media": "미디어",
@@ -23,6 +23,9 @@
     "backToHome": "← 홈으로",
     "backToHomePlain": "홈으로"
   },
+  "header": {
+    "brandTitle": "코리아 무슬림 커뮤니티"
+  },
   "blog": {
     "noPostsYet": "게시물이 아직 없습니다.",
     "noPostsMatch": "필터와 일치하는 게시물이 없습니다. 다른 필터를 사용하거나",
@@ -37,10 +40,10 @@
     "filterByYear": "연도별 필터",
     "allYears": "전체 연도",
     "clearYear": "연도 초기화",
-    "homeHeading": "블로그",
-    "sectionEmpty": "아직 블로그 글이 없습니다.",
-    "viewAllPosts": "블로그 전체 보기",
-    "embeddedAria": "블로그 글"
+    "homeHeading": "공지",
+    "sectionEmpty": "아직 공지가 없습니다.",
+    "viewAllPosts": "공지 전체 보기",
+    "embeddedAria": "공지"
   },
   "activity": {
     "noStoriesYet": "아직 소식이 없습니다.",
@@ -73,7 +76,7 @@
     "professionalDivision": "전문직 부문",
     "nationalAndInternational": "국내 및 국제",
     "media": "미디어",
-    "blog": "블로그",
+    "blog": "공지",
     "activity": "활동",
     "photoGallery": "사진 갤러리",
     "videoGallery": "비디오 갤러리",
@@ -122,11 +125,11 @@
   },
   "pages": {
     "blog": {
-      "subtitle": "기사, 공지, 학생 소식을 뉴스 형식으로 제공합니다.",
-      "archiveLink": "블로그 목록",
-      "backToArchive": "블로그 목록으로",
-      "sidebarHeading": "블로그의 다른 글",
-      "sidebarSub": "최근 기사와 공지",
+      "subtitle": "공지 및 커뮤니티 업데이트를 제공합니다.",
+      "archiveLink": "공지 목록",
+      "backToArchive": "공지 목록으로",
+      "sidebarHeading": "다른 공지",
+      "sidebarSub": "최근 공지와 안내",
       "sidebarFooter": "전체 목록 보기",
       "byline": "{{name}} 작성"
     },
@@ -470,10 +473,10 @@
     "headerLanguageShort": "언어",
     "nav": {
       "profile": "프로필",
-      "blogs": "블로그",
-      "allBlogs": "전체 블로그",
+      "blogs": "공지",
+      "allBlogs": "전체 공지",
       "categories": "카테고리",
-      "pendingBlogs": "승인 대기 블로그",
+      "pendingBlogs": "승인 대기 공지",
       "activity": "활동",
       "allActivities": "전체 활동",
       "articles": "기사",
@@ -526,15 +529,15 @@
       "title": "내 대시보드",
       "introBeforeLink": "프로필 요약을 확인하세요. 전체 등록 정보는",
       "introAfterLink": "에서 수정하세요.",
-      "writeBlog": "블로그 작성",
+      "writeBlog": "공지 작성",
       "loadingProfile": "프로필 불러오는 중…",
       "email": "이메일",
       "name": "이름",
       "memberCode": "회원 코드",
       "cityKorea": "도시(한국)",
       "editFullProfile": "설정에서 전체 프로필 수정",
-      "myBlogs": "내 블로그",
-      "noBlogsYet": "아직 작성한 블로그가 없습니다.",
+      "myBlogs": "내 공지",
+      "noBlogsYet": "아직 작성한 공지가 없습니다.",
       "colTitle": "제목",
       "colCategory": "분류",
       "colStatus": "상태",

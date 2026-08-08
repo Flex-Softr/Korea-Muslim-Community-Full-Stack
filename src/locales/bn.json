@@ -2,7 +2,7 @@
   "common": {
     "login": "লগইন",
     "home": "হোম",
-    "blog": "ব্লগ",
+    "blog": "নোটিশ",
     "activity": "অ্যাক্টিভিটি",
     "about": "পরিচিতি",
     "media": "মিডিয়া",
@@ -23,6 +23,9 @@
     "backToHome": "← হোমে ফিরুন",
     "backToHomePlain": "হোমে ফিরুন"
   },
+  "header": {
+    "brandTitle": "কোরিয়া মুসলিম কমিউনিটি"
+  },
   "blog": {
     "noPostsYet": "এখনও কোনো পোস্ট নেই।",
     "noPostsMatch": "ফিল্টারের সাথে কোনো পোস্ট মেলেনি। অন্য ফিল্টার চেষ্টা করুন বা",
@@ -37,10 +40,10 @@
     "filterByYear": "বছর দিয়ে ফিল্টার করুন",
     "allYears": "সব বছর",
     "clearYear": "বছর মুছুন",
-    "homeHeading": "আমাদের ব্লগ",
-    "sectionEmpty": "এখনও কোনো ব্লগ পোস্ট নেই।",
-    "viewAllPosts": "সব ব্লগ পোস্ট দেখুন",
-    "embeddedAria": "ব্লগ পোস্ট"
+    "homeHeading": "আমাদের নোটিশ",
+    "sectionEmpty": "এখনও কোনো নোটিশ নেই।",
+    "viewAllPosts": "সব নোটিশ দেখুন",
+    "embeddedAria": "নোটিশ"
   },
   "activity": {
     "noStoriesYet": "এখনও কোনো আপডেট নেই।",
@@ -73,7 +76,7 @@
     "professionalDivision": "পেশাজীবী বিভাগ",
     "nationalAndInternational": "জাতীয় ও আন্তর্জাতিক",
     "media": "মিডিয়া",
-    "blog": "ব্লগ",
+    "blog": "নোটিশ",
     "activity": "অ্যাক্টিভিটি",
     "photoGallery": "ফটো গ্যালারি",
     "videoGallery": "ভিডিও গ্যালারি",
@@ -90,14 +93,14 @@
   "members": {
     "nav": {
       "centralMember": "কেন্দ্রীয় দায়িত্বশীল",
-      "surahMember": "সূরা সদস্য",
+      "surahMember": "শূরা সদস্য",
       "member": "সদস্য"
     },
     "detail": {
       "backTo": "ফিরে যান"
     },
     "publicProfile": {
-      "bannerSubtitleSurahMember": "সূরা সদস্য",
+      "bannerSubtitleSurahMember": "শূরা সদস্য",
       "bannerSubtitleCentralMember": "কেন্দ্রীয় দায়িত্বশীল",
       "bannerSubtitleMember": "সদস্য",
       "metaTitleSuffix": "সদস্য প্রোফাইল"
@@ -109,9 +112,9 @@
         "emptyMessage": "প্রোফাইল প্রকাশিত হলে এখানে কেন্দ্রীয় দায়িত্বশীলদের তালিকা দেখাবে।"
       },
       "surahMember": {
-        "title": "সূরা সদস্যগণ",
+        "title": "শূরা সদস্যগণ",
         "subtitle": "পণ্ডিত ও জ্যেষ্ঠ উপদেষ্টাগণ যারা বিশ্বাস, নীতিশাস্ত্র ও কৌশলে সংগঠনকে পরামর্শ দেন।",
-        "emptyMessage": "প্রকাশিত হলে সূরা সদস্যদের প্রোফাইল এখানে থাকবে।"
+        "emptyMessage": "প্রকাশিত হলে শূরা সদস্যদের প্রোফাইল এখানে থাকবে।"
       },
       "member": {
         "title": "সদস্যগণ",
@@ -122,11 +125,11 @@
   },
   "pages": {
     "blog": {
-      "subtitle": "নিবন্ধ, ঘোষণা ও ছাত্রজীবনের খবর—খবরের আকারে।",
-      "archiveLink": "ব্লগ আর্কাইভ",
-      "backToArchive": "ব্লগ আর্কাইভে ফিরুন",
-      "sidebarHeading": "ব্লগের আরও লেখা",
-      "sidebarSub": "সাম্প্রতিক নিবন্ধ ও ঘোষণা",
+      "subtitle": "নোটিশ, ঘোষণা ও কমিউনিটি আপডেট।",
+      "archiveLink": "নোটিশ আর্কাইভ",
+      "backToArchive": "নোটিশ আর্কাইভে ফিরুন",
+      "sidebarHeading": "আরও নোটিশ",
+      "sidebarSub": "সাম্প্রতিক নোটিশ ও ঘোষণা",
       "sidebarFooter": "সম্পূর্ণ আর্কাইভ দেখুন",
       "byline": "লেখক: {{name}}"
     },
@@ -470,10 +473,10 @@
     "headerLanguageShort": "ভাষা",
     "nav": {
       "profile": "প্রোফাইল",
-      "blogs": "ব্লগ",
-      "allBlogs": "সব ব্লগ",
+      "blogs": "নোটিশ",
+      "allBlogs": "সব নোটিশ",
       "categories": "বিভাগ",
-      "pendingBlogs": "অনুমোদনের অপেক্ষায় ব্লগ",
+      "pendingBlogs": "অনুমোদনের অপেক্ষায় নোটিশ",
       "activity": "কার্যক্রম",
       "allActivities": "সব কার্যক্রম",
       "articles": "আর্টিকেল",
@@ -526,15 +529,15 @@
       "title": "আমার ড্যাশবোর্ড",
       "introBeforeLink": "সংক্ষিপ্ত প্রোফাইল দেখুন। সম্পূর্ণ নিবন্ধন সম্পাদনা করতে যান",
       "introAfterLink": "।",
-      "writeBlog": "ব্লগ লিখুন",
+      "writeBlog": "নোটিশ লিখুন",
       "loadingProfile": "প্রোফাইল লোড হচ্ছে…",
       "email": "ইমেইল",
       "name": "নাম",
       "memberCode": "সদস্য কোড",
       "cityKorea": "শহর (কোরিয়া)",
       "editFullProfile": "সেটিংসে সম্পূর্ণ প্রোফাইল সম্পাদনা করুন",
-      "myBlogs": "আমার ব্লগ",
-      "noBlogsYet": "আপনি এখনও কোনো ব্লগ তৈরি করেননি।",
+      "myBlogs": "আমার নোটিশ",
+      "noBlogsYet": "আপনি এখনও কোনো নোটিশ তৈরি করেননি।",
       "colTitle": "শিরোনাম",
       "colCategory": "বিভাগ",
       "colStatus": "অবস্থা",

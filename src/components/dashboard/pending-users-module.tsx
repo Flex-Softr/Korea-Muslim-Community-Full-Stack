@@ -273,7 +273,7 @@ export function PendingUsersModule() {
                   <DetailItem label="Bio" value={userDetails[row.id].profile?.bio || "N/A"} />
                   <DetailImage label="Profile Image" src={userDetails[row.id].profile?.imageUrl} />
                   <DetailItem
-                    label="Submitted Blogs"
+                    label="Submitted Notices"
                     value={String(userDetails[row.id].submittedBlogs.length)}
                   />
                 </div>

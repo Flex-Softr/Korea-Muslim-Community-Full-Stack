@@ -61,7 +61,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
           fetch("/api/dashboard/categories?type=blog", { cache: "no-store" }),
         ]);
         if (!itemRes.ok) {
-          notify("Blog not found.", "error");
+          notify("Notice not found.", "error");
           router.push("/dashboard/content/blog/blogs");
           return;
         }
@@ -74,7 +74,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
         setCoverImage(item.coverImage ?? null);
         setCategories((categoryData.items ?? []).map((c) => c.name));
       } catch {
-        if (!cancelled) notify("Could not load blog.", "error");
+        if (!cancelled) notify("Could not load notice.", "error");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -110,13 +110,13 @@ export function EditBlogPageForm({ id }: { id: string }) {
           }),
         });
         if (!res.ok) {
-          notify("Could not update blog.", "error");
+          notify("Could not update notice.", "error");
           return;
         }
-        notify("Blog updated.", "success");
+        notify("Notice updated.", "success");
         router.push("/dashboard/content/blog/blogs");
       } catch {
-        notify("Could not update blog.", "error");
+        notify("Could not update notice.", "error");
       } finally {
         setIsSubmitting(false);
       }
@@ -129,7 +129,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Edit Blog</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Edit Notice</h1>
           <p className="text-sm text-muted-foreground">
             Edit each language using the tabs above. Save when you are done.
           </p>
@@ -138,13 +138,13 @@ export function EditBlogPageForm({ id }: { id: string }) {
           href="/dashboard/content/blog/blogs"
           className={buttonVariants({ variant: "outline", size: "default" })}
         >
-          Back to all blogs
+          Back to all notices
         </Link>
       </div>
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         {loading || !localeContent || !block ? (
-          <p className="text-sm text-muted-foreground">Loading blog...</p>
+          <p className="text-sm text-muted-foreground">Loading notice...</p>
         ) : (
           <div className="space-y-4">
             <DashboardContentLocaleTabBar value={editLocale} onChange={setEditLocale} />
@@ -176,7 +176,7 @@ export function EditBlogPageForm({ id }: { id: string }) {
                 onChange={setCoverImage}
                 maxSizeMb={5}
                 uploadType="blog"
-                helperText="Upload featured image for the blog post."
+                helperText="Upload featured image for the notice."
               />
             </div>
 

@@ -137,7 +137,7 @@ export default async function MembersProfilePage({ params }: PageProps) {
           </div>
 
           <div className="mt-8">
-            <h2 className="mb-4 text-xl font-semibold">Blogs by this member</h2>
+            <h2 className="mb-4 text-xl font-semibold">Notices by this member</h2>
             {blogs.length === 0 ? (
               <p className="text-sm text-muted-foreground">No published blogs found for this member.</p>
             ) : (

@@ -40,7 +40,7 @@ export function AddBlogPageForm() {
         setCategories((data.items ?? []).map((item) => item.name));
       } catch {
         if (!cancelled) {
-          notify("Could not load blog categories.", "error");
+          notify("Could not load notice categories.", "error");
         }
       }
     };
@@ -90,13 +90,13 @@ export function AddBlogPageForm() {
           }),
         });
         if (!res.ok) {
-          notify("Could not create blog.", "error");
+          notify("Could not create notice.", "error");
           return;
         }
-        notify("Blog created.", "success");
+        notify("Notice created.", "success");
         router.push("/dashboard/content/blog/blogs");
       } catch {
-        notify("Could not create blog.", "error");
+        notify("Could not create notice.", "error");
       } finally {
         setIsSubmitting(false);
       }
@@ -107,16 +107,16 @@ export function AddBlogPageForm() {
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Add Blog</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Add Notice</h1>
           <p className="text-sm text-muted-foreground">
-            Create a new blog post with rich description and featured image.
+            Create a new notice with rich description and featured image.
           </p>
         </div>
         <Link
           href="/dashboard/content/blog/blogs"
           className={buttonVariants({ variant: "outline", size: "default" })}
         >
-          Back to all blogs
+          Back to all notices
         </Link>
       </div>
 
@@ -155,7 +155,7 @@ export function AddBlogPageForm() {
               onChange={setCoverImage}
               maxSizeMb={5}
               uploadType="blog"
-              helperText="Upload featured image for the blog post."
+              helperText="Upload featured image for the notice."
             />
           </div>
 

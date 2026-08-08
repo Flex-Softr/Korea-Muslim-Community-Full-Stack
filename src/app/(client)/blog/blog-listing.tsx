@@ -114,7 +114,7 @@ export function BlogListing({
           title={t("blog.filterByYear")}
           allLabel={t("blog.allYears")}
           clearLabel={t("blog.clearYear")}
-          ariaLabel="Blog years"
+          ariaLabel="Notice years"
           className="mb-8 sm:mb-10"
         />
 
@@ -167,7 +167,7 @@ export function BlogListing({
             totalPages={totalPages}
             onPageChange={setPage}
             className="mt-10"
-            ariaLabel="Blog list pagination"
+            ariaLabel="Notice list pagination"
             showSummary
             align="center"
           />
@@ -281,7 +281,7 @@ export function BlogListing({
 //           title={t("blog.filterByYear")}
 //           allLabel={t("blog.allYears")}
 //           clearLabel={t("blog.clearYear")}
-//           ariaLabel="Blog years"
+//           ariaLabel="Notice years"
 //           className="mb-8 sm:mb-10"
 //         />
 
@@ -364,7 +364,7 @@ export function BlogListing({
 //             totalPages={totalPages}
 //             onPageChange={setPage}
 //             className="mt-10"
-//             ariaLabel="Blog list pagination"
+//             ariaLabel="Notice list pagination"
 //             showSummary
 //             align="center"
 //           />

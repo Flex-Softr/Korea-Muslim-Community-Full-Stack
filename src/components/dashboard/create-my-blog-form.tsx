@@ -53,7 +53,7 @@ export function CreateMyBlogForm() {
     if (!plain) return notify("Content is required.", "warning");
     const categoryValue = category.trim() || categories[0] || "General";
     if (!categoryValue.trim()) {
-      notify("Category is required. Add a blog category in the dashboard or pick one from the list.", "warning");
+      notify("Category is required. Add a notice category in the dashboard or pick one from the list.", "warning");
       return;
     }
 
@@ -70,10 +70,10 @@ export function CreateMyBlogForm() {
         }),
       });
       if (!res.ok) {
-        notify("Could not create blog.", "error");
+        notify("Could not create notice.", "error");
         return;
       }
-      notify("Blog submitted successfully.", "success");
+      notify("Notice submitted successfully.", "success");
       router.push("/dashboard#my-blogs");
     })();
   };
@@ -82,13 +82,13 @@ export function CreateMyBlogForm() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Write Blog</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Write Notice</h1>
           <p className="text-sm text-muted-foreground">
-            Create your blog post. It will be saved as pending.
+            Create your notice. It will be saved as pending.
           </p>
         </div>
         <Link href="/dashboard#my-blogs" className={buttonVariants({ variant: "outline" })}>
-          Back to My Blogs
+          Back to My Notices
         </Link>
       </div>
 
@@ -133,7 +133,7 @@ export function CreateMyBlogForm() {
               value={content}
               onChange={setContent}
               uploadType="blog"
-              placeholder="Write your blog content..."
+              placeholder="Write your notice content..."
             />
           </div>
 
@@ -144,7 +144,7 @@ export function CreateMyBlogForm() {
               onChange={setThumbnail}
               maxSizeMb={5}
               uploadType="blog"
-              helperText="Optional thumbnail image for your blog."
+              helperText="Optional thumbnail image for your notice."
             />
           </div>
 
@@ -153,7 +153,7 @@ export function CreateMyBlogForm() {
               Cancel
             </Link>
             <Button type="button" onClick={onSubmit}>
-              Submit Blog
+              Submit Notice
             </Button>
           </div>
         </div>

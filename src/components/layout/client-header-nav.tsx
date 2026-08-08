@@ -202,7 +202,7 @@ function DesktopNav({
   t: NavTranslate;
 }) {
   return (
-    <nav className="hidden lg:flex gap-2">
+    <nav className="hidden lg:flex gap-1">
       {SITE_NAV.map((item) => (
         <DesktopMenu
           key={item.labelKey}
@@ -368,7 +368,7 @@ function HeaderInner({ user }: { user: Session["user"] | null }) {
           t={navT}
         />
 
-        <div className="hidden pl-4 md:block">
+        <div className="hidden pl-2 md:block">
           <DownloadMenu variant="header" />
         </div>
 
@@ -380,7 +380,7 @@ function HeaderInner({ user }: { user: Session["user"] | null }) {
           {mobileOpen ? (
             <X />
           ) : (
-            <Menu className="size-6 h-10 w-10 rounded-sm p-1 shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
+            <Menu className="size-5 h-8 w-8 rounded-sm p-1 shadow-sm shadow-zinc-800/60 hover:bg-zinc-800 focus-visible:ring-[#2c7bb6]/50 focus-visible:ring-offset-background dark:text-zinc-300 dark:hover:bg-zinc-800" />
           )}
         </button>
       </div>

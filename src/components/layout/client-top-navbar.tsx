@@ -65,15 +65,15 @@ export function TopHeaderBar({
 
   return (
     <div className="w-full bg-[#1e5f8f] text-xs text-white">
-      <div className="mx-auto flex max-w-full items-center justify-end px-4 py-1.5 md:max-w-[95%] md:justify-between md:py-3">
-        <div className="hidden items-center gap-6 text-sm md:flex">
+      <div className="mx-auto flex max-w-full items-center justify-end px-4 py-1 md:max-w-[95%] md:justify-between md:py-1.5">
+        <div className="hidden items-center gap-5 text-xs md:flex">
           <span className="flex gap-1.5">
-            <Mail className="size-4" />
+            <Mail className="size-3.5" />
             <a href={`mailto:${SITE_CONTACT.email}`}>{SITE_CONTACT.email}</a>
           </span>
 
           <span className="flex gap-1.5">
-            <Phone className="size-4" />
+            <Phone className="size-3.5" />
             <a href={`tel:${SITE_CONTACT.phoneTel}`}>{SITE_CONTACT.phoneDisplay}</a>
           </span>
         </div>

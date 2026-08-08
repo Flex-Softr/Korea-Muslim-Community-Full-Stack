@@ -3,7 +3,6 @@ import type { CommunityMemberProfileDTO } from "@/lib/members/queries";
 import {
   formatGender,
   formatOccupationType,
-  formatStudyStatus,
   parseProfileVisibility,
   PROFILE_VISIBILITY_LABELS,
 } from "@/lib/members/member-profile-fields";
@@ -110,24 +109,6 @@ export function MemberProfileContent({
     !!member.linkedInUrl ||
     !!member.facebookUrl;
 
-  const hasJourney =
-    member.yearArrivalKorea != null ||
-    !!member.visaType ||
-    !!member.scholarshipInfo ||
-    !!member.educationBangladesh;
-
-  const hasAchievements =
-    !!member.awards ||
-    !!member.publications ||
-    !!member.researchPapers ||
-    !!member.scholarshipsHonors;
-
-  const hasActivityStats =
-    member.activityPostsCount != null ||
-    member.activityCommentsCount != null ||
-    member.activityEventsCount != null ||
-    !!member.activityNotes;
-
   const linkClass =
     "font-medium text-[#2c7bb6] underline-offset-4 transition-colors hover:text-[#256fa3] hover:underline dark:text-sky-400 dark:hover:text-sky-300";
 
@@ -217,125 +198,13 @@ export function MemberProfileContent({
         ) : null}
       </ProfileSection>
 
-      <ProfileSection title="Academic (Korea)">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Field label="University" value={member.universityKr} />
-          <Field label="Degree" value={member.degree} />
-          <Field label="Major / subject" value={member.major} />
-          <Field
-            label="Study status"
-            value={formatStudyStatus(member.studyStatus)}
-          />
-          <Field
-            label="Year of admission"
-            value={
-              member.yearAdmission != null ? String(member.yearAdmission) : null
-            }
-          />
-          <Field
-            label="Graduation year"
-            value={
-              member.graduationYear != null
-                ? String(member.graduationYear)
-                : null
-            }
-          />
-        </div>
-      </ProfileSection>
-
-      <ProfileSection title="Current status">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Field
-            label="Location"
-            value={member.locationCity}
-            className="sm:col-span-2"
-          />
-          <Field label="Company / organisation" value={member.companyName} />
-          <Field label="Job title" value={member.jobTitle} />
-        </div>
-      </ProfileSection>
-
-      <ProfileSection title="Achievements & documents">
-        {hasAchievements ? (
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Field
-              label="Awards"
-              value={
-                member.awards ? (
-                  <span className="whitespace-pre-wrap">{member.awards}</span>
-                ) : null
-              }
-              className="sm:col-span-2"
-            />
-            <Field
-              label="Publications"
-              value={
-                member.publications ? (
-                  <span className="whitespace-pre-wrap">{member.publications}</span>
-                ) : null
-              }
-              className="sm:col-span-2"
-            />
-            <Field
-              label="Research papers"
-              value={
-                member.researchPapers ? (
-                  <span className="whitespace-pre-wrap">{member.researchPapers}</span>
-                ) : null
-              }
-              className="sm:col-span-2"
-            />
-            <Field
-              label="Scholarships & honors"
-              value={
-                member.scholarshipsHonors ? (
-                  <span className="whitespace-pre-wrap">
-                    {member.scholarshipsHonors}
-                  </span>
-                ) : null
-              }
-              className="sm:col-span-2"
-            />
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No awards, publications, or honors listed yet.
-          </p>
-        )}
-      </ProfileSection>
-
-      <ProfileSection title="Skills & expertise">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Field
-            label="Technical / professional skills"
-            value={
-              member.skillsTechnical ? (
-                <span className="whitespace-pre-wrap">{member.skillsTechnical}</span>
-              ) : null
-            }
-            className="sm:col-span-2"
-          />
-          <Field label="Korean / TOPIK" value={member.koreanLevelTopik} />
-          <Field
-            label="Certifications"
-            value={
-              member.certifications ? (
-                <span className="whitespace-pre-wrap">{member.certifications}</span>
-              ) : null
-            }
-            className="sm:col-span-2"
-          />
-        </div>
-      </ProfileSection>
-
       {showMembersOnlyGate ? (
         <section className="rounded-2xl border border-dashed border-[#2c7bb6]/35 bg-[#2c7bb6]/[0.04] p-6 dark:border-sky-500/30 dark:bg-sky-500/5 sm:p-7">
           <h2 className="text-base font-semibold text-foreground">
-            Contact & journey
+            Contact
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Contact details, social links, and Korea journey information on this
-            profile are limited to{" "}
+            Contact details and social links on this profile are limited to{" "}
             <strong className="text-foreground">signed-in members</strong>. Log in
             with your association account to view them.
           </p>
@@ -349,172 +218,75 @@ export function MemberProfileContent({
           </Link>
         </section>
       ) : (
-        <>
-          <ProfileSection title="Contact">
-            {hasContact ? (
-              <div className="grid gap-6 sm:grid-cols-2">
-                <Field
-                  label="Email"
-                  value={
-                    member.contactEmail ? (
-                      <a className={linkClass} href={`mailto:${member.contactEmail}`}>
-                        {member.contactEmail}
-                      </a>
-                    ) : null
-                  }
-                  className="sm:col-span-2"
-                />
-                <Field
-                  label="Phone"
-                  value={
-                    member.phone ? (
-                      <a
-                        className={linkClass}
-                        href={`tel:${member.phone.replace(/\s/g, "")}`}
-                      >
-                        {member.phone}
-                      </a>
-                    ) : null
-                  }
-                />
-                <Field label="WhatsApp" value={member.whatsApp} />
-                <Field label="KakaoTalk ID" value={member.kakaoId} />
-                <Field
-                  label="LinkedIn"
-                  value={
-                    member.linkedInUrl ? (
-                      <a
-                        href={member.linkedInUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(linkClass, "break-all")}
-                      >
-                        {member.linkedInUrl}
-                      </a>
-                    ) : null
-                  }
-                  className="sm:col-span-2"
-                />
-                <Field
-                  label="Facebook"
-                  value={
-                    member.facebookUrl ? (
-                      <a
-                        href={member.facebookUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(linkClass, "break-all")}
-                      >
-                        {member.facebookUrl}
-                      </a>
-                    ) : null
-                  }
-                  className="sm:col-span-2"
-                />
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No contact information listed.
-              </p>
-            )}
-          </ProfileSection>
-
-          <ProfileSection title="Journey to Korea (for newcomers)">
-            {hasJourney ? (
-              <div className="grid gap-6 sm:grid-cols-2">
-                <Field
-                  label="Year of arrival in Korea"
-                  value={
-                    member.yearArrivalKorea != null
-                      ? String(member.yearArrivalKorea)
-                      : null
-                  }
-                />
-                <Field label="Visa type" value={member.visaType} />
-                <Field
-                  label="Scholarship / funding"
-                  value={
-                    member.scholarshipInfo ? (
-                      <span className="whitespace-pre-wrap">
-                        {member.scholarshipInfo}
-                      </span>
-                    ) : null
-                  }
-                  className="sm:col-span-2"
-                />
-                <Field
-                  label="Previous education (Bangladesh)"
-                  value={
-                    member.educationBangladesh ? (
-                      <span className="whitespace-pre-wrap">
-                        {member.educationBangladesh}
-                      </span>
-                    ) : null
-                  }
-                  className="sm:col-span-2"
-                />
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                No journey details added yet.
-              </p>
-            )}
-          </ProfileSection>
-        </>
-      )}
-
-      <ProfileSection title="Activity & engagement">
-        {hasActivityStats ? (
-          <div className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-3">
-              {member.activityPostsCount != null ? (
-                <div className="rounded-xl border border-border/60 bg-gradient-to-b from-[#2c7bb6]/10 to-transparent px-4 py-4 text-center dark:from-sky-500/10">
-                  <p className="text-3xl font-bold tabular-nums tracking-tight text-[#2c7bb6] dark:text-sky-400">
-                    {member.activityPostsCount}
-                  </p>
-                  <p className="mt-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Posts
-                  </p>
-                </div>
-              ) : null}
-              {member.activityCommentsCount != null ? (
-                <div className="rounded-xl border border-border/60 bg-gradient-to-b from-[#2c7bb6]/10 to-transparent px-4 py-4 text-center dark:from-sky-500/10">
-                  <p className="text-3xl font-bold tabular-nums tracking-tight text-[#2c7bb6] dark:text-sky-400">
-                    {member.activityCommentsCount}
-                  </p>
-                  <p className="mt-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Comments
-                  </p>
-                </div>
-              ) : null}
-              {member.activityEventsCount != null ? (
-                <div className="rounded-xl border border-border/60 bg-gradient-to-b from-[#2c7bb6]/10 to-transparent px-4 py-4 text-center dark:from-sky-500/10">
-                  <p className="text-3xl font-bold tabular-nums tracking-tight text-[#2c7bb6] dark:text-sky-400">
-                    {member.activityEventsCount}
-                  </p>
-                  <p className="mt-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    Events
-                  </p>
-                </div>
-              ) : null}
+        <ProfileSection title="Contact">
+          {hasContact ? (
+            <div className="grid gap-6 sm:grid-cols-2">
+              <Field
+                label="Email"
+                value={
+                  member.contactEmail ? (
+                    <a className={linkClass} href={`mailto:${member.contactEmail}`}>
+                      {member.contactEmail}
+                    </a>
+                  ) : null
+                }
+                className="sm:col-span-2"
+              />
+              <Field
+                label="Phone"
+                value={
+                  member.phone ? (
+                    <a
+                      className={linkClass}
+                      href={`tel:${member.phone.replace(/\s/g, "")}`}
+                    >
+                      {member.phone}
+                    </a>
+                  ) : null
+                }
+              />
+              <Field label="WhatsApp" value={member.whatsApp} />
+              <Field label="KakaoTalk ID" value={member.kakaoId} />
+              <Field
+                label="LinkedIn"
+                value={
+                  member.linkedInUrl ? (
+                    <a
+                      href={member.linkedInUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(linkClass, "break-all")}
+                    >
+                      {member.linkedInUrl}
+                    </a>
+                  ) : null
+                }
+                className="sm:col-span-2"
+              />
+              <Field
+                label="Facebook"
+                value={
+                  member.facebookUrl ? (
+                    <a
+                      href={member.facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(linkClass, "break-all")}
+                    >
+                      {member.facebookUrl}
+                    </a>
+                  ) : null
+                }
+                className="sm:col-span-2"
+              />
             </div>
-            <Field
-              label="Highlights"
-              value={
-                member.activityNotes ? (
-                  <span className="whitespace-pre-wrap">{member.activityNotes}</span>
-                ) : null
-              }
-              className="sm:col-span-2"
-            />
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Activity counts will appear here when posts, comments, and events are
-            linked to member profiles. Admins can add highlights in the meantime.
-          </p>
-        )}
-      </ProfileSection>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No contact information listed.
+            </p>
+          )}
+        </ProfileSection>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-8">
         <Link href={listingHref} className={cn(linkClass, "inline-flex items-center gap-2 text-sm")}>

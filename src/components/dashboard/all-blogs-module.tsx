@@ -346,11 +346,11 @@ export function AllBlogsModule() {
   return (
     <ContentRowsModule
       contentType="blog"
-      title="All Blogs"
-      subtitle="Manage blog records from one place."
-      nounSingular="Blog"
-      nounPlural="Blogs"
-      paginationAriaLabel="All blogs pagination"
+      title="All Notices"
+      subtitle="Manage notice records from one place."
+      nounSingular="Notice"
+      nounPlural="Notices"
+      paginationAriaLabel="All notices pagination"
       enableCreate
       createHref="/dashboard/content/blog/blogs/add"
       editHrefBase="/dashboard/content/blog/blogs"

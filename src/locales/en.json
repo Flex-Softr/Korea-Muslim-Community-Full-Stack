@@ -2,7 +2,7 @@
   "common": {
     "login": "Login",
     "home": "Home",
-    "blog": "Blog",
+    "blog": "Notice",
     "activity": "Activity",
     "about": "About",
     "media": "Media",
@@ -23,6 +23,9 @@
     "backToHome": "← Back to home",
     "backToHomePlain": "Back to home"
   },
+  "header": {
+    "brandTitle": "Korea Muslim Community"
+  },
   "blog": {
     "noPostsYet": "No posts yet.",
     "noPostsMatch": "No posts match your filters. Try another filter or",
@@ -37,10 +40,10 @@
     "filterByYear": "Filter by year",
     "allYears": "All years",
     "clearYear": "Clear year",
-    "homeHeading": "Our blog posts",
-    "sectionEmpty": "No blog posts available yet.",
-    "viewAllPosts": "View all blog posts",
-    "embeddedAria": "Blog posts"
+    "homeHeading": "Our notices",
+    "sectionEmpty": "No notices available yet.",
+    "viewAllPosts": "View all notices",
+    "embeddedAria": "Notices"
   },
   "activity": {
     "noStoriesYet": "No stories yet.",
@@ -73,7 +76,7 @@
     "professionalDivision": "Professional Division",
     "nationalAndInternational": "National & International",
     "media": "Media",
-    "blog": "Blog",
+    "blog": "Notice",
     "activity": "Activity",
     "photoGallery": "Photo Gallery",
     "videoGallery": "Video Gallery",
@@ -122,11 +125,11 @@
   },
   "pages": {
     "blog": {
-      "subtitle": "Articles, announcements, and student life updates in a news format.",
-      "archiveLink": "Blog archive",
-      "backToArchive": "Back to blog archive",
-      "sidebarHeading": "More from the blog",
-      "sidebarSub": "Recent articles and announcements",
+      "subtitle": "Notices, announcements, and community updates.",
+      "archiveLink": "Notice archive",
+      "backToArchive": "Back to notice archive",
+      "sidebarHeading": "More notices",
+      "sidebarSub": "Recent notices and announcements",
       "sidebarFooter": "View full archive",
       "byline": "By {{name}}"
     },
@@ -470,10 +473,10 @@
     "headerLanguageShort": "Lang",
     "nav": {
       "profile": "Profile",
-      "blogs": "Blogs",
-      "allBlogs": "All Blogs",
+      "blogs": "Notices",
+      "allBlogs": "All Notices",
       "categories": "Categories",
-      "pendingBlogs": "Pending Blogs",
+      "pendingBlogs": "Pending Notices",
       "activity": "Activity",
       "allActivities": "All Activities",
       "articles": "Articles",
@@ -526,15 +529,15 @@
       "title": "My Dashboard",
       "introBeforeLink": "View a quick profile summary. Edit your full registration details in",
       "introAfterLink": ".",
-      "writeBlog": "Write Blog",
+      "writeBlog": "Write Notice",
       "loadingProfile": "Loading profile…",
       "email": "Email",
       "name": "Name",
       "memberCode": "Member code",
       "cityKorea": "City (Korea)",
       "editFullProfile": "Edit full profile in Settings",
-      "myBlogs": "My blogs",
-      "noBlogsYet": "You have not created any blogs yet.",
+      "myBlogs": "My notices",
+      "noBlogsYet": "You have not created any notices yet.",
       "colTitle": "Title",
       "colCategory": "Category",
       "colStatus": "Status",

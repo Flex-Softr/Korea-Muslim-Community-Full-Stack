@@ -42,7 +42,7 @@ export function PendingBlogsModule() {
       if (!res.ok) throw new Error("Failed");
       setRows(data.items ?? []);
     } catch {
-      notify("Could not load pending blogs.", "error");
+      notify("Could not load pending notices.", "error");
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export function PendingBlogsModule() {
             type="button"
             size="icon-sm"
             onClick={() => setApproveTarget(row)}
-            title="Approve blog"
+            title="Approve notice"
             className="hover:bg-emerald-600"
           >
             <Check className="size-4" />
@@ -92,7 +92,7 @@ export function PendingBlogsModule() {
             size="icon-sm"
             variant="destructive"
             onClick={() => setDeleteTarget(row)}
-            title="Reject and delete blog"
+            title="Reject and delete notice"
             className="hover:bg-red-600"
           >
             <Trash2 className="size-4" />
@@ -105,24 +105,24 @@ export function PendingBlogsModule() {
   return (
     <section className="space-y-4">
       <PageHeader
-        title="Pending Blogs"
-        subtitle="Review blogs awaiting moderation approval."
+        title="Pending Notices"
+        subtitle="Review notices awaiting moderation approval."
         breadcrumb={[
           { label: "Dashboard", href: "/dashboard" },
-          { label: "Blogs", href: "/dashboard/content/blog/blogs" },
-          { label: "Pending Blogs" },
+          { label: "Notices", href: "/dashboard/content/blog/blogs" },
+          { label: "Pending Notices" },
         ]}
       />
 
       <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         {loading ? (
-          <LoadingSpinner label="Loading pending blogs..." />
+          <LoadingSpinner label="Loading pending notices..." />
         ) : (
           <DataTable
             rows={pageRows}
             columns={columns}
             getRowId={(row) => row.id}
-            emptyLabel="No pending blogs."
+            emptyLabel="No pending notices."
           />
         )}
 
@@ -136,8 +136,8 @@ export function PendingBlogsModule() {
       <ConfirmActionModal
         open={approveTarget != null}
         onOpenChange={(open) => !open && setApproveTarget(null)}
-        title="Approve blog?"
-        description={`This will publish "${approveTarget?.title ?? "this blog"}".`}
+        title="Approve notice?"
+        description={`This will publish "${approveTarget?.title ?? "this notice"}".`}
         confirmLabel="Approve"
         cancelLabel="Cancel"
         onConfirm={() => {
@@ -148,9 +148,9 @@ export function PendingBlogsModule() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ status: "published" }),
             });
-            if (!res.ok) return notify("Could not approve blog.", "error");
+            if (!res.ok) return notify("Could not approve notice.", "error");
             setApproveTarget(null);
-            notify("Blog approved and published.", "success");
+            notify("Notice approved and published.", "success");
             void load();
           })();
         }}
@@ -159,8 +159,8 @@ export function PendingBlogsModule() {
       <ConfirmActionModal
         open={deleteTarget != null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-        title="Reject and delete blog?"
-        description={`This will permanently delete "${deleteTarget?.title ?? "this blog"}".`}
+        title="Reject and delete notice?"
+        description={`This will permanently delete "${deleteTarget?.title ?? "this notice"}".`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         confirmVariant="destructive"
@@ -170,9 +170,9 @@ export function PendingBlogsModule() {
             const res = await fetch(`/api/dashboard/blog/${deleteTarget.id}`, {
               method: "DELETE",
             });
-            if (!res.ok) return notify("Could not delete blog.", "error");
+            if (!res.ok) return notify("Could not delete notice.", "error");
             setDeleteTarget(null);
-            notify("Pending blog rejected and deleted.", "success");
+            notify("Pending notice rejected and deleted.", "success");
             void load();
           })();
         }}

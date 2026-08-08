@@ -5,9 +5,13 @@ import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { ClientHeaderNav } from "@/components/layout/client-header-nav";
 import { SiteLogoMark } from "@/components/layout/site-logo-mark";
+import { useLanguage } from "@/components/providers/language-provider";
 import { TopHeaderBar } from "./client-top-navbar";
+import { cn } from "@/lib/utils";
 
 export function ClientHeader() {
+  const { t, lang } = useLanguage();
+  const brandTitle = t("header.brandTitle");
   const [user, setUser] = useState<Session["user"] | null>(null);
 
   useEffect(() => {
@@ -28,19 +32,28 @@ export function ClientHeader() {
 
   return (
     <>
-    <TopHeaderBar user={user}/>
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#2c7bb6] text-white shadow-sm">
-      <div className="mx-auto flex min-h-20  max-w-full md:max-w-[90%] items-center justify-between gap-3 px-4 py-2 sm:min-h-24 sm:gap-4 sm:px-6">
-        <Link
-          href="/"
-          aria-label="Korea Muslim Community, home"
-          className="relative z-10 -my-1 flex min-w-0 max-w-[65%] shrink-0 items-center sm:-my-2 sm:max-w-none"
-        >
-          <SiteLogoMark priority className="h-16 w-16 sm:h-20 sm:w-20" />
-        </Link>
-        <ClientHeaderNav user={user} />
-      </div>
-    </header>
+      <TopHeaderBar user={user} />
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#2c7bb6] text-white shadow-sm">
+        <div className="mx-auto flex min-h-14 max-w-full items-center justify-between gap-2.5 px-4 py-1.5 sm:min-h-16 sm:gap-3 sm:px-6 md:max-w-[90%]">
+          <Link
+            href="/"
+            aria-label={`${brandTitle}, home`}
+            className="relative z-10 flex min-w-0 max-w-[min(58%,11rem)] shrink-0 items-center gap-2 sm:max-w-[min(40%,14rem)] sm:gap-2.5 md:max-w-none"
+          >
+            <SiteLogoMark priority className="h-11 w-11 sm:h-12 sm:w-12" />
+            <span
+              className={cn(
+                "min-w-0 text-left font-bold leading-[1.15] text-balance text-white",
+                "text-md sm:text-lg lg:text-xl",
+                lang === "bn" && "tracking-normal",
+              )}
+            >
+              {brandTitle}
+            </span>
+          </Link>
+          <ClientHeaderNav user={user} />
+        </div>
+      </header>
     </>
   );
 }

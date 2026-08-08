@@ -92,10 +92,10 @@ export function UserDetailsCard({ id }: { id: string }) {
 
             <div>
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Submitted blogs
+                Submitted notices
               </h2>
               {user.submittedBlogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No submitted blogs.</p>
+                <p className="text-sm text-muted-foreground">No submitted notices.</p>
               ) : (
                 <ul className="space-y-2">
                   {user.submittedBlogs.map((blog) => (

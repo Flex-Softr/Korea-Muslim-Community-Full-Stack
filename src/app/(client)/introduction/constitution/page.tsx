@@ -1,22 +1,18 @@
 import { PageBanner } from "@/components/layout/page-banner";
-import { PageContent } from "../../components/page-content";
-import { PageSidebar } from "../../components/page-sidebar";
+import { ConstitutionView } from "./components/constitution-view";
 
 export default async function ConstitutionPage() {
   return (
-      <>
-        <PageBanner
-          titleKey="nav.constitution"
-          breadcrumbs={[{ labelKey: "nav.home", href: "/" }, { labelKey: "nav.constitution" }]}
-        />
-         <div className="flex gap-4 max-w-7xl mx-auto py-10 px-2 flex-col sm:flex-row">
-          <div className="sm:w-1/3 w-full">
-            <PageSidebar />
-          </div>
-          <div className="sm:w-2/3 w-full">
-             <PageContent />
-          </div>
-        </div>
-      </>
-    )
-  }
+    <>
+      <PageBanner
+        titleKey="nav.constitution"
+        breadcrumbs={[
+          { labelKey: "nav.home", href: "/" },
+          { labelKey: "nav.introduction", href: "/introduction/brief-introduction" },
+          { labelKey: "nav.constitution" },
+        ]}
+      />
+      <ConstitutionView />
+    </>
+  );
+}
