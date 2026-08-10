@@ -38,18 +38,23 @@ export function ClientHeader() {
           <Link
             href="/"
             aria-label={`${brandTitle}, home`}
-            className="relative z-10 flex min-w-0 max-w-[min(58%,11rem)] shrink-0 items-center gap-2 sm:max-w-[min(40%,14rem)] sm:gap-2.5 md:max-w-none"
+            className="relative z-10 flex min-w-0 shrink-0 items-center gap-2 sm:max-w-[min(40%,14rem)] sm:gap-2.5 md:max-w-none"
           >
-            <SiteLogoMark priority className="h-11 w-11 sm:h-12 sm:w-12" />
-            <span
-              className={cn(
-                "min-w-0 text-left font-bold leading-[1.15] text-balance text-white",
-                "text-md sm:text-lg lg:text-xl",
-                lang === "bn" && "tracking-normal",
-              )}
-            >
-              {brandTitle}
-            </span>
+            <SiteLogoMark priority className="h-11 w-11 shrink-0 sm:h-12 sm:w-12" />
+            <div className="flex flex-col min-w-0">
+              <span
+                className={cn(
+                  "whitespace-nowrap sm:whitespace-normal min-w-0 text-left font-bold leading-[1.15] text-white",
+                  "text-md sm:text-lg lg:text-xl",
+                  lang === "bn" && "tracking-normal",
+                )}
+              >
+                {brandTitle}
+              </span>
+              <span className="block sm:hidden text-xs text-white/80 whitespace-nowrap font-medium">
+                {t("header.brandTitle", { lng: lang === "en" ? "bn" : "en" })}
+              </span>
+            </div>
           </Link>
           <ClientHeaderNav user={user} />
         </div>
