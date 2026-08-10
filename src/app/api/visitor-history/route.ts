@@ -1,7 +1,7 @@
 import { GoogleAuth } from "google-auth-library";
 import { connection, NextResponse } from "next/server";
 
-let token: null | string = null;
+let authClient: any = null;
 
 async function getVisitorsByCountry(accessToken: string) {
   const propertyId = process.env.GA4_PROPERTY_ID;
@@ -56,24 +56,25 @@ export async function GET(_request: Request) {
   }
 
   try {
-    if (!token) {
+    if (!authClient) {
       const auth = new GoogleAuth({
         credentials: {
           client_email: email,
-          private_key: privateKey,
+          private_key: privateKey.replace(/\\n/g, '\n'),
         },
         scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
       });
 
-      const client = await auth.getClient();
-      token = (await client.getAccessToken()).token || null;
-
-      if (!token) {
-        return NextResponse.json(
-          { status: 500, message: "Google auth failed." },
-          { status: 500 },
-        );
-      }
+      authClient = await auth.getClient();
+    }
+    
+    const token = (await authClient.getAccessToken()).token || null;
+    
+    if (!token) {
+      return NextResponse.json(
+        { status: 500, message: "Google auth failed." },
+        { status: 500 },
+      );
     }
 
     const data = await getVisitorsByCountry(token);
