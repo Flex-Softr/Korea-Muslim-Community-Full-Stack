@@ -145,7 +145,7 @@ export default async function MembersProfilePage({ params }: PageProps) {
                 {blogs.map((blog) => (
                   <Link
                     key={blog.id}
-                    href={`/blogs/${blog.slug}`}
+                    href={`/notice/${blog.slug}`}
                     className="rounded-xl border border-border/80 bg-card p-4 shadow-sm transition-colors hover:bg-muted/30"
                   >
                     <p className="line-clamp-2 font-semibold">{blog.title}</p>

@@ -82,11 +82,6 @@ export function ActivityArticleDetail({
     .map((p) => p.trim())
     .filter(Boolean);
 
-  const excerpt = useMemo(() => {
-    const plain = richTextToPlainText(loc.description);
-    return plain.slice(0, 180) || loc.title;
-  }, [loc]);
-
   const breadcrumbs = useMemo(
     () => [
       { label: t("nav.home"), href: "/" },
@@ -101,7 +96,7 @@ export function ActivityArticleDetail({
       <LocalizedDetailBanner
         key={`banner-${lang}`}
         title={loc.title}
-        subtitle={`${loc.category} · ${detail.date}`}
+        subtitle={detail.date}
         breadcrumbs={breadcrumbs}
       />
       <article className="border-b border-border/40 bg-muted/15 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
@@ -136,8 +131,6 @@ export function ActivityArticleDetail({
                   priority
                 />
               </div>
-
-              <p className="mt-8 text-lg leading-relaxed text-muted-foreground">{excerpt}</p>
 
               <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
                 {paragraphs.length > 0 ? (

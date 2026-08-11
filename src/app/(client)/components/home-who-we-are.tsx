@@ -83,6 +83,9 @@ export function HomeWhoWeAre() {
               </strong>{" "}
               {t("homeWhoWeAre.bodyAfterOrgName")}
             </p>
+            <p className="mt-6 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("homeWhoWeAre.body3rdPara")}
+            </p>
             <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
               {t("homeWhoWeAre.bodyInvite")}
             </p>
@@ -105,7 +108,7 @@ export function HomeWhoWeAre() {
 
           <div className="lg:col-span-7">
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border/60 bg-muted shadow-xl ring-1 ring-black/[0.04] dark:ring-white/10 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[min(100%,28rem)]">
+              <div className="relative aspect-4/3 overflow-hidden rounded-3xl border border-border/60 bg-muted shadow-xl ring-1 ring-black/4 dark:ring-white/10 sm:aspect-16/10 lg:aspect-auto lg:min-h-[min(100%,28rem)]">
                 <Image
                   src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1400&q=80"
                   alt={t("homeWhoWeAre.imageAlt")}
@@ -114,7 +117,7 @@ export function HomeWhoWeAre() {
                   sizes="(max-width: 1024px) 100vw, 58vw"
                 />
                 <div
-                  className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"
+                  className="absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-transparent"
                   aria-hidden
                 />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
@@ -128,7 +131,7 @@ export function HomeWhoWeAre() {
                 {highlights.map(({ icon: Icon, title, text, key }) => (
                   <div
                     key={key}
-                    className="flex gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm ring-1 ring-black/[0.03] transition hover:border-[#2c7bb6]/25 hover:shadow-md dark:bg-card/60 dark:ring-white/5"
+                    className="flex gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur-sm ring-1 ring-black/3 transition hover:border-[#2c7bb6]/25 hover:shadow-md dark:bg-card/60 dark:ring-white/5"
                   >
                     <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#2c7bb6]/10 text-[#2c7bb6] dark:bg-sky-400/15 dark:text-sky-400">
                       <Icon className="size-5" aria-hidden />

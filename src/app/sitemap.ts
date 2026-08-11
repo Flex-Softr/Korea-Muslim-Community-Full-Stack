@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const blogPosts = getAllBlogSlugs().map((slug) => ({
-    url: `${base}/blog/${slug}`,
+    url: `${base}/notice/${slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.55,
@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "",
     "/about",
-    "/blog",
+    "/notice",
     "/gallery",
     "/activity",
     "/team",

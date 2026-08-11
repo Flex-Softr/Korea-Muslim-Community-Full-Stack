@@ -143,13 +143,8 @@ export const SITE_NAV: SiteNavItem[] = [
       },
       {
         kind: "link",
-        href: "/blog",
+        href: "/notice",
         labelKey: "nav.blog",
-      },
-      {
-        kind: "link",
-        href: "/activity",
-        labelKey: "nav.activity",
       },
     ],
   },

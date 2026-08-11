@@ -108,7 +108,7 @@ const MEMBER_FOOTER_LINKS: { href: string; labelKey: string }[] =
   }));
 
 const MEDIA_FOOTER_LINKS: { href: string; labelKey: string }[] = [
-  { href: "/blog", labelKey: "common.blog" },
+  { href: "/notice", labelKey: "common.blog" },
   { href: "/activity", labelKey: "common.activity" },
   { href: "/photo-gallery", labelKey: "common.photoGallery" },
   { href: "/video-gallery", labelKey: "common.videoGallery" },

@@ -8,11 +8,7 @@ import { Suspense, useState } from "react";
 import { brandNavPillClass } from "@/components/layout/brand-nav-pill";
 import { cn } from "@/lib/utils";
 
-import {
-  SITE_NAV,
-  type SiteNavItem,
-  isNavItemActive,
-} from "@/config/site-nav";
+import { SITE_NAV, type SiteNavItem, isNavItemActive } from "@/config/site-nav";
 import {
   flyoutBranchTint,
   flyoutPanel,
@@ -48,8 +44,7 @@ function DesktopFlyoutItem({
   t: NavTranslate;
 }) {
   const active =
-    item.kind === "link" &&
-    isNavItemActive(pathname, searchParams, item);
+    item.kind === "link" && isNavItemActive(pathname, searchParams, item);
 
   if (item.kind === "link") {
     return (
@@ -85,13 +80,20 @@ function DesktopFlyoutItem({
         )}
       >
         <span>{t(item.labelKey)}</span>
-        <span className="shrink-0 text-xs leading-none opacity-95 lg:text-sm" aria-hidden>
+        <span
+          className="shrink-0 text-xs leading-none opacity-95 lg:text-sm"
+          aria-hidden
+        >
           ▸
         </span>
       </div>
       <ul
         role="menu"
-        className={cn(flyoutPanel, "absolute left-full top-0", flyoutStartHidden)}
+        className={cn(
+          flyoutPanel,
+          "absolute left-full top-0",
+          flyoutStartHidden,
+        )}
         style={{ zIndex: 50 + depth }}
       >
         {item.items?.map((child) => (
@@ -126,7 +128,11 @@ function DesktopFlyoutRoot({
   return (
     <ul
       role="menu"
-      className={cn(flyoutPanel, "absolute left-0 top-full z-50", flyoutStartHidden)}
+      className={cn(
+        flyoutPanel,
+        "absolute left-0 top-full z-50",
+        flyoutStartHidden,
+      )}
     >
       {items.map((child) => (
         <DesktopFlyoutItem
@@ -175,7 +181,10 @@ function DesktopMenu({
         )}
       >
         {t(item.labelKey)}
-        <span className="text-xs leading-none opacity-90 lg:text-sm" aria-hidden>
+        <span
+          className="text-xs leading-none opacity-90 lg:text-sm"
+          aria-hidden
+        >
           ▸
         </span>
       </span>
@@ -309,7 +318,7 @@ function MobileNav({
       />
 
       <div
-        className={`fixed top-0 right-0 z-80 flex h-full max-h-[100dvh] w-[100%] flex-col bg-[#2a74a8] transition-transform duration-300 ease-in-out md:w-[50%] ${
+        className={`fixed top-0 right-0 z-80 flex h-full max-h-dvh w-full flex-col bg-[#2a74a8] transition-transform duration-300 ease-in-out md:w-[50%] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -320,9 +329,7 @@ function MobileNav({
           </button>
         </div>
 
-        <div
-          className="flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain px-4 pb-[max(2rem,calc(env(safe-area-inset-bottom)+2rem))]"
-        >
+        <div className="flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain px-4 pb-[max(2rem,calc(env(safe-area-inset-bottom)+2rem))]">
           <div className="flex flex-col gap-2">
             {SITE_NAV.map((item) => (
               <MobileMenu

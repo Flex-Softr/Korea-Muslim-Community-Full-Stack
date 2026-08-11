@@ -67,7 +67,7 @@ export function BlogLatestSidebarClient({ cards }: { cards: CmsTextDetailSource[
       </ul>
       <div className="border-t border-border/60 p-4">
         <Link
-          href="/blog"
+          href="/notice"
           className="text-sm font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
         >
           {t("pages.blog.sidebarFooter")}

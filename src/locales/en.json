@@ -369,10 +369,11 @@
     "empty": "Visitor data is currently unavailable."
   },
   "homeWhoWeAre": {
-    "eyebrow": "Who we are",
-    "subtitle": "한국 무슬림 커뮤니티",
-    "bodyAfterOrgName": "is a voluntary organisation for Muslims across the Republic of Korea. We host programmes, spiritual activities, and outreach that reflect our faith while respecting Korean society and the law.",
-    "bodyInvite": "Whether you are new to Korea or have been here for years, you are welcome to connect, learn, and grow with us.",
+    "eyebrow": "Brief Introduction",
+    "subtitle": "কোরিয়া মুসলিম কমিউনিটি (কেএমসি)",
+    "bodyAfterOrgName": "is a voluntary and non-profit community organization established for Muslims residing in Korea. The primary objective of KMC is to strengthen brotherhood, cooperation, and mutual relationships among Muslims living in Korea and to build a united and supportive community based on Islamic values.",
+    "bodyInvite": "Through various social, educational, cultural, and spiritual activities, KMC promotes and reflects the core teachings and values of Islam. At the same time, KMC conducts its activities with a commitment to harmonious coexistence while respecting the laws, culture, and social values of Korea.",
+    "body3rdPara": "Whether you are newly arrived in Korea or have been residing here for many years, Korea Muslim Community warmly welcomes you. By participating in our activities, you can gain knowledge, contribute to mutual support, and take part in building a strong and thriving Muslim community in Korea.",
     "ctaAbout": "About us",
     "ctaContact": "Get in touch",
     "imageCaption": "Connecting Muslims through education, gatherings, and service — open to everyone who shares our values.",

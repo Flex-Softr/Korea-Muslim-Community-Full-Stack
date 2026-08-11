@@ -60,7 +60,7 @@ export function PublicBlogArticleDetail({
   const breadcrumbs = useMemo(
     () => [
       { label: t("nav.home"), href: "/" },
-      { label: t("common.blog"), href: "/blog" },
+      { label: t("common.blog"), href: "/notice" },
       { label: loc.title },
     ],
     [t, loc.title],
@@ -70,13 +70,13 @@ export function PublicBlogArticleDetail({
     <Fragment key={lang}>
       <LocalizedDetailBanner
         title={loc.title}
-        subtitle={`${loc.category} · ${dateLabel}`}
+        subtitle={dateLabel}
         breadcrumbs={breadcrumbs}
       />
       <article className="border-b border-border/40 bg-muted/15 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <Link
-            href="/blog"
+            href="/notice"
             className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
           >
             <ArrowLeft className="size-4" aria-hidden />

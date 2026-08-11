@@ -68,7 +68,7 @@ export function OurBlogSection({
         {embedded ? (
           <div className="mb-8 flex justify-end sm:mb-10">
             <Link
-              href="/blog"
+              href="/notice"
               className="inline-flex h-9 w-fit items-center justify-center gap-1 rounded-md bg-[#2c7bb6] px-4 text-sm font-medium text-white shadow transition-colors hover:bg-[#256fa3]"
             >
               {t("blog.viewAllPosts")}
@@ -89,7 +89,7 @@ export function OurBlogSection({
               </p>
             </div>
             <Link
-              href="/blog"
+              href="/notice"
               className="inline-flex h-9 w-fit items-center justify-center gap-1 rounded-md bg-[#2c7bb6] px-4 text-sm font-medium text-white shadow transition-colors hover:bg-[#256fa3]"
             >
               {t("blog.viewAllPosts")}

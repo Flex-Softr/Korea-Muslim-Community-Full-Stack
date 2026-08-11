@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardNavLinks } from "@/components/layout/dashboard-nav-links";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
@@ -30,7 +26,7 @@ export function DashboardShell({
   const { t } = useLanguage();
 
   return (
-    <div className="dashboard-theme flex h-[100dvh] min-h-0 w-full flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] lg:flex-row">
+    <div className="dashboard-theme flex h-dvh min-h-0 w-full flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] lg:flex-row">
       <DashboardSidebar role={role} />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -49,11 +45,13 @@ export function DashboardShell({
         <DialogContent
           showCloseButton
           className={cn(
-            "fixed start-0 top-0 z-50 flex h-[100dvh] max-h-none w-[min(19rem,calc(100vw-0.75rem))] max-w-none flex-col gap-0 rounded-none border-0 border-e border-emerald-800/60 bg-gradient-to-b from-emerald-900 via-emerald-900 to-emerald-800 p-0 text-white shadow-xl backdrop-blur-sm",
+            "fixed inset-s-0 top-0 z-50 flex h-dvh max-h-none w-[min(19rem,calc(100vw-0.75rem))] max-w-none flex-col gap-0 rounded-none border-0 border-e border-emerald-800/60 bg-linear-to-b from-emerald-900 via-emerald-900 to-emerald-800 p-0 text-white shadow-xl backdrop-blur-sm",
             "translate-x-0 translate-y-0",
           )}
         >
-          <DialogTitle className="sr-only">{t("dashboard.navAria")}</DialogTitle>
+          <DialogTitle className="sr-only">
+            {t("dashboard.navAria")}
+          </DialogTitle>
           <div className="flex h-16 shrink-0 items-center border-b border-white/15 px-5">
             <span className="text-base font-semibold tracking-tight text-white">
               {t("dashboard.sidebarTitle")}

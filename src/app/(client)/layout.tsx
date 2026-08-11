@@ -8,9 +8,9 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-full max-w-full flex-col overflow-x-hidden">
       <ClientHeader />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 max-w-full overflow-x-hidden">{children}</main>
       <ClientFooter />
       <GTMInit />
     </div>

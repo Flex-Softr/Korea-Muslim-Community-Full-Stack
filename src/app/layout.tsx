@@ -42,9 +42,9 @@ export default async function RootLayout({
       dir="ltr"
       translate="no"
       suppressHydrationWarning
-      className={`${solaimanLipi.variable} h-full antialiased`}
+      className={`${solaimanLipi.variable} h-full max-w-full overflow-x-hidden antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground font-bangla" translate="no">
+      <body className="min-h-full max-w-full overflow-x-hidden bg-background text-foreground font-bangla" translate="no">
         <AppProviders initialLang={initialLang}>
           {children}
         </AppProviders>

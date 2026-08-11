@@ -111,24 +111,24 @@ const navItems: Array<
       },
     ],
   },
-  {
-    type: "group",
-    labelKey: "dashboard.nav.news",
-    icon: Newspaper,
-    adminOnly: true,
-    children: [
-      {
-        href: "/dashboard/content/news/news",
-        labelKey: "dashboard.nav.allNews",
-        icon: Newspaper,
-      },
-      {
-        href: "/dashboard/content/news/categories",
-        labelKey: "dashboard.nav.categories",
-        icon: FolderKanban,
-      },
-    ],
-  },
+  // {
+  //   type: "group",
+  //   labelKey: "dashboard.nav.news",
+  //   icon: Newspaper,
+  //   adminOnly: true,
+  //   children: [
+  //     {
+  //       href: "/dashboard/content/news/news",
+  //       labelKey: "dashboard.nav.allNews",
+  //       icon: Newspaper,
+  //     },
+  //     {
+  //       href: "/dashboard/content/news/categories",
+  //       labelKey: "dashboard.nav.categories",
+  //       icon: FolderKanban,
+  //     },
+  //   ],
+  // },
   {
     type: "group",
     labelKey: "dashboard.nav.otherPagesData",

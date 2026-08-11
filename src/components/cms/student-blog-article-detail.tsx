@@ -80,15 +80,10 @@ export function StudentBlogArticleDetail({
     .map((p) => p.trim())
     .filter(Boolean);
 
-  const excerpt = useMemo(() => {
-    const plain = richTextToPlainText(loc.description);
-    return plain.slice(0, 180) || loc.title;
-  }, [loc]);
-
   const breadcrumbs = useMemo(
     () => [
       { label: t("nav.home"), href: "/" },
-      { label: t("common.blog"), href: "/blog" },
+      { label: t("common.blog"), href: "/notice" },
       { label: loc.title },
     ],
     [t, loc.title],
@@ -99,7 +94,7 @@ export function StudentBlogArticleDetail({
       <LocalizedDetailBanner
         key={`banner-${lang}`}
         title={loc.title}
-        subtitle={`${loc.category} · ${detail.date}`}
+        subtitle={detail.date}
         breadcrumbs={breadcrumbs}
       />
       <article className="border-b border-border/40 bg-muted/15 py-10 dark:bg-muted/10 sm:py-12 lg:py-14">
@@ -107,7 +102,7 @@ export function StudentBlogArticleDetail({
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="min-w-0 lg:col-span-7 xl:col-span-8">
               <Link
-                href="/blog"
+                href="/notice"
                 className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#2c7bb6] transition-colors hover:text-[#256fa3] dark:text-sky-400 dark:hover:text-sky-300"
               >
                 <ArrowLeft className="size-4" aria-hidden />
@@ -135,8 +130,6 @@ export function StudentBlogArticleDetail({
                 />
               </div>
 
-              <p className="mt-8 text-lg leading-relaxed text-muted-foreground">{excerpt}</p>
-
               <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
                 {paragraphs.length > 0 ? (
                   paragraphs.map((p, i) => <p key={i}>{p}</p>)
@@ -147,7 +140,7 @@ export function StudentBlogArticleDetail({
 
               <p className="mt-10 text-sm text-muted-foreground">
                 <Link
-                  href="/blog"
+                  href="/notice"
                   className="font-medium text-[#2c7bb6] underline-offset-4 hover:underline dark:text-sky-400"
                 >
                   {t("pages.blog.backToArchive")}

@@ -22,7 +22,7 @@ export type StudentNewsPost = {
 export const STUDENT_NEWS_POSTS: StudentNewsPost[] = [];
 
 export function blogPostPath(slug: string): string {
-  return `/blog/${slug}`;
+  return `/notice/${slug}`;
 }
 
 export function getBlogPostBySlug(slug: string): StudentNewsPost | undefined {

@@ -7,6 +7,9 @@ export type ConstitutionSectionId =
   | "chapter-2"
   | "chapter-3"
   | "chapter-4"
+  | "chapter-5"
+  | "chapter-6"
+  | "chapter-7"
   | "appendices";
 
 export type ConstitutionSection = {
@@ -404,9 +407,9 @@ export const CONSTITUTION_SECTIONS: ConstitutionSection[] = [
   {
     "id": "chapter-4",
     "titles": {
-      "en": "Chapter Four–Seven",
-      "bn": "চতুর্থ–সপ্তম অধ্যায়",
-      "ko": "제4–7장"
+      "en": "Chapter Four",
+      "bn": "চতুর্থ অধ্যায়",
+      "ko": "제4장"
     },
     "blocks": {
       "en": [
@@ -416,24 +419,7 @@ export const CONSTITUTION_SECTIONS: ConstitutionSection[] = [
         "Article 26 1. To conduct the organization's activities among women in South Korea, there shall be a separate women's division known as the Central Women's Wing, Korea Muslim Community. 2. For the development of the activities of the Central Women's Wing and for making important decisions, there shall be a Consultative Council known as the Central Women's Wing Consultative Council, Korea Muslim Community. 3. The Central President, in consultation with the Central Consultative Council, shall determine the proportional representation of the Central Women's Wing Consultative Council. 4. The Central President, in consultation with the Central Consultative Council, shall approve the Central Women's Wing Executive Committee for a term of one (1) year. 5. The Central President, in consultation with the Central Consultative Council, shall appoint one (1) Secretary of the Central Women's Wing and one (1) Assistant Secretary of the Central Women's Wing from among the members of the Central Women's Wing Executive Committee for a term of one (1) year. 6. The Central Organization of the Korea Muslim Community shall provide the necessary support for the implementation of all programs and activities of the Central Women's Wing.",
         "Branch/Sub-Branch Women's Wing",
         "Article 27 1. To expand and strengthen the activities of the Women's Wing, Branch and Sub-Branch Women's Wings shall be established throughout the country under the Central Women's Wing. 2. To facilitate the operation of the Branch or Sub-Branch and to make important decisions effectively, each",
-        "Branch or Sub-Branch shall have a committee known as the Branch/Sub-Branch Committee. 3. The Central Women's Wing shall approve the Branch or Sub-Branch Committee for a term of one (1) year. 4. The Central Women's Wing shall appoint one (1) President and one (1) Secretary for each Branch or Sub-Branch for a term of one (1) year.",
-        "Chapter Five",
-        "Baitulmal",
-        "Article 28 1. This organization shall maintain a Central Baitul Mal at the central level and a Branch Baitul Mal at the branch level. 2. The sources of income of the Baitul Mal shall include the monthly contributions (Ayanat) of members, workers, and supporters, donations from well-wishers, one-time donations, and proceeds from the sale of publications and other materials. 3. The respective President shall utilize the funds of the relevant Baitul Mal for the activities of the organization. Every President shall be accountable to the higher President, the Consultative Council, and the Members' Conference for the management and expenditure of such funds. 4. The Central President shall appoint an Audit Committee for a specified term. The Audit Committee shall examine the income and expenditure accounts of both the Central and Branch Baitul Mal and submit its audit report to the Central Consultative Council.",
-        "Chapter 6 Election",
-        "Article 29 1. In the election or appointment to any position of this organization, special consideration shall be given to a person's obedience to Allah and His Messenger (ﷺ), religious knowledge (Deeni Ilm), piety (Taqwa),",
-        "organizational wisdom, ability to maintain organizational discipline, analytical ability, creativity, foresight, broad-mindedness, determination, firmness in action, good character, and trustworthiness (Amanah). 2. Any person who directly or indirectly seeks, campaigns for, or aspires to any position shall be considered ineligible for election to that position. 3. Direct or indirect election campaigning shall not be permitted. No group or faction shall be formed in support of or in opposition to any candidate. 4. The candidate receiving the highest number of votes shall be declared elected. 5. The session of this organization shall commence on the 1st day of January each year.",
-        "Removal from Office, Expulsion, and Procedure for Expulsion",
-        "Article 30 1. Removal from Office: The membership of any member of the Consultative Council (Central or Branch) shall be deemed terminated under any of the following circumstances: (a) If he or she ceases to be a member of this organization or if his or her membership is suspended; (b) If he or she remains absent from two consecutive meetings of the respective Consultative Council without a reasonable excuse; (c) If he or she resigns from the Consultative Council and such resignation is accepted by the President; (d) If two-thirds (2/3) of the members express a vote of no confidence against him or her; (e) If he or she relocates outside the respective electoral constituency; (f) If he or she acts contrary to the declared principles of this organization. 2. Expulsion: The Central President, pursuant to a decision of the Central Consultative Council, may expel any member of this organization if he or she: (a) Acts contrary to the rules, discipline, or principles of this organization; (b) Engages in any activity that damages the reputation or dignity of this organization; (c) Shows no interest in the activities of this organization and remains inactive despite repeated reminders; (d) Attempts to create groups or factions within the organization; (e) Partially or wholly violates the conditions of membership, either verbally or through actions. 3. Procedure for Expulsion: For any of the above reasons, the Central President, pursuant to a decision of the Central Consultative Council, may suspend the membership of any member for a period of one (1) to three (3) months. If the concerned person fails to rectify his or her conduct during this period, he or she may be expelled from the organization. Suspension or Dissolution of Branch Organizations",
-        "Article 31 In consideration of the interests and welfare of the organization, the Central President, in consultation with the",
-        "Central Consultative Council, may suspend or dissolve any Branch Organization. Limits of Differences of Opinion within the Organization",
-        "Article 32 After pledging to fully abide by the Constitution of the Korea Muslim Community, if a member holds a different opinion from the organization's adopted decision regarding methods of achieving its objectives and goals, the following principles shall apply: 1. A member shall have the full right to express his or her differing opinion at organizational meetings; however, no statement or conduct that undermines the dignity of any individual or the meeting shall be permitted. 2. Such differences of opinion shall not be publicized through the media or social media. 3. No member shall have the right to conduct private consultations with individual members for the purpose of creating groups or influencing public opinion. 4. Every member shall be obliged to accept and act in accordance with the opinion of the majority. However, within the prescribed limits, he or she shall have the right to seek reconsideration of such decision in the appropriate meeting. 5. If any member publicly discloses disagreement with a decision of the organization outside the body that adopted the decision, he or she shall not be eligible to hold any position whose duty is to implement or officially interpret the declared policies of the organization.",
-        "Chapter Seven",
-        "Interpretation and Amendment of the Constitution",
-        "Article 33 If any disagreement arises regarding the interpretation of any Article or Clause of this Constitution, or if a clearer",
-        "interpretation is required, the matter shall be presented by the Central President at a meeting of the Central Consultative Council. The opinion of the majority of the members of the Central Consultative Council shall be regarded as the final interpretation of the relevant Article or Clause.",
-        "Amendment of the Constitution",
-        "Article 34 1. If any member of this organization considers that any provision of this Constitution requires amendment, modification, or addition, he or she shall submit the proposal to the Central President for presentation before the Central Consultative Council. 2. The Central President or any member of the Central Consultative Council may, as necessary, submit a proposal for amendment. 3. Any amendment to this Constitution shall be adopted with the approval of at least two-thirds (2/3) of the members of the Central Consultative Council."
+        "Branch or Sub-Branch shall have a committee known as the Branch/Sub-Branch Committee. 3. The Central Women's Wing shall approve the Branch or Sub-Branch Committee for a term of one (1) year. 4. The Central Women's Wing shall appoint one (1) President and one (1) Secretary for each Branch or Sub-Branch for a term of one (1) year."
       ],
       "bn": [
         "চতুর্থ অধ্যায়",
@@ -451,14 +437,69 @@ export const CONSTITUTION_SECTIONS: ConstitutionSection[] = [
         "১. মহিলা বিভাগের কার্যক্রম সম্প্রসারণ ও জোরদার করার জন্য সারা দেশে কেন্দ্রীয় মহিলা বিভাগের অধীনে শাখা ও উপ-শাখা মহিলা বিভাগ প্রতিষ্ঠা করা হবে।",
         "২. শাখা বা উপ-শাখার কার্যকর পরিচালনা ও গুরুত্বপূর্ণ সিদ্ধান্তের সুবিধার্থে প্রত্যেক শাখা/উপ-শাখায় শাখা/উপ-শাখা কমিটি নামে একটি কমিটি থাকবে।",
         "৩. কেন্দ্রীয় মহিলা বিভাগ এক (১) বছর মেয়াদের জন্য শাখা বা উপ-শাখা কমিটি অনুমোদন করবে।",
-        "৪. কেন্দ্রীয় মহিলা বিভাগ প্রত্যেক শাখা বা উপ-শাখার জন্য এক (১) বছর মেয়াদের একজন সভাপতি ও একজন সচিব নিয়োগ করবে।",
+        "৪. কেন্দ্রীয় মহিলা বিভাগ প্রত্যেক শাখা বা উপ-শাখার জন্য এক (১) বছর মেয়াদের একজন সভাপতি ও একজন সচিব নিয়োগ করবে।"
+      ],
+      "ko": [
+        "제4장",
+        "제4장",
+        "여성부",
+        "중앙 여성부",
+        "제26조 1. 대한민국 내 여성을 대상으로 한 조직의 활동을 수행하기 위하여 한국 무슬림 커뮤니티 중앙 여성부를 둔다. 2. 중앙 여성부의 활동을 발전시키고 주요 사항을 심의·의결하기 위하여 한국 무슬림 커뮤니티 중앙 여성부 자문위원회를 둔다. 3. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 자문위원회의 대표 비율을 결정한다. 4. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 집행위원회를 1년의 임기로 승인한다. 5. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 집행위원회 위원 중에서 중앙",
+        "여성부 서기 1인과 중앙 여성부 부서기 1인을 1년의 임기로 임명한다. 6. 한국 무슬림 커뮤니티 중앙조직은 중앙 여성부의 모든 사업과 활동이 원활하게 수행될 수 있도록 필요한 지원을 제공한다.",
+        "지부/분지부 여성부",
+        "제27조 1. 여성부의 활동을 확대하고 발전시키기 위하여 중앙 여성부 산하에 전국적으로 지부 및 분지부 여성부를 둘 수 있다. 2. 지부 또는 분지부의 운영을 활성화하고 주요 사항을 효율적으로 결정하기 위하여",
+        "지부/분지부 위원회를 둔다. 3. 중앙 여성부는 지부 또는 분지부 위원회를 1년의 임기로 승인한다. 4. 중앙 여성부는 지부 또는 분지부의 운영을 위하여 회장 1인과 서기 1인을 1년의 임기로 임명한다."
+      ]
+    }
+  },
+  {
+    "id": "chapter-5",
+    "titles": {
+      "en": "Chapter Five",
+      "bn": "পঞ্চম অধ্যায়",
+      "ko": "제5장"
+    },
+    "blocks": {
+      "en": [
+        "Chapter Five",
+        "Baitulmal",
+        "Article 28 1. This organization shall maintain a Central Baitul Mal at the central level and a Branch Baitul Mal at the branch level. 2. The sources of income of the Baitul Mal shall include the monthly contributions (Ayanat) of members, workers, and supporters, donations from well-wishers, one-time donations, and proceeds from the sale of publications and other materials. 3. The respective President shall utilize the funds of the relevant Baitul Mal for the activities of the organization. Every President shall be accountable to the higher President, the Consultative Council, and the Members' Conference for the management and expenditure of such funds. 4. The Central President shall appoint an Audit Committee for a specified term. The Audit Committee shall examine the income and expenditure accounts of both the Central and Branch Baitul Mal and submit its audit report to the Central Consultative Council."
+      ],
+      "bn": [
         "পঞ্চম অধ্যায়",
         "বাইতুলমাল",
         "ধারা-২৮",
         "১. এই সংগঠন কেন্দ্রীয় পর্যায়ে কেন্দ্রীয় বাইতুলমাল এবং শাখা পর্যায়ে শাখা বাইতুলমাল পরিচালনা করবে।",
         "২. বাইতুলমালের আয়ের উৎস হবে সদস্য, কর্মী ও সমর্থকদের মাসিক চাঁদা (আয়ানাত), শুভানুধ্যায়ীদের দান, এককালীন দান, এবং প্রকাশনা ও অন্যান্য উপকরণ বিক্রয়লব্ধ অর্থ।",
         "৩. সংশ্লিষ্ট সভাপতি সংগঠনের কার্যক্রমের জন্য সংশ্লিষ্ট বাইতুলমালের তহবিল ব্যবহার করবেন। প্রত্যেক সভাপতি তহবিল ব্যবস্থাপনা ও ব্যয়ের জন্য ঊর্ধ্বতন সভাপতি, পরামর্শ সভা এবং সদস্য সম্মেলনের নিকট জবাবদিহি থাকবেন।",
-        "৪. কেন্দ্রীয় সভাপতি নির্দিষ্ট মেয়াদের জন্য একটি নিরীক্ষা কমিটি নিয়োগ করবেন। নিরীক্ষা কমিটি কেন্দ্রীয় ও শাখা বাইতুলমালের আয়-ব্যয় হিসাব পরীক্ষা করে কেন্দ্রীয় পরামর্শ সভার নিকট প্রতিবেদন দাখিল করবে।",
+        "৪. কেন্দ্রীয় সভাপতি নির্দিষ্ট মেয়াদের জন্য একটি নিরীক্ষা কমিটি নিয়োগ করবেন। নিরীক্ষা কমিটি কেন্দ্রীয় ও শাখা বাইতুলমালের আয়-ব্যয় হিসাব পরীক্ষা করে কেন্দ্রীয় পরামর্শ সভার নিকট প্রতিবেদন দাখিল করবে।"
+      ],
+      "ko": [
+        "제5장",
+        "제5장 바이툴 말(Baitulmal)",
+        "제28조 1. 본 조직은 중앙 단위에 **중앙 바이툴 말(Central Baitul Mal)**을 두며, 지부 단위에 **지부 바이툴 말(Branch Baitulmal)**을 둔다. 2. 바이툴 말의 재원은 회원, 활동회원 및 후원자의 월 정기 기부금(Ayanat), 후원자의 기부금, 일시 기부금, 출판물 및 기타 물품 판매 수익으로 한다. 3. 각급 회장은 조직의 업무 수행을 위하여 해당 바이툴 말의 자금을 집행할 수 있으며, 모든 회장은 상급 회장, 자문위원회 및 회원총회에 대하여 그 재정 운영과 지출에 관한 책임을 진다. 4. 중앙회장은 일정한 임기의 감사위원회를 구성한다. 감사위원회는 중앙 및 지부 바이툴 말의 수입과 지출을 감사하고, 그 결과를 중앙 자문위원회 회의에 감사보고서로 제출한다."
+      ]
+    }
+  },
+  {
+    "id": "chapter-6",
+    "titles": {
+      "en": "Chapter Six",
+      "bn": "ষষ্ঠ অধ্যায়",
+      "ko": "제6장"
+    },
+    "blocks": {
+      "en": [
+        "Chapter 6 Election",
+        "Article 29 1. In the election or appointment to any position of this organization, special consideration shall be given to a person's obedience to Allah and His Messenger (ﷺ), religious knowledge (Deeni Ilm), piety (Taqwa),",
+        "organizational wisdom, ability to maintain organizational discipline, analytical ability, creativity, foresight, broad-mindedness, determination, firmness in action, good character, and trustworthiness (Amanah). 2. Any person who directly or indirectly seeks, campaigns for, or aspires to any position shall be considered ineligible for election to that position. 3. Direct or indirect election campaigning shall not be permitted. No group or faction shall be formed in support of or in opposition to any candidate. 4. The candidate receiving the highest number of votes shall be declared elected. 5. The session of this organization shall commence on the 1st day of January each year.",
+        "Removal from Office, Expulsion, and Procedure for Expulsion",
+        "Article 30 1. Removal from Office: The membership of any member of the Consultative Council (Central or Branch) shall be deemed terminated under any of the following circumstances: (a) If he or she ceases to be a member of this organization or if his or her membership is suspended; (b) If he or she remains absent from two consecutive meetings of the respective Consultative Council without a reasonable excuse; (c) If he or she resigns from the Consultative Council and such resignation is accepted by the President; (d) If two-thirds (2/3) of the members express a vote of no confidence against him or her; (e) If he or she relocates outside the respective electoral constituency; (f) If he or she acts contrary to the declared principles of this organization. 2. Expulsion: The Central President, pursuant to a decision of the Central Consultative Council, may expel any member of this organization if he or she: (a) Acts contrary to the rules, discipline, or principles of this organization; (b) Engages in any activity that damages the reputation or dignity of this organization; (c) Shows no interest in the activities of this organization and remains inactive despite repeated reminders; (d) Attempts to create groups or factions within the organization; (e) Partially or wholly violates the conditions of membership, either verbally or through actions. 3. Procedure for Expulsion: For any of the above reasons, the Central President, pursuant to a decision of the Central Consultative Council, may suspend the membership of any member for a period of one (1) to three (3) months. If the concerned person fails to rectify his or her conduct during this period, he or she may be expelled from the organization. Suspension or Dissolution of Branch Organizations",
+        "Article 31 In consideration of the interests and welfare of the organization, the Central President, in consultation with the",
+        "Central Consultative Council, may suspend or dissolve any Branch Organization. Limits of Differences of Opinion within the Organization",
+        "Article 32 After pledging to fully abide by the Constitution of the Korea Muslim Community, if a member holds a different opinion from the organization's adopted decision regarding methods of achieving its objectives and goals, the following principles shall apply: 1. A member shall have the full right to express his or her differing opinion at organizational meetings; however, no statement or conduct that undermines the dignity of any individual or the meeting shall be permitted. 2. Such differences of opinion shall not be publicized through the media or social media. 3. No member shall have the right to conduct private consultations with individual members for the purpose of creating groups or influencing public opinion. 4. Every member shall be obliged to accept and act in accordance with the opinion of the majority. However, within the prescribed limits, he or she shall have the right to seek reconsideration of such decision in the appropriate meeting. 5. If any member publicly discloses disagreement with a decision of the organization outside the body that adopted the decision, he or she shall not be eligible to hold any position whose duty is to implement or officially interpret the declared policies of the organization."
+      ],
+      "bn": [
         "ষষ্ঠ অধ্যায়",
         "নির্বাচন",
         "ধারা-২৯",
@@ -482,7 +523,36 @@ export const CONSTITUTION_SECTIONS: ConstitutionSection[] = [
         "২. এমন মতপার্থক্য গণমাধ্যম বা সামাজিক যোগাযোগমাধ্যমে প্রচার করা যাবে না।",
         "৩. দল সৃষ্টি বা জনমত প্রভাবিত করার উদ্দেশ্যে ব্যক্তিগত সদস্যের সাথে গোপন আলোচনা করার অধিকার কারো থাকবে না।",
         "৪. প্রত্যেক সদস্য সংখ্যাগরিষ্ঠের মত গ্রহণ ও অনুসারে কাজ করতে বাধ্য থাকবেন। তবে নির্ধারিত সীমার মধ্যে যথাযথ সভায় পুনর্বিবেচনা চাইতে পারবেন।",
-        "৫. যে সভায় সিদ্ধান্ত গৃহীত হয়েছে তার বাইরে যদি কোনো সদস্য প্রকাশ্যে মতভেদ প্রকাশ করেন, তিনি সংগঠনের ঘোষিত নীতি বাস্তবায়ন বা অফিসিয়াল ব্যাখ্যার দায়িত্বের কোনো পদে অধিষ্ঠিত থাকার যোগ্য হবেন না।",
+        "৫. যে সভায় সিদ্ধান্ত গৃহীত হয়েছে তার বাইরে যদি কোনো সদস্য প্রকাশ্যে মতভেদ প্রকাশ করেন, তিনি সংগঠনের ঘোষিত নীতি বাস্তবায়ন বা অফিসিয়াল ব্যাখ্যার দায়িত্বের কোনো পদে অধিষ্ঠিত থাকার যোগ্য হবেন না।"
+      ],
+      "ko": [
+        "제6장 선거",
+        "제29조 1. 본 조직의 모든 직위에 대한 선출 또는 임명 시에는 알라와 그분의 사도(ﷺ)에 대한 순종, 종교적 지식(Deeni Ilm), 경건함(Taqwa), 조직 운영 능력, 조직 규율 유지 능력, 분석력, 창의력, 통찰력, 포용력, 확고한 의지, 업무 수행 능력, 훌륭한 품성 및 신뢰성(Amanah)을 특히 중요하게 고려하여야 한다. 2. 직위를 직접 또는 간접적으로 희망하거나 이를 위해 활동하는 사람은 해당 직위의 선출 대상 자격이 없는 것으로 본다. 3. 직접 또는 간접적인 선거운동은 허용되지 않는다. 특정 후보를 지지하거나 반대하기 위한 그룹이나 파벌을 형성해서는 안 된다. 4. 최다 득표자를 당선인으로 선언한다. 5. 본 조직의 회기는 매년 1월 1일부터 시작한다. 직위 해제, 제명 및 제명 절차",
+        "제30조 1. 직위 해제: 중앙 또는 지부 자문위원회 위원은 다음 각 호의 어느 하나에 해당하는 경우 그 자격을 상실한 것으로 본다. (가) 본 조직의 회원 자격을 상실하거나 회원 자격이 정지된 경우 (나) 정당한 사유 없이 해당 자문위원회 회의에 연속 두 차례 불참한 경우 (다) 자문위원회 위원직을 사임하고 회장이 이를 승인한 경우 (라) 재적위원 3분의 2 이상의 불신임을 받은 경우 (마) 해당 선거구를 이전한 경우 (바) 본 조직의 공식 원칙에 반하는 행위를 한 경우 2. 제명: 중앙회장은 중앙 자문위원회의 의결에 따라 다음 각 호의 어느 하나에 해당하는 회원을 제명할 수 있다. (가) 조직의 규율 또는 원칙에 반하는 행위를 한 경우 (나) 조직의 명예 또는 위신을 훼손하는 행위를 한 경우 (다) 조직 활동에 지속적으로 무관심하며 반복적인 권고에도 불구하고 활동하지 않는 경우 (라) 조직 내부에 그룹이나 파벌을 형성하려고 시도한 경우 (마) 회원의 의무를 전부 또는 일부 위반한 경우 3. 제명 절차: 중앙회장은 중앙 자문위원회의 의결에 따라 해당 회원의 자격을 1개월 이상 3개월 이하의 기간 동안 정지할 수 있으며, 그 기간 내에 개선되지 않을 경우 제명할 수 있다.",
+        "지부 조직의 활동 정지 및 해산",
+        "제31조 조직의 필요와 발전을 고려하여 중앙회장은 중앙 자문위원회와 협의한 후 지부 조직의 활동을 정지하거나 해산할 수 있다. 조직 내 의견 차이의 범위",
+        "제32조",
+        "회원이 본 정관을 준수할 것을 서약한 이후 조직의 목적과 목표를 달성하기 위한 방법에 관하여 조직의 결정과 다른 의견을 가진 경우에는 다음 원칙을 따라야 한다. 1. 회원은 조직 회의에서 자신의 의견을 자유롭게 개진할 권리가 있다. 다만, 개인이나 회의의 품위를 훼손하는 언행은 하여서는 안 된다. 2. 이러한 의견 차이는 언론이나 소셜미디어를 통하여 공개하여서는 안 된다. 3. 그룹이나 여론 형성을 목적으로 개별 회원과 비공개 협의를 하여서는 안 된다. 4. 회원은 다수의 의견을 수용하고 이에 따라 행동하여야 한다. 다만, 정해진 절차와 범위 내에서 관련 회의에서 그 결정을 변경하도록 제안할 권리를 가진다. 5. 조직의 결정을 내린 기구 외부에서 자신의 반대 의견을 공개한 회원은 조직의 정책을 집행하거나 공식적으로 설명하는 직책을 맡을 수 없다."
+      ]
+    }
+  },
+  {
+    "id": "chapter-7",
+    "titles": {
+      "en": "Chapter Seven",
+      "bn": "সপ্তম অধ্যায়",
+      "ko": "제7장"
+    },
+    "blocks": {
+      "en": [
+        "Chapter Seven",
+        "Interpretation and Amendment of the Constitution",
+        "Article 33 If any disagreement arises regarding the interpretation of any Article or Clause of this Constitution, or if a clearer",
+        "interpretation is required, the matter shall be presented by the Central President at a meeting of the Central Consultative Council. The opinion of the majority of the members of the Central Consultative Council shall be regarded as the final interpretation of the relevant Article or Clause.",
+        "Amendment of the Constitution",
+        "Article 34 1. If any member of this organization considers that any provision of this Constitution requires amendment, modification, or addition, he or she shall submit the proposal to the Central President for presentation before the Central Consultative Council. 2. The Central President or any member of the Central Consultative Council may, as necessary, submit a proposal for amendment. 3. Any amendment to this Constitution shall be adopted with the approval of at least two-thirds (2/3) of the members of the Central Consultative Council."
+      ],
+      "bn": [
         "সপ্তম অধ্যায়",
         "গঠনতন্ত্রের ব্যাখ্যা ও সংশোধন",
         "ধারা-৩৩",
@@ -494,25 +564,6 @@ export const CONSTITUTION_SECTIONS: ConstitutionSection[] = [
         "৩. এই গঠনতন্ত্রের যে কোনো সংশোধন কেন্দ্রীয় পরামর্শ সভার কমপক্ষে দুই-তৃতীয়াংশ (২/৩) সদস্যের অনুমোদনে গৃহীত হবে।"
       ],
       "ko": [
-        "제4장",
-        "제4장",
-        "여성부",
-        "중앙 여성부",
-        "제26조 1. 대한민국 내 여성을 대상으로 한 조직의 활동을 수행하기 위하여 한국 무슬림 커뮤니티 중앙 여성부를 둔다. 2. 중앙 여성부의 활동을 발전시키고 주요 사항을 심의·의결하기 위하여 한국 무슬림 커뮤니티 중앙 여성부 자문위원회를 둔다. 3. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 자문위원회의 대표 비율을 결정한다. 4. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 집행위원회를 1년의 임기로 승인한다. 5. 중앙회장은 중앙 자문위원회와 협의하여 중앙 여성부 집행위원회 위원 중에서 중앙",
-        "여성부 서기 1인과 중앙 여성부 부서기 1인을 1년의 임기로 임명한다. 6. 한국 무슬림 커뮤니티 중앙조직은 중앙 여성부의 모든 사업과 활동이 원활하게 수행될 수 있도록 필요한 지원을 제공한다.",
-        "지부/분지부 여성부",
-        "제27조 1. 여성부의 활동을 확대하고 발전시키기 위하여 중앙 여성부 산하에 전국적으로 지부 및 분지부 여성부를 둘 수 있다. 2. 지부 또는 분지부의 운영을 활성화하고 주요 사항을 효율적으로 결정하기 위하여",
-        "지부/분지부 위원회를 둔다. 3. 중앙 여성부는 지부 또는 분지부 위원회를 1년의 임기로 승인한다. 4. 중앙 여성부는 지부 또는 분지부의 운영을 위하여 회장 1인과 서기 1인을 1년의 임기로 임명한다.",
-        "제5장",
-        "제5장 바이툴 말(Baitulmal)",
-        "제28조 1. 본 조직은 중앙 단위에 **중앙 바이툴 말(Central Baitul Mal)**을 두며, 지부 단위에 **지부 바이툴 말(Branch Baitulmal)**을 둔다. 2. 바이툴 말의 재원은 회원, 활동회원 및 후원자의 월 정기 기부금(Ayanat), 후원자의 기부금, 일시 기부금, 출판물 및 기타 물품 판매 수익으로 한다. 3. 각급 회장은 조직의 업무 수행을 위하여 해당 바이툴 말의 자금을 집행할 수 있으며, 모든 회장은 상급 회장, 자문위원회 및 회원총회에 대하여 그 재정 운영과 지출에 관한 책임을 진다. 4. 중앙회장은 일정한 임기의 감사위원회를 구성한다. 감사위원회는 중앙 및 지부 바이툴 말의 수입과 지출을 감사하고, 그 결과를 중앙 자문위원회 회의에 감사보고서로 제출한다.",
-        "제6장 선거",
-        "제29조 1. 본 조직의 모든 직위에 대한 선출 또는 임명 시에는 알라와 그분의 사도(ﷺ)에 대한 순종, 종교적 지식(Deeni Ilm), 경건함(Taqwa), 조직 운영 능력, 조직 규율 유지 능력, 분석력, 창의력, 통찰력, 포용력, 확고한 의지, 업무 수행 능력, 훌륭한 품성 및 신뢰성(Amanah)을 특히 중요하게 고려하여야 한다. 2. 직위를 직접 또는 간접적으로 희망하거나 이를 위해 활동하는 사람은 해당 직위의 선출 대상 자격이 없는 것으로 본다. 3. 직접 또는 간접적인 선거운동은 허용되지 않는다. 특정 후보를 지지하거나 반대하기 위한 그룹이나 파벌을 형성해서는 안 된다. 4. 최다 득표자를 당선인으로 선언한다. 5. 본 조직의 회기는 매년 1월 1일부터 시작한다. 직위 해제, 제명 및 제명 절차",
-        "제30조 1. 직위 해제: 중앙 또는 지부 자문위원회 위원은 다음 각 호의 어느 하나에 해당하는 경우 그 자격을 상실한 것으로 본다. (가) 본 조직의 회원 자격을 상실하거나 회원 자격이 정지된 경우 (나) 정당한 사유 없이 해당 자문위원회 회의에 연속 두 차례 불참한 경우 (다) 자문위원회 위원직을 사임하고 회장이 이를 승인한 경우 (라) 재적위원 3분의 2 이상의 불신임을 받은 경우 (마) 해당 선거구를 이전한 경우 (바) 본 조직의 공식 원칙에 반하는 행위를 한 경우 2. 제명: 중앙회장은 중앙 자문위원회의 의결에 따라 다음 각 호의 어느 하나에 해당하는 회원을 제명할 수 있다. (가) 조직의 규율 또는 원칙에 반하는 행위를 한 경우 (나) 조직의 명예 또는 위신을 훼손하는 행위를 한 경우 (다) 조직 활동에 지속적으로 무관심하며 반복적인 권고에도 불구하고 활동하지 않는 경우 (라) 조직 내부에 그룹이나 파벌을 형성하려고 시도한 경우 (마) 회원의 의무를 전부 또는 일부 위반한 경우 3. 제명 절차: 중앙회장은 중앙 자문위원회의 의결에 따라 해당 회원의 자격을 1개월 이상 3개월 이하의 기간 동안 정지할 수 있으며, 그 기간 내에 개선되지 않을 경우 제명할 수 있다.",
-        "지부 조직의 활동 정지 및 해산",
-        "제31조 조직의 필요와 발전을 고려하여 중앙회장은 중앙 자문위원회와 협의한 후 지부 조직의 활동을 정지하거나 해산할 수 있다. 조직 내 의견 차이의 범위",
-        "제32조",
-        "회원이 본 정관을 준수할 것을 서약한 이후 조직의 목적과 목표를 달성하기 위한 방법에 관하여 조직의 결정과 다른 의견을 가진 경우에는 다음 원칙을 따라야 한다. 1. 회원은 조직 회의에서 자신의 의견을 자유롭게 개진할 권리가 있다. 다만, 개인이나 회의의 품위를 훼손하는 언행은 하여서는 안 된다. 2. 이러한 의견 차이는 언론이나 소셜미디어를 통하여 공개하여서는 안 된다. 3. 그룹이나 여론 형성을 목적으로 개별 회원과 비공개 협의를 하여서는 안 된다. 4. 회원은 다수의 의견을 수용하고 이에 따라 행동하여야 한다. 다만, 정해진 절차와 범위 내에서 관련 회의에서 그 결정을 변경하도록 제안할 권리를 가진다. 5. 조직의 결정을 내린 기구 외부에서 자신의 반대 의견을 공개한 회원은 조직의 정책을 집행하거나 공식적으로 설명하는 직책을 맡을 수 없다.",
         "제7장",
         "제7장 정관의 해석 및 개정",
         "제33조 본 정관의 조항 또는 세부 조항의 해석에 의견 차이가 발생하거나 보다 명확한 해석이 필요한 경우,",
