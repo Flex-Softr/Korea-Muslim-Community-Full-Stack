@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { normalizeDownloadFileSource } from "@/lib/download-file";
 import { buildCarouselLocaleMapFromSource } from "@/lib/i18n/build-carousel-locale";
 import { buildLocaleContentMapFromSource } from "@/lib/i18n/build-locale-content";
 import {
@@ -83,6 +84,8 @@ export type DashboardContentRow = {
   coverImage?: string;
   videoUrl?: string;
   fileUrl?: string;
+  /** Download only: "upload" | "external" */
+  fileSource?: "upload" | "external";
   createdById?: string;
   status?: "pending" | "published";
 };
@@ -114,6 +117,7 @@ type DbContentRow = {
   coverImage: string | null;
   videoUrl: string | null;
   fileUrl?: string | null;
+  fileSource?: string | null;
   createdById: string | null;
   status: string | null;
   slug: string | null;
@@ -146,6 +150,9 @@ function mapContentRow(row: DbContentRow): DashboardContentRow {
     coverImage: row.coverImage ?? undefined,
     videoUrl: row.videoUrl ?? undefined,
     fileUrl: row.fileUrl ?? undefined,
+    fileSource: row.fileUrl
+      ? normalizeDownloadFileSource(row.fileSource, row.fileUrl)
+      : undefined,
     createdById: row.createdById ?? undefined,
     status: row.status === "pending" || row.status === "published" ? row.status : undefined,
   };
@@ -248,6 +255,7 @@ export async function createDashboardContent(
     coverImage?: string;
     videoUrl?: string;
     fileUrl?: string;
+    fileSource?: "upload" | "external";
     createdById?: string;
     status?: "pending" | "published";
     localeContent?: LocaleContentMap;
@@ -273,7 +281,12 @@ export async function createDashboardContent(
       description: en.description || localeContent.ko.description || localeContent.bn.description,
       coverImage: input.coverImage?.trim() ?? "",
       videoUrl: input.videoUrl?.trim() || null,
-      ...(type === "download" ? { fileUrl: input.fileUrl?.trim() || null } : {}),
+      ...(type === "download"
+        ? {
+            fileUrl: input.fileUrl?.trim() || null,
+            fileSource: input.fileSource === "external" ? "external" : "upload",
+          }
+        : {}),
       createdById: input.createdById,
       status: resolvedStatus,
       publishedAt: resolvedStatus === "published" ? new Date() : null,
@@ -366,6 +379,7 @@ export async function updateDashboardContent(
     coverImage: string;
     videoUrl: string;
     fileUrl: string;
+    fileSource: "upload" | "external";
     status: "pending" | "published";
   }>,
 ): Promise<DashboardContentRow | null> {
@@ -397,6 +411,9 @@ export async function updateDashboardContent(
     ...(input.coverImage !== undefined ? { coverImage: input.coverImage?.trim() || null } : {}),
     ...(input.videoUrl !== undefined ? { videoUrl: input.videoUrl.trim() || null } : {}),
     ...(type === "download" && input.fileUrl !== undefined ? { fileUrl: input.fileUrl.trim() || null } : {}),
+    ...(type === "download" && input.fileSource !== undefined
+      ? { fileSource: input.fileSource === "external" ? "external" : "upload" }
+      : {}),
     ...(input.status !== undefined
       ? {
           status: input.status,

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { listDashboardContent } from "@/lib/dashboard/store";
+import {
+  isExternalHttpUrl,
+  normalizeDownloadFileSource,
+} from "@/lib/download-file";
 
 export async function GET(request: Request) {
   const searchParams = new URL(request.url).searchParams;
@@ -10,12 +14,18 @@ export async function GET(request: Request) {
     : rows;
 
   return NextResponse.json({
-    items: filtered.map((row) => ({
-      id: row.id,
-      title: row.title,
-      category: row.category,
-      image: row.coverImage || "/brand/logo.png",
-      fileUrl: row.fileUrl ?? "",
-    })),
+    items: filtered.map((row) => {
+      const fileUrl = row.fileUrl ?? "";
+      const fileSource = normalizeDownloadFileSource(row.fileSource, fileUrl);
+      return {
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        image: row.coverImage || "/brand/logo.png",
+        fileUrl,
+        fileSource,
+        isExternal: fileSource === "external" || isExternalHttpUrl(fileUrl),
+      };
+    }),
   });
 }

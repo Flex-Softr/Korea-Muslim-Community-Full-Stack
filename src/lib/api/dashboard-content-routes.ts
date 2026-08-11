@@ -9,6 +9,11 @@ import {
   updateDashboardContent,
   type DashboardContentType,
 } from "@/lib/dashboard/store";
+import {
+  normalizeDownloadFileSource,
+  validateDownloadFileUrl,
+  type DownloadFileSource,
+} from "@/lib/download-file";
 import { normalizeContentLocale } from "@/lib/i18n/content-locale";
 import type { LocaleContentMap } from "@/lib/i18n/content-locale";
 import { hasMinimumRole } from "@/lib/roles";
@@ -45,6 +50,7 @@ export function dashboardContentCollectionHandlers(type: DashboardContentType) {
         coverImage?: string;
         videoUrl?: string;
         fileUrl?: string;
+        fileSource?: DownloadFileSource;
         localeContent?: LocaleContentMap;
       };
 
@@ -71,8 +77,14 @@ export function dashboardContentCollectionHandlers(type: DashboardContentType) {
           return NextResponse.json({ error: "Description is required" }, { status: 400 });
         }
       }
-      if (type === "download" && !body.fileUrl?.trim()) {
-        return NextResponse.json({ error: "File is required" }, { status: 400 });
+      if (type === "download") {
+        const fileSource = normalizeDownloadFileSource(body.fileSource, body.fileUrl);
+        const fileError = validateDownloadFileUrl(body.fileUrl ?? "", fileSource);
+        if (fileError) {
+          return NextResponse.json({ error: fileError }, { status: 400 });
+        }
+        body.fileSource = fileSource;
+        body.fileUrl = body.fileUrl?.trim();
       }
 
       const created = await createDashboardContent(type, {
@@ -83,6 +95,7 @@ export function dashboardContentCollectionHandlers(type: DashboardContentType) {
         coverImage: body.coverImage?.trim(),
         videoUrl: body.videoUrl,
         fileUrl: body.fileUrl,
+        fileSource: body.fileSource,
         createdById: session?.user?.id ?? undefined,
         status: "published",
         localeContent: body.localeContent,
@@ -140,10 +153,28 @@ export function dashboardContentItemHandlers(type: DashboardContentType) {
         coverImage?: string;
         videoUrl?: string;
         fileUrl?: string;
+        fileSource?: DownloadFileSource;
         status?: "pending" | "published";
       };
       if (body.category !== undefined && !body.category.trim()) {
         return NextResponse.json({ error: "Category is required" }, { status: 400 });
+      }
+      if (type === "download" && (body.fileUrl !== undefined || body.fileSource !== undefined)) {
+        const fileSource = normalizeDownloadFileSource(
+          body.fileSource ?? existing.fileSource,
+          body.fileUrl ?? existing.fileUrl,
+        );
+        const fileError = validateDownloadFileUrl(
+          body.fileUrl ?? existing.fileUrl ?? "",
+          fileSource,
+        );
+        if (fileError) {
+          return NextResponse.json({ error: fileError }, { status: 400 });
+        }
+        body.fileSource = fileSource;
+        if (body.fileUrl !== undefined) {
+          body.fileUrl = body.fileUrl.trim();
+        }
       }
       const updated = await updateDashboardContent(type, id, body);
       if (!updated) {

@@ -257,7 +257,10 @@ model DashboardDownload {
   description   String?
   coverImage    String?
   videoUrl      String?
+  /// Local upload path (e.g. /download/files/…) or absolute external URL (Drive, etc.).
   fileUrl       String?
+  /// "upload" | "external" — how fileUrl should be treated.
+  fileSource    String?
   slug          String?
   localeContent Json?
   createdById   String?
