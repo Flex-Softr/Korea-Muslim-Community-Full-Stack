@@ -132,7 +132,10 @@ export function OurBlogSection({
                 </Link>
               </h3>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                {stripHtmlTags(featuredExcerpt)}
+                {stripHtmlTags(featuredExcerpt).replace(
+                  /।\s*/g,
+                  "।\u00A0\u00A0",
+                )}
               </p>
               <Link
                 href={featuredHref}
