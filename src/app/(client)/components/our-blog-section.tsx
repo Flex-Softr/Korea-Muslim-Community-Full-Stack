@@ -98,11 +98,11 @@ export function OurBlogSection({
           </div>
         )}
 
-        <article className="mb-10 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/5">
+        <article className="mb-10 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm ring-1 ring-black/4 dark:ring-white/5">
           <div className="grid lg:grid-cols-2">
             <Link
               href={featuredHref}
-              className="relative aspect-[16/10] min-h-[200px] bg-muted lg:aspect-auto lg:min-h-[280px]"
+              className="relative aspect-16/10 min-h-50 bg-muted lg:aspect-auto lg:min-h-70"
             >
               <Image
                 src={featuredItem.coverImage}
@@ -132,7 +132,7 @@ export function OurBlogSection({
                 </Link>
               </h3>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-               {stripHtmlTags(featuredExcerpt)}
+                {stripHtmlTags(featuredExcerpt)}
               </p>
               <Link
                 href={featuredHref}

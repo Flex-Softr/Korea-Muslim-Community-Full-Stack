@@ -74,12 +74,7 @@ export function StudentBlogArticleDetail({
     return pickCmsDetailDisplayText(detail, lang);
   }, [mainText, detail, lang]);
 
-  const plainContent = richTextToPlainText(loc.description);
-  const paragraphs = plainContent
-    .split(/(?:\r?\n){2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-
+  const plainContent = loc.description;
   const breadcrumbs = useMemo(
     () => [
       { label: t("nav.home"), href: "/" },
@@ -119,7 +114,7 @@ export function StudentBlogArticleDetail({
                 </Badge>
               </div>
 
-              <div className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-xl border border-border/80 bg-muted shadow-sm ring-1 ring-black/[0.04] dark:ring-white/5">
+              <div className="relative mt-6 aspect-16/10 w-full overflow-hidden rounded-xl border border-border/80 bg-muted shadow-sm ring-1 ring-black/4 dark:ring-white/5">
                 <Image
                   src={detail.imageSrc}
                   alt={loc.title}
@@ -131,11 +126,7 @@ export function StudentBlogArticleDetail({
               </div>
 
               <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
-                {paragraphs.length > 0 ? (
-                  paragraphs.map((p, i) => <p key={i}>{p}</p>)
-                ) : (
-                  <p>{plainContent}</p>
-                )}
+                <div dangerouslySetInnerHTML={{ __html: plainContent }}></div>
               </div>
 
               <p className="mt-10 text-sm text-muted-foreground">

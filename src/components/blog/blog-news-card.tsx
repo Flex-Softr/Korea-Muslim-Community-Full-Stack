@@ -5,10 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/components/providers/language-provider";
 import { Badge } from "@/components/ui/badge";
-import {
-  blogPostPath,
-  type StudentNewsPost,
-} from "@/data/student-news";
+import { blogPostPath, type StudentNewsPost } from "@/data/student-news";
 import { useTranslatedFields } from "@/hooks/use-translated-fields";
 import { stripHtmlTags } from "@/lib/utils";
 
@@ -32,12 +29,12 @@ export function BlogNewsCard({
   });
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:ring-white/5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm ring-1 ring-black/4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:ring-white/5">
       <Link
         href={blogPostPath(item.slug)}
         className="flex h-full min-h-0 flex-col"
       >
-        <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted">
+        <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-muted">
           <Image
             src={item.coverImage}
             alt={item.title}
@@ -45,7 +42,7 @@ export function BlogNewsCard({
             className="object-cover transition duration-500 group-hover:scale-[1.04]"
             sizes={imageSizes}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent opacity-80" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/20 to-transparent opacity-80" />
         </div>
         <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
@@ -53,7 +50,10 @@ export function BlogNewsCard({
             <span aria-hidden className="text-border">
               ·
             </span>
-            <Badge variant="secondary" className="rounded-full px-2 py-0 text-[11px] font-medium">
+            <Badge
+              variant="secondary"
+              className="rounded-full px-2 py-0 text-[11px] font-medium"
+            >
               {translated.category}
             </Badge>
           </div>

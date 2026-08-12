@@ -101,11 +101,11 @@ export function OurActivitySection({
           </div>
         )}
 
-        <article className="mb-10 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/5">
+        <article className="mb-10 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm ring-1 ring-black/4 dark:ring-white/5">
           <div className="grid lg:grid-cols-2">
             <Link
               href={featuredHref}
-              className="relative aspect-[16/10] min-h-[200px] bg-muted lg:aspect-auto lg:min-h-[280px]"
+              className="relative aspect-16/10 min-h-50 bg-muted lg:aspect-auto lg:min-h-70"
             >
               <Image
                 src={featuredItem.imageSrc}
@@ -135,7 +135,12 @@ export function OurActivitySection({
                 </Link>
               </h3>
               <div className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
-                <p>{stripHtmlTags(featuredExcerpt).replace(/।\s*/g, "।\u00A0\u00A0")}</p>
+                <p>
+                  {stripHtmlTags(featuredExcerpt).replace(
+                    /।\s*/g,
+                    "।\u00A0\u00A0",
+                  )}
+                </p>
               </div>
               <Link
                 href={featuredHref}

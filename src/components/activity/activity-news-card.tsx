@@ -32,12 +32,12 @@ export function ActivityNewsCard({
   });
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:ring-white/5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-sm ring-1 ring-black/4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:ring-white/5">
       <Link
         href={activityDetailPath(item.slug)}
         className="flex h-full min-h-0 flex-col"
       >
-        <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted">
+        <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-muted">
           <Image
             src={item.imageSrc}
             alt=""
@@ -45,7 +45,7 @@ export function ActivityNewsCard({
             className="object-cover transition duration-500 group-hover:scale-[1.04]"
             sizes={imageSizes}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent opacity-80" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/20 to-transparent opacity-80" />
         </div>
         <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
@@ -53,7 +53,10 @@ export function ActivityNewsCard({
             <span aria-hidden className="text-border">
               ·
             </span>
-            <Badge variant="secondary" className="rounded-full px-2 py-0 text-[11px] font-medium">
+            <Badge
+              variant="secondary"
+              className="rounded-full px-2 py-0 text-[11px] font-medium"
+            >
               {translated.category}
             </Badge>
           </div>
@@ -61,7 +64,7 @@ export function ActivityNewsCard({
             {translated.title}
           </h3>
           <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
-            {stripHtmlTags(translated.excerpt).replace(/।\s*/g, "।\u00A0\u00A0")}
+            {stripHtmlTags(translated.excerpt)}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400">
             {t("common.readMore")}
