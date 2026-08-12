@@ -134,9 +134,9 @@ export function OurActivitySection({
                   {featuredTitle}
                 </Link>
               </h3>
-              <p className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
-                {stripHtmlTags(featuredExcerpt)}
-              </p>
+              <div className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
+                <p>{stripHtmlTags(featuredExcerpt).replace(/।\s*/g, "।\u00A0\u00A0")}</p>
+              </div>
               <Link
                 href={featuredHref}
                 className="mt-6 inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400"

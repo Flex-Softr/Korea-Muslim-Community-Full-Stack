@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
   ACTIVITY_NEWS,
@@ -57,9 +58,9 @@ import {
 type CmsModelDelegate = {
   count(args: unknown): Promise<number>;
   findMany(args: unknown): Promise<unknown[]>;
-  groupBy(args: unknown): Promise<
-    { category: string; _count: { _all: number } }[]
-  >;
+  groupBy(
+    args: unknown,
+  ): Promise<{ category: string; _count: { _all: number } }[]>;
 };
 
 type DashboardPrismaClient = typeof prisma & {
@@ -88,7 +89,13 @@ const HOME_LIMIT_FALLBACK = 50;
 ====================================================== */
 
 function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const danda = String.fromCharCode(0x0964);
+  return input
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(new RegExp(danda, "g"), danda + " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function slugify(input: string): string {
@@ -117,11 +124,7 @@ function formatDate(dateIso: string): string {
 function resolveLocale(row: any) {
   return (
     parseLocaleContentMap(row.localeContent) ??
-    legacyLocaleMapFromFlat(
-      row.title,
-      row.category,
-      row.description ?? "",
-    )
+    legacyLocaleMapFromFlat(row.title, row.category, row.description ?? "")
   );
 }
 
@@ -256,12 +259,7 @@ export function repositoryOptsForListQuery(
 
   const pageSize = query.pageSize;
 
-  if (
-    page !== 1 ||
-    query.category ||
-    query.year != null ||
-    pageSize == null
-  ) {
+  if (page !== 1 || query.category || query.year != null || pageSize == null) {
     return undefined;
   }
 
@@ -295,10 +293,7 @@ export async function listBlogPosts(
           where,
         });
 
-    const { page, pageSize, skip, totalPages } = paginate(
-      total,
-      query,
-    );
+    const { page, pageSize, skip, totalPages } = paginate(total, query);
 
     const rows = await dashboardPrisma.dashboardBlog.findMany({
       where,
@@ -322,12 +317,7 @@ export async function listBlogPosts(
     return {
       items: rows.map((row) => mapBlog(row, requestLang)),
       ...emptyFacets(),
-      pagination: buildPagination(
-        page,
-        pageSize,
-        total,
-        totalPages,
-      ),
+      pagination: buildPagination(page, pageSize, total, totalPages),
     };
   } catch (error) {
     console.error("[listBlogPosts]", error);
@@ -339,20 +329,12 @@ export async function listBlogPosts(
 
     const total = items.length;
 
-    const { page, pageSize, totalPages } = paginate(
-      total,
-      query,
-    );
+    const { page, pageSize, totalPages } = paginate(total, query);
 
     return {
       items,
       ...emptyFacets(),
-      pagination: buildPagination(
-        page,
-        pageSize,
-        total,
-        totalPages,
-      ),
+      pagination: buildPagination(page, pageSize, total, totalPages),
     };
   }
 }
@@ -424,15 +406,11 @@ export async function listActivityItems(
       OR: [{ status: "published" }, { status: null }],
     };
 
-    const total =
-      await dashboardPrisma.dashboardActivity.count({
-        where,
-      });
+    const total = await dashboardPrisma.dashboardActivity.count({
+      where,
+    });
 
-    const { page, pageSize, skip, totalPages } = paginate(
-      total,
-      query,
-    );
+    const { page, pageSize, skip, totalPages } = paginate(total, query);
 
     const rows = await dashboardPrisma.dashboardActivity.findMany({
       where,
@@ -444,16 +422,9 @@ export async function listActivityItems(
     });
 
     return {
-      items: rows.map((row) =>
-        mapActivity(row, requestLang),
-      ),
+      items: rows.map((row) => mapActivity(row, requestLang)),
       ...emptyFacets(),
-      pagination: buildPagination(
-        page,
-        pageSize,
-        total,
-        totalPages,
-      ),
+      pagination: buildPagination(page, pageSize, total, totalPages),
     };
   } catch (error) {
     console.error("[listActivityItems]", error);
@@ -465,20 +436,12 @@ export async function listActivityItems(
 
     const total = items.length;
 
-    const { page, pageSize, totalPages } = paginate(
-      total,
-      query,
-    );
+    const { page, pageSize, totalPages } = paginate(total, query);
 
     return {
       items,
       ...emptyFacets(),
-      pagination: buildPagination(
-        page,
-        pageSize,
-        total,
-        totalPages,
-      ),
+      pagination: buildPagination(page, pageSize, total, totalPages),
     };
   }
 }
@@ -490,8 +453,7 @@ export async function getActivityItem(
   const requestLang = lang ?? (await getRequestLang());
 
   try {
-    const row =
-      await getPublishedDashboardActivityBySlug(slug);
+    const row = await getPublishedDashboardActivityBySlug(slug);
 
     if (row) {
       return mapActivity(
@@ -558,12 +520,7 @@ export async function listPhotoItems(
     return {
       items,
       ...emptyFacets(),
-      pagination: buildPagination(
-        1,
-        total,
-        total,
-        1,
-      ),
+      pagination: buildPagination(1, total, total, 1),
     };
   } catch (error) {
     console.error("[listPhotoItems]", error);
@@ -573,12 +530,7 @@ export async function listPhotoItems(
     return {
       items: PHOTO_GALLERY_ITEMS,
       ...emptyFacets(),
-      pagination: buildPagination(
-        1,
-        total,
-        total,
-        1,
-      ),
+      pagination: buildPagination(1, total, total, 1),
     };
   }
 }
@@ -599,21 +551,14 @@ export async function listVideoItems(
       },
     });
 
-    const items = rows
-      .filter((row: any) => row.videoUrl?.trim())
-      .map(mapVideo);
+    const items = rows.filter((row: any) => row.videoUrl?.trim()).map(mapVideo);
 
     const total = items.length;
 
     return {
       items,
       ...emptyFacets(),
-      pagination: buildPagination(
-        1,
-        total,
-        total,
-        1,
-      ),
+      pagination: buildPagination(1, total, total, 1),
     };
   } catch (error) {
     console.error("[listVideoItems]", error);
@@ -623,12 +568,7 @@ export async function listVideoItems(
     return {
       items: VIDEO_GALLERY_ITEMS,
       ...emptyFacets(),
-      pagination: buildPagination(
-        1,
-        total,
-        total,
-        1,
-      ),
+      pagination: buildPagination(1, total, total, 1),
     };
   }
 }
@@ -696,7 +636,6 @@ export async function listCachedVideoItems(
 
   return listVideoItems(query, lang, opts);
 }
-
 
 // import { ACTIVITY_NEWS, type ActivityNewsItem, getActivityBySlug } from "@/data/activity-news";
 // import { PHOTO_GALLERY_ITEMS, type PhotoGalleryItem, VIDEO_GALLERY_ITEMS, type VideoGalleryItem } from "@/data/gallery-media";

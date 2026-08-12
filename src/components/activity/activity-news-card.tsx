@@ -61,7 +61,7 @@ export function ActivityNewsCard({
             {translated.title}
           </h3>
           <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
-            {stripHtmlTags(translated.excerpt)}
+            {stripHtmlTags(translated.excerpt).replace(/।\s*/g, "।\u00A0\u00A0")}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400">
             {t("common.readMore")}

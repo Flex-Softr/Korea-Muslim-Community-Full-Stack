@@ -6,7 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function stripHtmlTags(value: string) {
-  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()
+  const danda = String.fromCharCode(0x0964);
+  return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(new RegExp(danda, "g"), danda + " ").replace(/\s+/g, " ").trim()
 }
 
 export function cleanHtml(html: string): string {

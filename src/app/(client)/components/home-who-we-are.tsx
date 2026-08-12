@@ -84,11 +84,12 @@ export function HomeWhoWeAre() {
               {t("homeWhoWeAre.bodyAfterOrgName")}
             </p>
             <p className="mt-6 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {t("homeWhoWeAre.body3rdPara")}
-            </p>
-            <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
               {t("homeWhoWeAre.bodyInvite")}
             </p>
+            <p className="mt-6 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("homeWhoWeAre.body3rdPara")}
+            </p>
+            
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/about"
