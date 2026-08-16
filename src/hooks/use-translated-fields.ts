@@ -5,6 +5,7 @@ import {
   pickLocalizedFields,
   type LocaleContentMap,
 } from "@/lib/i18n/content-locale";
+import { stripHtmlTags } from "@/lib/utils";
 
 type Input = {
   locale?: string | null;
@@ -33,10 +34,12 @@ export function useTranslatedFields(content: Input): Output {
     ? pickLocalizedFields(content.localeContent, lang)
     : null;
 
-  const title = localized?.title?.trim() || content.title || "";
+  const rawTitle = localized?.title?.trim() || content.title || "";
+  const title = stripHtmlTags(rawTitle);
   const category = localized?.category?.trim() || content.category || "";
   const description = localized?.description || content.description || "";
-  const excerpt = localized?.description?.trim() || content.excerpt || description;
+  const rawExcerpt = localized?.description?.trim() || content.excerpt || description;
+  const excerpt = stripHtmlTags(rawExcerpt);
 
   return {
     title,

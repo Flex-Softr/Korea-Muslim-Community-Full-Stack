@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { blogPostPath, type StudentNewsPost } from "@/data/student-news";
 import { useTranslatedFields } from "@/hooks/use-translated-fields";
+import { stripHtmlTags } from "@/lib/utils";
 
 type BlogArchiveCardProps = {
   post: StudentNewsPost;
@@ -54,10 +55,10 @@ export function BlogArchiveCard({
             </Badge>
           </div>
           <h3 className="mt-2 text-base font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-lg dark:group-hover:text-sky-300">
-            {translated.title}
+            {stripHtmlTags(translated.title)}
           </h3>
           <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-            {translated.excerpt.replace(/<[^>]*>/g, "")}
+            {stripHtmlTags(translated.excerpt)}
           </p>
           <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[#2c7bb6] dark:text-sky-400">
             {t("common.readMore")}

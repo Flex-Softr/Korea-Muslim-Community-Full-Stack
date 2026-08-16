@@ -50,7 +50,7 @@ export function OurBlogSection({
   const featuredLocalized = featuredItem.localeContent
     ? pickLocalizedFields(featuredItem.localeContent, lang)
     : null;
-  const featuredTitle = featuredLocalized?.title || featuredItem.title;
+  const featuredTitle = stripHtmlTags(featuredLocalized?.title || featuredItem.title);
   const featuredExcerpt =
     featuredLocalized?.description?.trim() || featuredItem.excerpt;
   const featuredCategory = featuredLocalized?.category || featuredItem.category;
@@ -132,10 +132,7 @@ export function OurBlogSection({
                 </Link>
               </h3>
               <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                {stripHtmlTags(featuredExcerpt).replace(
-                  /।\s*/g,
-                  "।\u00A0\u00A0",
-                )}
+                {stripHtmlTags(featuredExcerpt)}
               </p>
               <Link
                 href={featuredHref}

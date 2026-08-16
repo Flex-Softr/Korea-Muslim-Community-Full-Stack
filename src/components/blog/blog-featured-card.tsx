@@ -7,7 +7,7 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { Badge } from "@/components/ui/badge";
 import { blogPostPath, type StudentNewsPost } from "@/data/student-news";
 import { useTranslatedFields } from "@/hooks/use-translated-fields";
-import { cn } from "@/lib/utils";
+import { cn, stripHtmlTags } from "@/lib/utils";
 
 type BlogFeaturedCardProps = {
   post: StudentNewsPost;
@@ -63,10 +63,10 @@ export function BlogFeaturedCard({ post, className }: BlogFeaturedCardProps) {
             </Badge>
           </div>
           <h2 className="mt-3 text-balance text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-3xl dark:group-hover:text-sky-300">
-            {translated.title}
+            {stripHtmlTags(translated.title)}
           </h2>
           <p className="mt-4 line-clamp-3 text-pretty text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
-            {translated.excerpt}
+            {stripHtmlTags(translated.excerpt)}
           </p>
           <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2c7bb6] dark:text-sky-400">
             {t("common.readArticle")}

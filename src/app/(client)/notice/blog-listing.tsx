@@ -42,12 +42,12 @@ export function BlogListing({
   const searchParamsString = searchParams?.toString() ?? "";
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    initialCategory
+    initialCategory,
   );
   const [selectedYear, setSelectedYear] = useState<number | null>(initialYear);
 
   const filtered = useMemo(() => {
-    return posts.filter((post) => {
+    return posts.filter(post => {
       if (selectedCategory != null && post.category !== selectedCategory) {
         return false;
       }
@@ -108,7 +108,7 @@ export function BlogListing({
         <ActivityCategoryFilter
           categories={years.map(String)}
           selectedCategory={selectedYear != null ? String(selectedYear) : null}
-          onSelectCategory={(year) =>
+          onSelectCategory={year =>
             setSelectedYear(year != null ? Number.parseInt(year, 10) : null)
           }
           title={t("blog.filterByYear")}
@@ -153,7 +153,7 @@ export function BlogListing({
 
         {pageItems.length > 0 && (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {pageItems.map((post) => (
+            {pageItems.map(post => (
               <li key={post.id} className="min-w-0">
                 <BlogArchiveCard post={post} imageSizes={GRID_IMAGE_SIZES} />
               </li>

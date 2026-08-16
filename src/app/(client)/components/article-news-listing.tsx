@@ -45,7 +45,7 @@ export function ArticleNewsListing({
 
         return {
           ...item,
-          title: localized?.title?.trim() || item.title,
+          title: stripHtmlTags(localized?.title?.trim() || item.title),
           category: localized?.category?.trim() || item.category,
           excerpt: localized?.description?.trim() || item.excerpt,
         };

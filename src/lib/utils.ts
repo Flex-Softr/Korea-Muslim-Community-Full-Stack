@@ -6,8 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function stripHtmlTags(value: string) {
-  const danda = String.fromCharCode(0x0964);
-  return value.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(new RegExp(danda, "g"), danda + " ").replace(/\s+/g, " ").trim()
+  const danda = String.fromCharCode(0x0964)
+  // Regular spaces after danda (।) collapse in Bangla fonts; NBSP keeps a visible gap.
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(new RegExp(`${danda}\\s*`, "g"), `${danda}\u00A0\u00A0`)
 }
 
 export function cleanHtml(html: string): string {

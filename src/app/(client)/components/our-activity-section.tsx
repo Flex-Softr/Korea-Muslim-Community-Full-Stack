@@ -53,7 +53,7 @@ export function OurActivitySection({
   const featuredLocalized = featuredItem.localeContent
     ? pickLocalizedFields(featuredItem.localeContent, lang)
     : null;
-  const featuredTitle = featuredLocalized?.title || featuredItem.title;
+  const featuredTitle = stripHtmlTags(featuredLocalized?.title || featuredItem.title);
   const featuredExcerpt =
     featuredLocalized?.description?.trim() || featuredItem.excerpt;
   const featuredCategory = featuredLocalized?.category || featuredItem.category;
@@ -136,10 +136,7 @@ export function OurActivitySection({
               </h3>
               <div className="mt-4 line-clamp-3 text-base leading-relaxed text-muted-foreground sm:line-clamp-4">
                 <p>
-                  {stripHtmlTags(featuredExcerpt).replace(
-                    /।\s*/g,
-                    "।\u00A0\u00A0",
-                  )}
+                  {stripHtmlTags(featuredExcerpt)}
                 </p>
               </div>
               <Link

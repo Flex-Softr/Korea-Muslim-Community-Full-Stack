@@ -58,7 +58,7 @@ export function BlogNewsCard({
             </Badge>
           </div>
           <h3 className="mt-2.5 line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[#2c7bb6] sm:text-lg">
-            {translated.title}
+            {stripHtmlTags(translated.title)}
           </h3>
           <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground sm:line-clamp-3">
             {stripHtmlTags(translated.excerpt)}
