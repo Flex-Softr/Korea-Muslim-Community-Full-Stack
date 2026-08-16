@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Calendar, ExternalLink, Tag } from "lucide-react";
 import { ParentModuleSidebar } from "@/components/layout/parent-module-sidebar";
 import { PageBanner } from "@/components/layout/page-banner";
 import { useI18n } from "@/components/providers/language-provider";
@@ -21,6 +21,7 @@ type Props = {
   category: string;
   localeContent: LocaleContentMap;
   coverImage: string | null;
+  videoUrl?: string | null;
   dateIso: string;
   initialLang: Lang;
 };
@@ -29,6 +30,7 @@ export function EpsDetailView({
   category,
   localeContent,
   coverImage,
+  videoUrl,
   dateIso,
   initialLang,
 }: Props) {
@@ -136,6 +138,20 @@ export function EpsDetailView({
                   No content available for this language.
                 </p>
               )}
+
+              {videoUrl && videoUrl.trim() ? (
+                <div className="mt-8">
+                  <a
+                    href={videoUrl.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#2c7bb6] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#256fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50"
+                  >
+                    Open Link
+                    <ExternalLink className="size-4" aria-hidden />
+                  </a>
+                </div>
+              ) : null}
 
               <p className="mt-12 text-sm text-muted-foreground">
                 <Link

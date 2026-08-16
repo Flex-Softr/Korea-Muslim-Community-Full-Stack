@@ -49,6 +49,7 @@ type ContentRow = {
   id: string;
   localeContent: LocaleContentMap;
   coverImage: string;
+  videoUrl?: string;
 };
 
 function richTextToPlainText(value: string): string {
@@ -127,6 +128,7 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
   const [editLocale, setEditLocale] = useState<ContentLocale>("en");
   const [localeContent, setLocaleContent] = useState<LocaleContentMap>(emptyLocaleContentMap());
   const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -191,6 +193,7 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
             sourceLocale: editLocale,
             localeContent,
             coverImage,
+            videoUrl: videoUrl.trim() || undefined,
           }),
         });
         if (!res.ok) {
@@ -202,6 +205,7 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
         // reset form
         setLocaleContent(emptyLocaleContentMap());
         setCoverImage(null);
+        setVideoUrl("");
         setEditLocale("en");
         
         // redirect
@@ -245,6 +249,16 @@ export function AddGenericContentPageForm({ type }: { type: GenericContentType }
           <div className="space-y-2">
             <Label>Image</Label>
             <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType={type} helperText="Upload image for this record." />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`${type}-video-url`}>External Link / URL (Optional)</Label>
+            <Input
+              id={`${type}-video-url`}
+              type="url"
+              placeholder="https://example.com"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+            />
           </div>
           {type === "other-page" ? (
             <>
@@ -323,6 +337,7 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
   const [editLocale, setEditLocale] = useState<ContentLocale>("en");
   const [localeContent, setLocaleContent] = useState<LocaleContentMap | null>(null);
   const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -352,6 +367,7 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
         if (cancelled) return;
         setLocaleContent(cloneLocaleMap(item.localeContent));
         setCoverImage(item.coverImage ?? null);
+        setVideoUrl(item.videoUrl ?? "");
         setCategories((categoryData.items ?? []).map((c) => c.name));
       } catch {
         if (!cancelled) notify(`Could not load ${config.label.toLowerCase()}.`, "error");
@@ -381,7 +397,7 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
         const res = await fetch(`${config.api}/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ localeContent, coverImage }),
+          body: JSON.stringify({ localeContent, coverImage, videoUrl: videoUrl.trim() || null }),
         });
         if (!res.ok) {
           notify(`Could not update ${config.label.toLowerCase()}.`, "error");
@@ -431,6 +447,16 @@ export function EditGenericContentPageForm({ type, id }: { type: GenericContentT
             <div className="space-y-2">
               <Label>Image</Label>
               <ImageUploader value={coverImage} onChange={setCoverImage} maxSizeMb={5} uploadType={type} helperText="Upload image for this record." />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`${type}-edit-video-url`}>External Link / URL (Optional)</Label>
+              <Input
+                id={`${type}-edit-video-url`}
+                type="url"
+                placeholder="https://example.com"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+              />
             </div>
             {type === "other-page" ? (
               <>

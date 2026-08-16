@@ -82,6 +82,7 @@ function DynamicTabContent({ category }: { category: string }) {
       id: string;
       title: string;
       image?: string;
+      link?: string | null;
     }>
   >([]);
   const [loading, setLoading] = useState(false);
@@ -128,39 +129,47 @@ function DynamicTabContent({ category }: { category: string }) {
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-      {items.map((item) => (
-        <Link
-          key={item.id}
-          href={`/eps/detail/${item.id}`}
-          className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2c7bb6]/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50"
-        >
-          <div className="relative aspect-video w-full overflow-hidden bg-muted">
-            {item.image && item.image !== "/brand/logo.png" ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.image}
-                alt={item.title}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-[#2c7bb6]/10 text-[#2c7bb6]">
-                <FileText className="size-8" aria-hidden />
-              </div>
-            )}
-            <div className="absolute inset-0 bg-[#2c7bb6]/0 transition-colors duration-200 group-hover:bg-[#2c7bb6]/10" />
-            <ArrowUpRight
-              className="absolute right-2 top-2 size-4 rounded-full bg-white/80 p-0.5 text-[#2c7bb6] opacity-0 shadow-sm transition-opacity duration-200 group-hover:opacity-100"
-              aria-hidden
-            />
-          </div>
+      {items.map((item) => {
+        const hasLink = Boolean(item.link && item.link.trim());
+        const targetHref = hasLink ? item.link!.trim() : `/eps/detail/${item.id}`;
+        const isExternal = hasLink && (targetHref.startsWith("http://") || targetHref.startsWith("https://") || targetHref.startsWith("//"));
 
-          <div className="flex flex-1 items-center px-3 py-2.5">
-            <span className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-[#2c7bb6]">
-              {item.title}
-            </span>
-          </div>
-        </Link>
-      ))}
+        return (
+          <Link
+            key={item.id}
+            href={targetHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2c7bb6]/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2c7bb6]/50"
+          >
+            <div className="relative aspect-video w-full overflow-hidden bg-muted">
+              {item.image && item.image !== "/brand/logo.png" ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-[#2c7bb6]/10 text-[#2c7bb6]">
+                  <FileText className="size-8" aria-hidden />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-[#2c7bb6]/0 transition-colors duration-200 group-hover:bg-[#2c7bb6]/10" />
+              <ArrowUpRight
+                className="absolute right-2 top-2 size-4 rounded-full bg-white/80 p-0.5 text-[#2c7bb6] opacity-0 shadow-sm transition-opacity duration-200 group-hover:opacity-100"
+                aria-hidden
+              />
+            </div>
+
+            <div className="flex flex-1 items-center px-3 py-2.5">
+              <span className="line-clamp-2 text-sm font-medium leading-snug text-foreground transition-colors group-hover:text-[#2c7bb6]">
+                {item.title}
+              </span>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

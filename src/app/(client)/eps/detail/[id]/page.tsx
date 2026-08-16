@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getDashboardOtherPageDataById } from "@/lib/dashboard/store";
 import { getRequestLang } from "@/lib/i18n/server-language";
@@ -34,6 +34,7 @@ export default async function EpsDetailPage({ params }: PageProps) {
       category={row.category}
       localeContent={row.localeContent}
       coverImage={row.coverImage ?? null}
+      videoUrl={row.videoUrl ?? null}
       dateIso={row.dateIso}
       initialLang={lang}
     />

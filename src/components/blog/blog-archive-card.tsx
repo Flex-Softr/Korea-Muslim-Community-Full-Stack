@@ -27,15 +27,13 @@ export function BlogArchiveCard({
     localeContent: post.localeContent,
   });
 
-   
-
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] transition-shadow hover:shadow-md dark:ring-white/5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-sm ring-1 ring-black/4 transition-shadow hover:shadow-md dark:ring-white/5">
       <Link
         href={blogPostPath(post.slug)}
         className="flex h-full min-h-0 flex-col"
       >
-        <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted">
+        <div className="relative aspect-16/10 w-full shrink-0 overflow-hidden bg-muted">
           <Image
             src={post.coverImage}
             alt=""

@@ -38,7 +38,8 @@ export function useTranslatedFields(content: Input): Output {
   const title = stripHtmlTags(rawTitle);
   const category = localized?.category?.trim() || content.category || "";
   const description = localized?.description || content.description || "";
-  const rawExcerpt = localized?.description?.trim() || content.excerpt || description;
+  const rawExcerpt =
+    localized?.description?.trim() || content.excerpt || description;
   const excerpt = stripHtmlTags(rawExcerpt);
 
   return {

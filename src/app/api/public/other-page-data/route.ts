@@ -29,6 +29,7 @@ export async function GET(request: Request) {
         category: fields.category || row.category,
         rawCategory: row.category,
         slug: row.slug,
+        link: row.videoUrl || null,
       };
     }),
     pagination: {
