@@ -22,7 +22,7 @@ export function OrganizationalMethodView() {
   );
 
   const active =
-    ORGANIZATIONAL_METHOD_SECTIONS.find((s) => s.id === activeId) ??
+    ORGANIZATIONAL_METHOD_SECTIONS.find(s => s.id === activeId) ??
     ORGANIZATIONAL_METHOD_SECTIONS[0];
 
   if (!active) return null;
@@ -39,7 +39,7 @@ export function OrganizationalMethodView() {
             className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-black/5 sm:p-5"
           >
             <ul className="flex flex-col gap-1">
-              {ORGANIZATIONAL_METHOD_SECTIONS.map((section) => {
+              {ORGANIZATIONAL_METHOD_SECTIONS.map(section => {
                 const label = getOrganizationalMethodTitle(section, lang);
                 const isActive = section.id === activeId;
                 return (
