@@ -45,14 +45,14 @@ const INTRO_LINKS: { href: string; labelKey: string }[] = [
     href: `/introduction/brief-introduction`,
     labelKey: "footer.linkIntroBriefIntroduction",
   },
-  {
-    href: `/introduction/constitution`,
-    labelKey: "footer.linkIntroConstitution",
-  },
-  {
-    href: `/introduction/organizational-method`,
-    labelKey: "footer.linkIntroOrganizationalMethod",
-  },
+  // {
+  //   href: `/introduction/constitution`,
+  //   labelKey: "footer.linkIntroConstitution",
+  // },
+  // {
+  //   href: `/introduction/organizational-method`,
+  //   labelKey: "footer.linkIntroOrganizationalMethod",
+  // },
   {
     href: `/introduction/policies`,
     labelKey: "footer.linkIntroPolicies",

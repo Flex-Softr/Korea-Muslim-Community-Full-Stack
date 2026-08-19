@@ -46,16 +46,16 @@ export const SITE_NAV: SiteNavItem[] = [
             href: "/introduction/brief-introduction",
             labelKey: "nav.briefIntroduction",
           },
-          {
-            kind: "link",
-            href: "/introduction/constitution",
-            labelKey: "nav.constitution",
-          },
-          {
-            kind: "link",
-            href: "/introduction/organizational-method",
-            labelKey: "nav.organizationalMethod",
-          },
+          // {
+          //   kind: "link",
+          //   href: "/introduction/constitution",
+          //   labelKey: "nav.constitution",
+          // },
+          // {
+          //   kind: "link",
+          //   href: "/introduction/organizational-method",
+          //   labelKey: "nav.organizationalMethod",
+          // },
           {
             kind: "link",
             href: "/introduction/policies",
